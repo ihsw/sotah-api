@@ -17,7 +17,7 @@ interface ISetupSettings {
 const setup = (): ISetupSettings => {
     const natsConnection = nats.connect({
         url: `nats://${process.env["NATS_HOST"]}:${process.env["NATS_PORT"]}`
-    })
+    });
 
     const app = getApp(natsConnection);
 
