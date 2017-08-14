@@ -1,0 +1,40 @@
+{
+  "name": "sotah-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "scripts": {
+    "test": "ava --verbose ./dist/test/*.js ./dist/test/**/*.js",
+    "test-coverage": "nyc --reporter=lcov --check-coverage --lines 95 --functions 95 --branches 95 npm test && nyc report",
+    "build": "tsc && echo built",
+    "ava": "ava --verbose",
+    "lint": "tslint ./src/**/*.ts && echo linted",
+    "coveralls-coverage": "nyc report --reporter=text-lcov | coveralls"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ihsw/sotah-api.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ihsw/sotah-api/issues"
+  },
+  "homepage": "https://github.com/ihsw/sotah-api#readme",
+  "devDependencies": {
+    "@types/express": "^4.0.36",
+    "@types/http-status": "^0.2.29",
+    "@types/supertest": "^2.0.2",
+    "ava": "^0.21.0",
+    "coveralls": "^2.13.1",
+    "nyc": "^11.1.0",
+    "supertest": "^3.0.0",
+    "tslint": "^5.6.0",
+    "typescript": "^2.4.2"
+  },
+  "dependencies": {
+    "express": "^4.15.4",
+    "http-status": "^1.0.1",
+    "nats": "^0.7.20"
+  }
+}
