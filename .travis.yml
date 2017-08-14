@@ -9,11 +9,15 @@ env:
   global:
   - APP_PORT=80
   - DOCKER_IMAGE_NAME=$TRAVIS_REPO_SLUG:$TRAVIS_COMMIT
+  - NATS_HOST=localhost
+  - NATS_PORT=4222
 before_install:
 - cd ./app
 install:
 - npm install -s
 - npm run -s build
+before_script:
+- docker run -d -p 4222:4222 nats
 script:
 - npm run -s lint
 - ./bin/run-tests-coverage
