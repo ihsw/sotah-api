@@ -1,15 +1,16 @@
 import * as express from "express";
-import * as nats from "nats";
+import { wrap } from "async-middleware";
 
-export default (natsConnection: nats.Client): express.Express => {
-    const app = express();
+import Messenger from "./messenger";
 
-    app.get("/", (_, res) => res.send("Hello, world!"));
-    app.get("/status", (_, res) => {
-        natsConnection.request("status", (natsMsg) => {
-            res.send(natsMsg);
-        });
-    });
+export default (messenger: Messenger): express.Express => {
+  const app = express();
 
-    return app;
+  app.get("/", (_, res) => res.send("Hello, world!"));
+  app.get("/status", wrap(async (_, res) => {
+    const status = await messenger.getStatus();
+    res.send(status).end();
+  }));
+
+  return app;
 };

@@ -33,6 +33,7 @@
     "typescript": "^2.4.2"
   },
   "dependencies": {
+    "async-middleware": "^1.2.1",
     "express": "^4.15.4",
     "http-status": "^1.0.1",
     "nats": "^0.7.20"
