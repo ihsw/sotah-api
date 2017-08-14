@@ -1,19 +1,27 @@
+import * as process from "process";
+
 import { test } from "ava";
 import * as supertest from "supertest";
 import * as HttpStatus from "http-status";
 import * as express from "express";
+import * as nats from "nats";
 
 import getApp from "../lib/app";
 
 interface ISetupSettings {
     request: supertest.SuperTest<supertest.Test>;
     app: express.Express;
+    natsConnection: nats.Client;
 }
 
 const setup = (): ISetupSettings => {
-    const app = getApp();
+    const natsConnection = nats.connect({
+        url: `nats://${process.env["NATS_HOST"]}:${process.env["NATS_PORT"]}`
+    })
 
-    return { app, request: supertest(app) };
+    const app = getApp(natsConnection);
+
+    return { natsConnection, app, request: supertest(app) };
 };
 
 test("Homepage Should return standard greeting", async (t) => {

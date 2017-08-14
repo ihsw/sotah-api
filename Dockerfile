@@ -1,3 +1,3 @@
 FROM node
 
-CMD ["node", "."]
+CMD ["./bin/run-app"]

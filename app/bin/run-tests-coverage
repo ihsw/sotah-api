@@ -1,0 +1,4 @@
+#! /bin/bash
+
+node ./dist/validate-environment.js \
+    && npm run -s test-coverage
