@@ -17,7 +17,7 @@ const setup = (): ISetupSettings => {
   return { messenger };
 };
 
-test.only("Messenger Should fetch regions", async (t) => {
+test("Messenger Should fetch regions", async (t) => {
   const { messenger } = setup();
 
   const regions = await messenger.getRegions();
