@@ -21,10 +21,10 @@ export default (messenger: Messenger): express.Express => {
 
     res.send(regions).end();
   }));
-  app.get("/status", wrap(async (_, res) => {
+  app.get("/status/:regionName", wrap(async (req, res) => {
     let status: string = "";
     try {
-      status = await messenger.getStatus("us");
+      status = await messenger.getStatus(req.params["regionName"]);
     } catch (err) {
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err.message).end();
 

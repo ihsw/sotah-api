@@ -12,15 +12,17 @@ import { IRegion } from "../lib/region";
 
 interface ISetupSettings {
   app: express.Express;
+  messenger: Messenger;
   request: supertest.SuperTest<supertest.Test>;
 }
 
 const setup = (): ISetupSettings => {
-  const app = getApp(new Messenger(nats.connect({
+  const messenger = new Messenger(nats.connect({
     url: `nats://${process.env["NATS_HOST"]}:${process.env["NATS_PORT"]}`
-  })));
+  }));
+  const app = getApp(messenger);
 
-  return { app, request: supertest(app) };
+  return { app, messenger, request: supertest(app) };
 };
 
 test("Homepage Should return standard greeting", async (t) => {
@@ -31,7 +33,7 @@ test("Homepage Should return standard greeting", async (t) => {
   t.is(res.text, "Hello, world!");
 });
 
-test.only("Regions Should return list of regions", async (t) => {
+test("Regions Should return list of regions", async (t) => {
   const { request } = setup();
 
   const tId = setTimeout(() => { throw new Error("Timed out!"); }, 5 * 1000);
@@ -44,12 +46,22 @@ test.only("Regions Should return list of regions", async (t) => {
   t.true(regions.length > 0);
 });
 
-test("Status Should return status information", async (t) => {
-  const { request } = setup();
+test.only("Status Should return status information", async (t) => {
+  const { request, messenger } = setup();
 
   const tId = setTimeout(() => { throw new Error("Timed out!"); }, 5 * 1000);
 
-  const res = await request.get("/status");
+  let regions: IRegion[] = [];
+  try {
+    regions = await messenger.getRegions();
+  } catch (err) {
+    t.fail(err.message);
+
+    return;
+  }
+  t.true(regions.length > 0);
+
+  const res = await request.get(`/status/${regions[0]}`);
   clearTimeout(tId);
 
   t.is(res.status, HttpStatus.OK, "Http status is OK");
