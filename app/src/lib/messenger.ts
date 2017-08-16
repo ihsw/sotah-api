@@ -45,7 +45,7 @@ export default class {
   }
 
   async getStatus(regionName: string): Promise<string> {
-    return this.request(subjects.status, JSON.stringify({ regionName: regionName }));
+    return this.request(subjects.status, JSON.stringify({ region_name: regionName }));
   }
 
   async getRegions(): Promise<IRegion[]> {
