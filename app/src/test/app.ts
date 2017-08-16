@@ -61,7 +61,7 @@ test.only("Status Should return status information", async (t) => {
   }
   t.true(regions.length > 0);
 
-  const res = await request.get(`/status/${regions[0]}`);
+  const res = await request.get(`/status/${regions[0].name}`);
   clearTimeout(tId);
 
   t.is(res.status, HttpStatus.OK, "Http status is OK");
