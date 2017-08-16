@@ -39,5 +39,4 @@ test.only("Status Should return status information", async (t) => {
   clearTimeout(tId);
 
   t.is(res.status, HttpStatus.OK, "Http status is OK");
-  console.log(res.body);
 });
