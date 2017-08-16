@@ -6,7 +6,7 @@ import * as nats from "nats";
 import Messenger from "../lib/messenger";
 
 interface ISetupSettings {
-    messenger: Messenger
+  messenger: Messenger;
 }
 
 const setup = (): ISetupSettings => {

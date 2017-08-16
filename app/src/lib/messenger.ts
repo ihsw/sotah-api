@@ -9,7 +9,7 @@ enum subjects {
   regions = "regions"
 }
 
-export interface message {
+export interface IMessage {
   data: string;
   error: string;
 }
@@ -32,7 +32,7 @@ export default class {
       this.client.request(subject, body, (msg: string) => {
         clearTimeout(tId);
 
-        const parsedMsg: message = JSON.parse(msg);
+        const parsedMsg: IMessage = JSON.parse(msg);
         if (parsedMsg.error.length > 0) {
           reject(new Error(parsedMsg.error));
 
