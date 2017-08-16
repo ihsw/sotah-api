@@ -46,7 +46,7 @@ test("Regions Should return list of regions", async (t) => {
   t.true(regions.length > 0);
 });
 
-test.only("Status Should return status information", async (t) => {
+test("Status Should return status information", async (t) => {
   const { request, messenger } = setup();
 
   const tId = setTimeout(() => { throw new Error("Timed out!"); }, 5 * 1000);
@@ -65,5 +65,4 @@ test.only("Status Should return status information", async (t) => {
   clearTimeout(tId);
 
   t.is(res.status, HttpStatus.OK, "Http status is OK");
-  console.log("res.text", res.text);
 });
