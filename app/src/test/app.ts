@@ -8,6 +8,7 @@ import * as nats from "nats";
 
 import getApp from "../lib/app";
 import Messenger from "../lib/messenger";
+import { IRegion } from "../lib/region";
 
 interface ISetupSettings {
   app: express.Express;
@@ -28,6 +29,19 @@ test("Homepage Should return standard greeting", async (t) => {
   const res = await request.get("/");
   t.is(res.status, HttpStatus.OK);
   t.is(res.text, "Hello, world!");
+});
+
+test.only("Regions Should return list of regions", async (t) => {
+  const { request } = setup();
+
+  const tId = setTimeout(() => { throw new Error("Timed out!"); }, 5 * 1000);
+
+  const res = await request.get("/regions");
+  clearTimeout(tId);
+
+  t.is(res.status, HttpStatus.OK, "Http status is OK");
+  const regions: IRegion[] = res.body;
+  t.true(regions.length > 0);
 });
 
 test("Status Should return status information", async (t) => {
