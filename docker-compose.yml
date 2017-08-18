@@ -11,7 +11,7 @@ services:
     - nats
     volumes:
     - ./app/test-fixtures/config.json:/tmp/config.json
-    command: -config /tmp/config.json -nats_host nats
+    command: -c /tmp/config.json -h nats
     environment:
     - API_KEY=$API_KEY
   sotah-api:
