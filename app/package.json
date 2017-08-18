@@ -5,11 +5,12 @@
   "main": "./dist/index.js",
   "scripts": {
     "test": "ava --verbose ./dist/test/*.js ./dist/test/**/*.js",
-    "test-coverage": "nyc --reporter=lcov --check-coverage --lines 95 --functions 95 --branches 95 npm test && nyc report",
+    "test-coverage": "nyc --reporter=lcov npm test",
+    "test-coverage-check": "nyc check-coverage --lines 95 --functions 95 --branches 95",
+    "coveralls-coverage": "nyc report --reporter=text-lcov | coveralls",
     "build": "tsc && echo built",
     "ava": "ava --verbose",
-    "lint": "tslint ./src/**/*.ts && echo linted",
-    "coveralls-coverage": "nyc report --reporter=text-lcov | coveralls"
+    "lint": "tslint ./src/**/*.ts && echo linted"
   },
   "repository": {
     "type": "git",
