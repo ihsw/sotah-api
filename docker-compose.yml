@@ -11,7 +11,9 @@ services:
     - nats
     volumes:
     - ./app/test-fixtures/config.json:/tmp/config.json
-    command: -config /tmp/config.json -nats_host nats -nats_port 4222
+    command: -config /tmp/config.json -nats_host nats
+    environment:
+    - API_KEY=$API_KEY
   sotah-api:
     build: .
     depends_on:
