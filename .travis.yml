@@ -20,6 +20,6 @@ before_script:
 - cd ../ && docker-compose up -d sotah-server
 script:
 - cd ./app && npm run -s lint && ./bin/run-tests-coverage && npm run -s coveralls-coverage
-- npm run -s test-coverage-check
+- npm run -s test-coverage-report && npm run -s test-coverage-check
 - cd ../ && docker build -t $DOCKER_IMAGE_NAME .
 
