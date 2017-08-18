@@ -5,7 +5,7 @@
   "main": "./dist/index.js",
   "scripts": {
     "test": "ava --verbose ./dist/test/*.js ./dist/test/**/*.js",
-    "test-coverage": "nyc --reporter=lcov --check-coverage --lines 75 --functions 50 --branches 95 npm test && nyc report",
+    "test-coverage": "nyc --reporter=lcov --check-coverage --lines 95 --functions 95 --branches 95 npm test && nyc report",
     "build": "tsc && echo built",
     "ava": "ava --verbose",
     "lint": "tslint ./src/**/*.ts && echo linted",
@@ -37,5 +37,9 @@
     "express": "^4.15.4",
     "http-status": "^1.0.1",
     "nats": "^0.7.20"
+  },
+  "nyc": {
+    "exclude": [
+    ]
   }
 }
