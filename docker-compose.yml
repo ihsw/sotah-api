@@ -9,6 +9,9 @@ services:
     image: ihsw/sotah-server
     depends_on:
     - nats
+    volumes:
+    - ./app/test-fixtures/config.json:/tmp/config.json
+    command: -config /tmp/config.json -nats_host nats -p 4222
   sotah-api:
     build: .
     depends_on:
