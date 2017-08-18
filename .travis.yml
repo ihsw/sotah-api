@@ -18,6 +18,7 @@ install:
 - npm run -s build
 before_script:
 - docker run -d -p 4222:4222 nats
+- docker run -d -v ./test-fixtures/config.json:/tmp/config.json ihsw/sotah-server -config /tmp/config.json -nats_host localhost -nats_port 4222
 script:
 - npm run -s lint
 - ./bin/run-tests-coverage
