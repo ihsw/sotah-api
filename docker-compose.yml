@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  nats:
+    image: nats
+    ports:
+    - "4222:4222"
+  sotah-server:
+    image: ihsw/sotah-server
+    depends_on:
+    - nats
+  sotah-api:
+    build: .
+    depends_on:
+    - sotah-server
