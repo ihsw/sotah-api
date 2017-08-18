@@ -22,3 +22,5 @@ services:
     environment:
     - NATS_HOST=nats
     - NATS_PORT=4222
+    volumes:
+    - ./app:/srv/app
