@@ -18,3 +18,7 @@ services:
     build: .
     depends_on:
     - sotah-server
+    - nats
+    environment:
+    - NATS_HOST=nats
+    - NATS_PORT=4222
