@@ -66,3 +66,14 @@ test("Status Should return status information", async (t) => {
 
   t.is(res.status, HttpStatus.OK, "Http status is OK");
 });
+
+test("Status Should return 404 on invalid region name", async (t) => {
+  const { request } = setup();
+
+  const tId = setTimeout(() => { throw new Error("Timed out!"); }, 5 * 1000);
+
+  const res = await request.get("/status/fdsfgs");
+  clearTimeout(tId);
+
+  t.is(res.status, HttpStatus.NOT_FOUND, "Http status is NOT_FOUND");
+});

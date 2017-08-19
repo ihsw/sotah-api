@@ -14,7 +14,7 @@ export enum code {
 
 export class Message {
   error: Error | null;
-  data: any;
+  data: object | null;
   code: code;
 
   constructor(msg: IMessage) {
@@ -23,7 +23,10 @@ export class Message {
       this.error = new Error(msg.error);
     }
 
-    this.data = JSON.parse(msg.data);
+    this.data = null;
+    if (msg.data.length > 0) {
+      this.data = JSON.parse(msg.data);
+    }
     this.code = code[msg.code.toString()];
   }
 }
