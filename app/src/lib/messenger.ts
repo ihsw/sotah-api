@@ -8,13 +8,15 @@ enum subjects {
 }
 
 export enum code {
-  ok = "1",
-  not_found = "-1"
+  ok = 1,
+  genericError = -1,
+  msgJsonParseError = -2,
+  notFound = -3
 }
 
 export class Message {
   error: Error | null;
-  data: object | null;
+  data: any;
   code: code;
 
   constructor(msg: IMessage) {
@@ -23,11 +25,12 @@ export class Message {
       this.error = new Error(msg.error);
     }
 
-    this.data = null;
+    this.data = {};
     if (msg.data.length > 0) {
       this.data = JSON.parse(msg.data);
     }
-    this.code = code[msg.code.toString()];
+
+    this.code = msg.code;
   }
 }
 
@@ -57,7 +60,7 @@ export default class {
 
         const parsedMsg: IMessage = JSON.parse(natsMsg);
         const msg = new Message(parsedMsg);
-        if (msg.error) {
+        if (msg.error !== null && msg.code === code.genericError) {
           reject(msg.error);
 
           return;

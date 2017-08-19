@@ -15,7 +15,7 @@ export default (messenger: Messenger): express.Express => {
   }));
   app.get("/status/:regionName", wrap(async (req, res) => {
     const msg = await messenger.getStatus(req.params["regionName"]);
-    if (msg.code === code.not_found) {
+    if (msg.code === code.notFound) {
       res.status(HttpStatus.NOT_FOUND).end();
 
       return;
