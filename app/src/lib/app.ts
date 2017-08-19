@@ -26,7 +26,7 @@ export default (messenger: Messenger): express.Express => {
   }));
   app.get("/internal-error", () => {
     throw new Error("Test error!");
-  })
+  });
   app.use((err: Error, _: express.Request, res: express.Response, next: Function) => {
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err.message);
     next();
