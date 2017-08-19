@@ -4,6 +4,7 @@ import { test } from "ava";
 import * as nats from "nats";
 
 import Messenger from "../lib/messenger";
+import { IRegion } from "../lib/region";
 
 interface ISetupSettings {
   messenger: Messenger;
@@ -20,6 +21,6 @@ const setup = (): ISetupSettings => {
 test("Messenger Should fetch regions", async (t) => {
   const { messenger } = setup();
 
-  const regions = await messenger.getRegions();
+  const regions: IRegion[] = (await messenger.getRegions()).data;
   t.true(regions.length > 0);
 });

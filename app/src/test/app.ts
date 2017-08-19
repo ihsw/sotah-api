@@ -53,7 +53,7 @@ test("Status Should return status information", async (t) => {
 
   let regions: IRegion[] = [];
   try {
-    regions = await messenger.getRegions();
+    regions = (await messenger.getRegions()).data;
   } catch (err) {
     t.fail(err.message);
 
