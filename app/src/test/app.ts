@@ -77,3 +77,10 @@ test("Status Should return 404 on invalid region name", async (t) => {
 
   t.is(res.status, HttpStatus.NOT_FOUND, "Http status is NOT_FOUND");
 });
+
+test("Internal-error Should return 500", async (t) => {
+  const { request } = setup();
+
+  const res = await request.get("/internal-error");
+  t.is(res.status, HttpStatus.INTERNAL_SERVER_ERROR, "Http status is NOT_FOUND");
+});
