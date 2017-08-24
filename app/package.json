@@ -7,7 +7,7 @@
     "test": "ava --verbose ./dist/test/*.js ./dist/test/**/*.js",
     "test-coverage": "nyc --reporter=lcov npm test",
     "test-coverage-report": "nyc report",
-    "test-coverage-check": "nyc check-coverage --lines 95 --functions 95 --branches 95",
+    "test-coverage-check": "nyc check-coverage --lines 95 --functions 75 --branches 95",
     "coveralls-coverage": "nyc report --reporter=text-lcov | coveralls",
     "build": "tsc && echo built",
     "ava": "ava --verbose",
