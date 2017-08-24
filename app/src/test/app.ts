@@ -51,14 +51,7 @@ test("Status Should return status information", async (t) => {
 
   const tId = setTimeout(() => { throw new Error("Timed out!"); }, 5 * 1000);
 
-  let regions: IRegion[] = [];
-  try {
-    regions = (await messenger.getRegions()).data;
-  } catch (err) {
-    t.fail(err.message);
-
-    return;
-  }
+  const regions = (await messenger.getRegions()).data;
   t.true(regions.length > 0);
 
   const res = await request.get(`/status/${regions[0].name}`);
