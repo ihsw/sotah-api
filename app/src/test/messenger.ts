@@ -29,7 +29,7 @@ test("Messenger Should throw error when requesting from generic test errors queu
   const { messenger } = setup();
 
   try {
-    await messenger.request(subjects.genericTestErrors)
+    await messenger.request(subjects.genericTestErrors);
   } catch (err) {
     t.true(err instanceof MessageError);
     t.is(code.genericError, (<MessageError>err).code);
