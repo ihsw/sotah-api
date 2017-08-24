@@ -33,9 +33,5 @@ test("Messenger Should throw error when requesting from generic test errors queu
   } catch (err) {
     t.true(err instanceof MessageError);
     t.is(code.genericError, (<MessageError>err).code);
-
-    return;
   }
-
-  t.fail();
 });
