@@ -2,9 +2,10 @@ import * as nats from "nats";
 
 const DEFAULT_TIMEOUT = 2.5 * 1000;
 
-enum subjects {
+export enum subjects {
   status = "status",
-  regions = "regions"
+  regions = "regions",
+  genericTestErrors = "genericTestErrors"
 }
 
 export enum code {
@@ -12,6 +13,16 @@ export enum code {
   genericError = -1,
   msgJsonParseError = -2,
   notFound = -3
+}
+
+export class MessageError {
+  message: string;
+  code: code;
+
+  constructor(message: string, code: code) {
+    this.message = message;
+    this.code = code;
+  }
 }
 
 export class Message {
@@ -61,7 +72,7 @@ export default class {
         const parsedMsg: IMessage = JSON.parse(natsMsg);
         const msg = new Message(parsedMsg);
         if (msg.error !== null && msg.code === code.genericError) {
-          reject(msg.error);
+          reject(new MessageError(msg.error.message, msg.code));
 
           return;
         }
