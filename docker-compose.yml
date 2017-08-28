@@ -10,10 +10,11 @@ services:
     depends_on:
     - nats
     volumes:
-    - ./app/test-fixtures/config.json:/tmp/config.json
-    command: -c /tmp/config.json -h nats
+    - ./app/test-fixtures:/tmp/fixtures
+    command: -c /tmp/fixtures/config.json api-test -d /tmp/fixtures
     environment:
     - API_KEY=$API_KEY
+    - NATS_HOST=nats
   sotah-api:
     build: .
     depends_on:
