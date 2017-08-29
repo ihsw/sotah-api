@@ -1,5 +1,7 @@
 import * as nats from "nats";
 
+import { regionName, IRegion } from "./region";
+
 const DEFAULT_TIMEOUT = 2.5 * 1000;
 
 export enum subjects {
@@ -25,9 +27,9 @@ export class MessageError {
   }
 }
 
-export class Message {
+export class Message<T> {
   error: Error | null;
-  data: any;
+  data: T;
   code: code;
 
   constructor(msg: IMessage) {
@@ -36,7 +38,7 @@ export class Message {
       this.error = new Error(msg.error);
     }
 
-    this.data = {};
+    this.data = <T>{};
     if (msg.data.length > 0) {
       this.data = JSON.parse(msg.data);
     }
@@ -58,8 +60,8 @@ export default class {
     this.client = client;
   }
 
-  request(subject: string, body?: string): Promise<Message> {
-    return new Promise<Message>((resolve, reject) => {
+  request<T>(subject: string, body?: string): Promise<Message<T>> {
+    return new Promise<Message<T>>((resolve, reject) => {
       const tId = setTimeout(() => reject(new Error("Timed out!")), DEFAULT_TIMEOUT);
 
       if (!body) {
@@ -70,7 +72,7 @@ export default class {
         clearTimeout(tId);
 
         const parsedMsg: IMessage = JSON.parse(natsMsg);
-        const msg = new Message(parsedMsg);
+        const msg = new Message<T>(parsedMsg);
         if (msg.error !== null && msg.code === code.genericError) {
           reject(new MessageError(msg.error.message, msg.code));
 
@@ -82,11 +84,11 @@ export default class {
     });
   }
 
-  getStatus(regionName: string): Promise<Message> {
-    return this.request(subjects.status, JSON.stringify({ region_name: regionName }));
+  getStatus(name: regionName): Promise<Message<IRegion[]>> {
+    return this.request(subjects.status, JSON.stringify({ region_name: name }));
   }
 
-  getRegions(): Promise<Message> {
+  getRegions(): Promise<Message<IRegion[]>> {
     return this.request(subjects.regions);
   }
 }

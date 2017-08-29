@@ -1,4 +1,6 @@
+export type regionName = string;
+
 export interface IRegion {
-    name: string;
+    name: regionName;
     hostname: string;
 }
