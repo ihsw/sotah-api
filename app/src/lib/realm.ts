@@ -1,4 +1,4 @@
-type realmSlug = string;
+export type realmSlug = string;
 
 export interface IRealm {
   type: string;
