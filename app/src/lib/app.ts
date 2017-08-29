@@ -3,15 +3,14 @@ import { wrap } from "async-middleware";
 import * as HttpStatus from "http-status";
 
 import { default as Messenger, code } from "./messenger";
-import { IRegion } from "./region";
 
 export default (messenger: Messenger): express.Express => {
   const app = express();
 
   app.get("/", (_, res) => res.send("Hello, world!"));
   app.get("/regions", wrap(async (_, res) => {
-    const regions: IRegion[] = (await messenger.getRegions()).data;
-    res.send(regions).end();
+    const msg = await messenger.getRegions();
+    res.send(msg.data).end();
   }));
   app.get("/status/:regionName", wrap(async (req, res) => {
     const msg = await messenger.getStatus(req.params["regionName"]);
@@ -21,8 +20,7 @@ export default (messenger: Messenger): express.Express => {
       return;
     }
 
-    const status = msg.data;
-    res.send(status).end();
+    res.send(msg.data).end();
   }));
   app.get("/internal-error", () => {
     throw new Error("Test error!");
