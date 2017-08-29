@@ -1,13 +1,16 @@
 import * as nats from "nats";
 
-import { regionName, IRegion } from "./region";
+import { regionName, IRegion, IStatus } from "./region";
+import { realmSlug } from "./realm";
+import { IAuctions } from "./auction";
 
 const DEFAULT_TIMEOUT = 2.5 * 1000;
 
 export enum subjects {
   status = "status",
   regions = "regions",
-  genericTestErrors = "genericTestErrors"
+  genericTestErrors = "genericTestErrors",
+  auctions = "auctions"
 }
 
 export enum code {
@@ -84,11 +87,18 @@ export default class {
     });
   }
 
-  getStatus(name: regionName): Promise<Message<IRegion[]>> {
-    return this.request(subjects.status, JSON.stringify({ region_name: name }));
+  getStatus(regionName: regionName): Promise<Message<IStatus>> {
+    return this.request(subjects.status, JSON.stringify({ region_name: regionName }));
   }
 
   getRegions(): Promise<Message<IRegion[]>> {
     return this.request(subjects.regions);
+  }
+
+  getAuctions(regionName: regionName, realmSlug: realmSlug): Promise<Message<IAuctions>> {
+    return this.request(
+      subjects.auctions,
+      JSON.stringify({ region_name: regionName, realm_slug: realmSlug })
+    );
   }
 }

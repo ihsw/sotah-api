@@ -38,3 +38,13 @@ test("Messenger Should throw error when requesting from generic test errors queu
 
   t.fail();
 });
+
+test("Messenger Should fetch region statuses", async (t) => {
+  const { messenger } = setup();
+
+  const regions = (await messenger.getRegions()).data;
+  t.true(regions.length > 0);
+
+  const status = (await messenger.getStatus(regions[0].name)).data;
+  t.true(status.realms.length > 0);
+});
