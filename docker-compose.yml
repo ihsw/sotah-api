@@ -11,7 +11,7 @@ services:
     - nats
     volumes:
     - ./app/test-fixtures:/tmp/fixtures
-    command: -c /tmp/fixtures/config.json api-test -d /tmp/fixtures
+    command: -c /tmp/fixtures/config.json -v debug api-test -d /tmp/fixtures
     environment:
     - API_KEY=$API_KEY
     - NATS_HOST=nats
