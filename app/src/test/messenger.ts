@@ -50,12 +50,8 @@ test("Messenger Should fetch region statuses", async (t) => {
 test("Messenger Should fetch auctions", async (t) => {
   const { messenger } = setup();
 
-  const regions = (await messenger.getRegions()).data;
-  for (const reg of regions) {
-    const status = (await messenger.getStatus(reg.name)).data;
-    for (const rea of status.realms) {
-      const auctions = (await messenger.getAuctions(reg.name, rea.slug)).data;
-      t.true(auctions.auctions.length > 0);
-    }
-  }
+  const [reg] = (await messenger.getRegions()).data;
+  const { realms } = (await messenger.getStatus(reg.name)).data;
+  const auctions = (await messenger.getAuctions(reg.name, realms[0].slug)).data;
+  t.true(auctions.auctions.length > 0);
 });
