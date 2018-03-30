@@ -56,7 +56,7 @@ interface IMessage {
   code: number;
 }
 
-export default class {
+export class Messenger {
   client: nats.Client;
 
   constructor(client: nats.Client) {

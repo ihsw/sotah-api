@@ -2,9 +2,9 @@ import * as express from "express";
 import { wrap } from "async-middleware";
 import * as HttpStatus from "http-status";
 
-import { default as Messenger, code } from "./messenger";
+import { Messenger, code } from "./messenger";
 
-export default (messenger: Messenger): express.Express => {
+export const getApp = (messenger: Messenger): express.Express => {
   const app = express();
 
   app.get("/", (_, res) => res.send("Hello, world!"));

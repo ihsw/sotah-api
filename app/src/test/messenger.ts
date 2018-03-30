@@ -3,7 +3,7 @@ import * as process from "process";
 import { test } from "ava";
 import * as nats from "nats";
 
-import { default as Messenger, MessageError, subjects, code } from "../lib/messenger";
+import { Messenger, MessageError, subjects, code } from "../lib/messenger";
 
 interface ISetupSettings {
   messenger: Messenger;

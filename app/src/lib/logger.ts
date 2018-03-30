@@ -1,5 +1,5 @@
 import { Logger, LoggerInstance, transports } from "winston";
 
-export default (): LoggerInstance => {
+export const getLogger = (): LoggerInstance => {
   return new Logger({ transports: [new transports.Console()] });
 };

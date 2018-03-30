@@ -6,8 +6,8 @@ import * as HttpStatus from "http-status";
 import * as express from "express";
 import * as nats from "nats";
 
-import getApp from "../lib/app";
-import Messenger from "../lib/messenger";
+import { getApp } from "../lib/app";
+import { Messenger } from "../lib/messenger";
 import { IRegion } from "../lib/region";
 
 interface ISetupSettings {
