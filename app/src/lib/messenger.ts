@@ -20,10 +20,15 @@ export enum code {
   notFound = -3
 }
 
-export type MessageError = {
-  message: string,
-  code: code
-};
+export class MessageError {
+  message: string;
+  code: code;
+
+  constructor(message: string, code: code) {
+    this.message = message;
+    this.code = code;
+  }
+}
 
 export class Message<T> {
   error: Error | null;
@@ -72,7 +77,7 @@ export class Messenger {
         const parsedMsg: IMessage = JSON.parse(natsMsg);
         const msg = new Message<T>(parsedMsg);
         if (msg.error !== null && msg.code === code.genericError) {
-          reject({message: msg.error.message, code: msg.code});
+          reject(new MessageError(msg.error.message, msg.code));
 
           return;
         }
