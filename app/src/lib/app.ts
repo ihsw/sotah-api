@@ -7,6 +7,11 @@ import { Messenger, code } from "./messenger";
 export const getApp = (messenger: Messenger): express.Express => {
   const app = express();
 
+  app.use((_, res, next) => {
+    res.set("access-control-allow-origin", "*");
+    next();
+  });
+
   app.get("/", (_, res) => res.send("Hello, world!"));
   app.get("/ping", (_, res) => res.send("Pong!"));
   app.get("/regions", wrap(async (_, res) => {
