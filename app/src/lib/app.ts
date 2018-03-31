@@ -8,6 +8,7 @@ export const getApp = (messenger: Messenger): express.Express => {
   const app = express();
 
   app.get("/", (_, res) => res.send("Hello, world!"));
+  app.get("/ping", (_, res) => res.send("Pong!"));
   app.get("/regions", wrap(async (_, res) => {
     const msg = await messenger.getRegions();
     res.send(msg.data).end();
