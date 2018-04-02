@@ -1,4 +1,5 @@
 import * as nats from "nats";
+import { LoggerInstance } from "winston";
 
 import { regionName, IRegion, IStatus } from "./region";
 import { realmSlug } from "./realm";
@@ -58,9 +59,11 @@ interface IMessage {
 
 export class Messenger {
   client: nats.Client;
+  logger: LoggerInstance;
 
-  constructor(client: nats.Client) {
+  constructor(client: nats.Client, logger: LoggerInstance) {
     this.client = client;
+    this.logger = logger;
   }
 
   request<T>(subject: string, body?: string): Promise<Message<T>> {
@@ -71,8 +74,10 @@ export class Messenger {
         body = "";
       }
 
+      this.logger.info("Sending messenger request", {subject, body});
       this.client.request(subject, body, (natsMsg: string) => {
         clearTimeout(tId);
+        this.logger.info("Received messenger response", {subject, natsMsg});
 
         const parsedMsg: IMessage = JSON.parse(natsMsg);
         const msg = new Message<T>(parsedMsg);

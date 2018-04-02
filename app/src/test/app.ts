@@ -9,6 +9,7 @@ import * as nats from "nats";
 import { getApp } from "../lib/app";
 import { Messenger } from "../lib/messenger";
 import { IRegion } from "../lib/region";
+import { getLogger } from "../lib/logger";
 
 interface ISetupSettings {
   app: express.Express;
@@ -17,10 +18,11 @@ interface ISetupSettings {
 }
 
 const setup = (): ISetupSettings => {
+  const logger = getLogger();
   const messenger = new Messenger(nats.connect({
     url: `nats://${process.env["NATS_HOST"]}:${process.env["NATS_PORT"]}`
-  }));
-  const app = getApp(messenger);
+  }), logger);
+  const app = getApp(messenger, logger);
 
   return { app, messenger, request: supertest(app) };
 };

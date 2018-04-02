@@ -4,6 +4,7 @@ import { test } from "ava";
 import * as nats from "nats";
 
 import { Messenger, MessageError, subjects, code } from "../lib/messenger";
+import { getLogger } from "../lib/logger";
 
 interface ISetupSettings {
   messenger: Messenger;
@@ -12,7 +13,7 @@ interface ISetupSettings {
 const setup = (): ISetupSettings => {
   const messenger = new Messenger(nats.connect({
     url: `nats://${process.env["NATS_HOST"]}:${process.env["NATS_PORT"]}`
-  }));
+  }), getLogger());
 
   return { messenger };
 };

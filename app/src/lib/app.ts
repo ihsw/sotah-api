@@ -1,13 +1,16 @@
 import * as express from "express";
 import { wrap } from "async-middleware";
 import * as HttpStatus from "http-status";
+import { LoggerInstance } from "winston";
 
 import { Messenger, code } from "./messenger";
 
-export const getApp = (messenger: Messenger): express.Express => {
+export const getApp = (messenger: Messenger, logger: LoggerInstance): express.Express => {
   const app = express();
 
   app.use((_, res, next) => {
+    logger.info("Received HTTP request");
+
     res.set("access-control-allow-origin", "*");
     next();
   });

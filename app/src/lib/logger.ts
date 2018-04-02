@@ -1,5 +1,5 @@
-import { Logger, LoggerInstance, transports } from "winston";
+import { Logger, LoggerInstance, transports, NPMLoggingLevel } from "winston";
 
-export const getLogger = (): LoggerInstance => {
-  return new Logger({ transports: [new transports.Console()] });
+export const getLogger = (level: NPMLoggingLevel = "warn"): LoggerInstance => {
+  return new Logger({ transports: [new transports.Console({level})] });
 };
