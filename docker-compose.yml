@@ -1,6 +1,8 @@
 version: "2"
 
 services:
+  db:
+    image: postgres
   nats:
     image: nats
     ports:
@@ -22,8 +24,10 @@ services:
     depends_on:
     - sotah-server
     - nats
+    - db
     environment:
     - NATS_HOST=nats
     - NATS_PORT=4222
+    - DB_HOST=db
     volumes:
     - ./app:/srv/app

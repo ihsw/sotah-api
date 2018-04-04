@@ -1,39 +1,40 @@
 import * as express from "express";
-import { wrap } from "async-middleware";
 import * as HttpStatus from "http-status";
+import * as nats from "nats";
 import { LoggerInstance } from "winston";
 
-import { Messenger, code } from "./messenger";
+import { Messenger } from "./messenger";
+import { defaultRouter, getDataRouter } from "../routes";
 
-export const getApp = (messenger: Messenger, logger: LoggerInstance): express.Express => {
+type Options = {
+  logger: LoggerInstance
+  natsHost: string
+  natsPort: string
+};
+
+export const getApp = (opts: Options): express.Express => {
+  const { logger, natsHost, natsPort } = opts;
+
+  // express init
   const app = express();
+  app.use(express.json());
 
+  // messenger init
+  const messenger = new Messenger(nats.connect({ url: `nats://${natsHost}:${natsPort}` }), logger);
+
+  // request logging
   app.use((req, res, next) => {
-    logger.info("Received HTTP request", {url: req.originalUrl});
+    logger.info("Received HTTP request", { url: req.originalUrl });
 
     res.set("access-control-allow-origin", "*");
     next();
   });
 
-  app.get("/", (_, res) => res.send("Hello, world!"));
-  app.get("/ping", (_, res) => res.send("Pong!"));
-  app.get("/regions", wrap(async (_, res) => {
-    const msg = await messenger.getRegions();
-    res.send(msg.data).end();
-  }));
-  app.get("/status/:regionName", wrap(async (req, res) => {
-    const msg = await messenger.getStatus(req.params["regionName"]);
-    if (msg.code === code.notFound) {
-      res.status(HttpStatus.NOT_FOUND).end();
+  // route init
+  app.use("/", defaultRouter);
+  app.use("/", getDataRouter(messenger));
 
-      return;
-    }
-
-    res.send(msg.data).end();
-  }));
-  app.get("/internal-error", () => {
-    throw new Error("Test error!");
-  });
+  // error handler
   app.use((err: Error, _: express.Request, res: express.Response, next: Function) => {
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err.message);
     next();

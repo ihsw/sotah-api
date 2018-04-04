@@ -1,15 +1,15 @@
-import * as nats from "nats";
+import * as process from "process";
 
 import { getApp } from "./lib/app";
-import { Messenger } from "./lib/messenger";
 import { getLogger } from "./lib/logger";
 
+// logger init
 const logger = getLogger("info");
 
-const messenger = new Messenger(nats.connect({
-  url: `nats://${process.env["NATS_HOST"]}:${process.env["NATS_PORT"]}`
-}), logger);
-const app = getApp(messenger, logger);
+// app init
+const natsHost = process.env["NATS_HOST"] || "";
+const natsPort = process.env["NATS_PORT"] || "";
+const app = getApp({ logger, natsHost, natsPort });
 
 const appPort = process.env["APP_PORT"];
 const server = app.listen(appPort, () => logger.info(`Listening on ${appPort}`));

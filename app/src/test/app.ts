@@ -19,10 +19,12 @@ interface ISetupSettings {
 
 const setup = (): ISetupSettings => {
   const logger = getLogger();
-  const messenger = new Messenger(nats.connect({
-    url: `nats://${process.env["NATS_HOST"]}:${process.env["NATS_PORT"]}`
-  }), logger);
-  const app = getApp(messenger, logger);
+
+  const natsHost = process.env["NATS_HOST"] || "";
+  const natsPort = process.env["NATS_PORT"] || "";
+  const messenger = new Messenger(nats.connect({ url: `nats://${natsHost}:${natsPort}` }), logger);
+
+  const app = getApp({ logger, natsHost, natsPort });
 
   return { app, messenger, request: supertest(app) };
 };
