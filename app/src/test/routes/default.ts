@@ -36,6 +36,14 @@ test("Homepage Should return standard greeting", async (t) => {
   t.is(res.text, "Hello, world!");
 });
 
+test("Ping Should return pong", async (t) => {
+  const { request } = setup();
+
+  const res = await request.get("/ping");
+  t.is(res.status, HttpStatus.OK);
+  t.is(res.text, "Pong");
+});
+
 test("Internal-error Should return 500", async (t) => {
   const { request } = setup();
 
