@@ -8,8 +8,8 @@ import { Messenger, code } from "./messenger";
 export const getApp = (messenger: Messenger, logger: LoggerInstance): express.Express => {
   const app = express();
 
-  app.use((_, res, next) => {
-    logger.info("Received HTTP request");
+  app.use((req, res, next) => {
+    logger.info("Received HTTP request", {url: req.originalUrl});
 
     res.set("access-control-allow-origin", "*");
     next();

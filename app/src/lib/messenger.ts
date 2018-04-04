@@ -77,7 +77,7 @@ export class Messenger {
       this.logger.info("Sending messenger request", {subject, body});
       this.client.request(subject, body, (natsMsg: string) => {
         clearTimeout(tId);
-        this.logger.info("Received messenger response", {subject, natsMsg});
+        this.logger.info("Received messenger response", {subject});
 
         const parsedMsg: IMessage = JSON.parse(natsMsg);
         const msg = new Message<T>(parsedMsg);
