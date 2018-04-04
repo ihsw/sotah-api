@@ -36,8 +36,6 @@ test("Messenger Should throw error when requesting from generic test errors queu
 
     return;
   }
-
-  t.fail();
 });
 
 test("Messenger Should fetch region statuses", async (t) => {
