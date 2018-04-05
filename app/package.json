@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/ihsw/sotah-api#readme",
   "devDependencies": {
+    "@types/bcrypt": "^1.0.0",
     "@types/express": "^4.11.1",
     "@types/http-status": "^0.2.29",
     "@types/sequelize": "^4.27.13",
@@ -40,6 +41,7 @@
   },
   "dependencies": {
     "async-middleware": "^1.2.1",
+    "bcrypt": "^1.0.3",
     "express": "^4.16.3",
     "http-status": "^1.0.1",
     "nats": "^0.7.20",

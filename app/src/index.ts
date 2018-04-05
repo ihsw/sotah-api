@@ -9,7 +9,8 @@ const logger = getLogger("info");
 // app init
 const natsHost = process.env["NATS_HOST"] || "";
 const natsPort = process.env["NATS_PORT"] || "";
-const app = getApp({ logger, natsHost, natsPort });
+const dbHost = process.env["DB_HOST"] || "";
+const app = getApp({ logger, natsHost, natsPort, dbHost });
 
 const appPort = process.env["APP_PORT"];
 const server = app.listen(appPort, () => logger.info(`Listening on ${appPort}`));

@@ -21,9 +21,10 @@ const setup = (): ISetupSettings => {
 
   const natsHost = process.env["NATS_HOST"] as string;
   const natsPort = process.env["NATS_PORT"] as string;
+  const dbHost = process.env["DB_HOST"] as string;
   const messenger = new Messenger(nats.connect({ url: `nats://${natsHost}:${natsPort}` }), logger);
 
-  const app = getApp({ logger, natsHost, natsPort });
+  const app = getApp({ logger, natsHost, natsPort, dbHost });
 
   return { app, messenger, request: supertest(app) };
 };
