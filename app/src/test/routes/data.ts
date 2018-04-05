@@ -1,38 +1,20 @@
 import * as process from "process";
 
 import { test } from "ava";
-import * as supertest from "supertest";
 import * as HttpStatus from "http-status";
-import * as express from "express";
-import * as nats from "nats";
 
-import { getApp } from "../../lib/app";
-import { Messenger } from "../../lib/messenger";
-import { IRegion } from "../../lib/region";
 import { getLogger } from "../../lib/logger";
+import { setup } from "../../lib/test-helper";
+import { IRegion } from "../../lib/region";
 
-interface ISetupSettings {
-  app: express.Express;
-  messenger: Messenger;
-  request: supertest.SuperTest<supertest.Test>;
-}
-
-const setup = (): ISetupSettings => {
-  const logger = getLogger();
-
-  const natsHost = process.env["NATS_HOST"] as string;
-  const natsPort = process.env["NATS_PORT"] as string;
-  const dbHost = process.env["DB_HOST"] as string;
-  const messenger = new Messenger(nats.connect({ url: `nats://${natsHost}:${natsPort}` }), logger);
-
-  const app = getApp({ logger, natsHost, natsPort, dbHost });
-
-  return { app, messenger, request: supertest(app) };
-};
+const { request, messenger } = setup({
+  dbHost: process.env["DB_HOST"] as string,
+  logger: getLogger(),
+  natsHost: process.env["NATS_HOST"] as string,
+  natsPort: process.env["NATS_PORT"] as string
+});
 
 test("Regions Should return list of regions", async (t) => {
-  const { request } = setup();
-
   const tId = setTimeout(() => { throw new Error("Timed out!"); }, 5 * 1000);
 
   const res = await request.get("/regions");
@@ -44,8 +26,6 @@ test("Regions Should return list of regions", async (t) => {
 });
 
 test("Status Should return status information", async (t) => {
-  const { request, messenger } = setup();
-
   const tId = setTimeout(() => { throw new Error("Timed out!"); }, 5 * 1000);
 
   const regions = (await messenger.getRegions()).data;
@@ -58,8 +38,6 @@ test("Status Should return status information", async (t) => {
 });
 
 test("Status Should return 404 on invalid region name", async (t) => {
-  const { request } = setup();
-
   const tId = setTimeout(() => { throw new Error("Timed out!"); }, 5 * 1000);
 
   const res = await request.get("/status/fdsfgs");
