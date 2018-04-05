@@ -8,7 +8,7 @@ import { Messenger } from "./messenger";
 import { defaultRouter, getDataRouter, getUserRouter } from "../routes";
 import { createModels } from "../models";
 
-type Options = {
+export type Options = {
   logger: LoggerInstance
   natsHost: string
   natsPort: string,
