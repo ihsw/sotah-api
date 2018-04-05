@@ -4,8 +4,8 @@
   "description": "",
   "main": "./dist/index.js",
   "scripts": {
-    "test": "ava --verbose ./dist/test/*.js ./dist/test/**/*.js",
-    "test:w": "ava --verbose --watch ./dist/test/*.js ./dist/test/**/*.js",
+    "test": "ava -vs ./dist/test/*.js ./dist/test/**/*.js",
+    "test:w": "ava -vsw ./dist/test/*.js ./dist/test/**/*.js",
     "test-coverage": "nyc --reporter=lcov npm test",
     "test-coverage-report": "nyc report",
     "test-coverage-check": "nyc check-coverage --lines 95 --functions 75 --branches 95",
@@ -31,13 +31,15 @@
     "@types/http-status": "^0.2.29",
     "@types/sequelize": "^4.27.13",
     "@types/supertest": "^2.0.2",
+    "@types/uuid": "^3.4.3",
     "@types/winston": "^2.3.5",
     "ava": "^0.21.0",
     "coveralls": "^2.13.1",
     "nyc": "^11.1.0",
     "supertest": "^3.0.0",
     "tslint": "^5.6.0",
-    "typescript": "^2.4.2"
+    "typescript": "^2.8.1",
+    "uuid": "^3.2.1"
   },
   "dependencies": {
     "async-middleware": "^1.2.1",
