@@ -13,7 +13,9 @@
     "build": "tsc && echo built",
     "build:w": "tsc -w && echo built",
     "ava": "ava --verbose",
-    "lint": "tslint ./src/**/*.ts && echo linted"
+    "lint": "tslint ./src/**/*.ts && echo linted",
+    "migrate-up": "sequelize db:migrate --migrations-path ./dist/migrations",
+    "migrate-down": "sequelize db:migrate:undo --migrations-path ./dist/migrations"
   },
   "repository": {
     "type": "git",
