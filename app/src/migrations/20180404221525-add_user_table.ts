@@ -2,9 +2,19 @@ import { QueryInterface, INTEGER, STRING } from "sequelize";
 
 export const up = async (query: QueryInterface) => {
   await query.createTable("users", {
-    email: STRING,
-    hashed_password: STRING,
-    id: INTEGER
+    email: {
+      allowNull: false,
+      type: STRING
+    },
+    hashed_password: {
+      allowNull: false,
+      type: STRING
+    },
+    id: {
+      autoIncrement: true,
+      primaryKey: true,
+      type: INTEGER
+    }
   });
 };
 
