@@ -15,8 +15,8 @@ export type UserModel = SequelizeStatic.Model<UserInstance, UserAttributes>;
 
 export const createModel = (sequelize: Sequelize): UserModel => {
   return sequelize.define<UserInstance, UserAttributes>("user", {
-    email: {type: STRING, allowNull: false},
-    hashed_password: {type: STRING, allowNull: false}
+    email: { type: STRING, allowNull: false },
+    hashed_password: { type: STRING, allowNull: false }
   });
 };
 
