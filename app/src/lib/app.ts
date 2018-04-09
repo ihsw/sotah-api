@@ -37,9 +37,10 @@ export const getApp = (opts: Options): express.Express => {
 
   // request logging
   app.use((req, res, next) => {
-    logger.info("Received HTTP request", { url: req.originalUrl });
+    logger.info("Received HTTP request", { url: req.originalUrl, method: req.method });
 
     res.set("access-control-allow-origin", "*");
+    res.set("access-control-allow-headers", "content-type");
     next();
   });
 
