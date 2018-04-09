@@ -11,7 +11,15 @@ export const getRouter = (User: UserModel) => {
   router.post("/users", wrap(async (req: Request, res: Response) => {
     const email: string = req.body.email;
     const password: string = await bcrypt.hash(req.body.password, 10);
-    const user = await User.create({ email, hashed_password: password });
+
+    let user = await User.findOne({ where: { email } });
+    if (user !== null) {
+      res.status(HTTPStatus.BAD_REQUEST).json({ email: "Email is already in use!" });
+
+      return;
+    }
+
+    user = await User.create({ email, hashed_password: password });
 
     res.status(HTTPStatus.CREATED).json(withoutPassword(user));
   }));
