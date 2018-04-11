@@ -3,9 +3,11 @@ import * as process from "process";
 import test, { TestContext } from "ava";
 import * as HTTPStatus from "http-status";
 import { v4 as uuidv4 } from "uuid";
+import * as jwt from "jsonwebtoken";
 
 import { getLogger } from "../../lib/logger";
 import { setup, getTestHelper, IUserRequest, IUserResponse } from "../../lib/test-helper";
+import { JwtPayload, jwtOptions } from "../../lib/session";
 
 const { request } = setup({
   dbHost: process.env["DB_HOST"] as string,
@@ -136,4 +138,15 @@ test("User creation endpoint Should return logged in user", async (t) => {
   res = await (request.get("/user").set("Authorization", `Bearer ${res.body.token}`));
   t.is(res.status, HTTPStatus.OK);
   t.is(res.body.id, user.id);
+});
+
+test("User creation endpoint Should fail on valid jwt token but invalid payload", async (t) => {
+  const token = jwt.sign(
+    <JwtPayload>{ data: "-1" },
+    jwtOptions.secret,
+    { issuer: jwtOptions.issuer, audience: jwtOptions.audience }
+  );
+
+  const res = await (request.get("/user").set("Authorization", `Bearer ${token}`));
+  t.is(res.status, HTTPStatus.UNAUTHORIZED);
 });
