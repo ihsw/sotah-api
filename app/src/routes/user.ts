@@ -2,8 +2,10 @@ import { Request, Response, Router } from "express";
 import * as HTTPStatus from "http-status";
 import { wrap } from "async-middleware";
 import * as bcrypt from "bcrypt";
+import * as jwt from "jsonwebtoken";
 
-import { UserModel, withoutPassword } from "../models/user";
+import { UserModel, withoutPassword, UserInstance } from "../models/user";
+import { jwtOptions, JwtPayload, auth } from "../lib/session";
 
 export const getRouter = (User: UserModel) => {
   const router = Router();
@@ -58,6 +60,38 @@ export const getRouter = (User: UserModel) => {
     user.set("email", req.body.email);
     user.save();
     res.json(withoutPassword(user));
+  }));
+
+  router.post("/login", wrap(async (req: Request, res: Response) => {
+    // validating provided email
+    const email: string = req.body.email;
+    const user = await User.findOne({ where: { email } });
+    if (user === null) {
+      res.status(HTTPStatus.BAD_REQUEST).json({ email: "Invalid email!" });
+
+      return;
+    }
+
+    // validating provided password
+    const password: string = req.body.password;
+    const isMatching = await bcrypt.compare(password, user.get("hashed_password"));
+    if (isMatching === false) {
+      res.status(HTTPStatus.BAD_REQUEST).json({ email: "Invalid password!" });
+
+      return;
+    }
+
+    // issuing a jwt token
+    const token = jwt.sign(
+      <JwtPayload>{ data: user.get("id") },
+      jwtOptions.secret,
+      { issuer: jwtOptions.issuer, audience: jwtOptions.audience }
+    );
+    res.status(HTTPStatus.OK).json({ ...withoutPassword(user), token });
+  }));
+
+  router.get("/user", auth, wrap(async (req: Request, res: Response) => {
+    res.json(withoutPassword(req.user as UserInstance));
   }));
 
   return router;

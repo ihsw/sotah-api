@@ -81,3 +81,59 @@ test("User creation endpoint Should error on updating a user by invalid id", asy
   const res = await request.put("/user/-1");
   t.is(res.status, HTTPStatus.NOT_FOUND);
 });
+
+test("User creation endpoint Should fail on invalid username", async (t) => {
+  const res = await request.post("/login").send({ email: `login-fail+${uuidv4()}@test.com` });
+  t.is(res.status, HTTPStatus.BAD_REQUEST);
+  t.is(res.body.email, "Invalid email!");
+});
+
+test("User creation endpoint Should fail on invalid password", async (t) => {
+  const user = await createUser(t, {
+    email: `login-fail+${uuidv4()}@test.com`,
+    password: "test"
+  });
+
+  const res = await request.post("/login").send({ email: user.email, password: "test2" });
+  t.is(res.status, HTTPStatus.BAD_REQUEST);
+  t.is(res.body.email, "Invalid password!");
+});
+
+test("User creation endpoint Should succeed", async (t) => {
+  const password = "test";
+  const user = await createUser(t, {
+    email: `login-succeed+${uuidv4()}@test.com`,
+    password
+  });
+
+  const res = await request.post("/login").send({ email: user.email, password });
+  t.is(res.status, HTTPStatus.OK);
+  t.true("token" in res.body);
+});
+
+test("User creation endpoint Should return jwt when providing valid credentials", async (t) => {
+  const password = "test";
+  const user = await createUser(t, {
+    email: `valid-credentials+${uuidv4()}@test.com`,
+    password
+  });
+
+  const res = await request.post("/login").send({ email: user.email, password });
+  t.is(res.status, HTTPStatus.OK);
+  t.true("token" in res.body);
+});
+
+test("User creation endpoint Should return logged in user", async (t) => {
+  const password = "test";
+  const user = await createUser(t, {
+    email: `login-succeed+${uuidv4()}@test.com`,
+    password
+  });
+
+  let res = await request.post("/login").send({ email: user.email, password });
+  t.is(res.status, HTTPStatus.OK);
+
+  res = await (request.get("/user").set("Authorization", `Bearer ${res.body.token}`));
+  t.is(res.status, HTTPStatus.OK);
+  t.is(res.body.id, user.id);
+});

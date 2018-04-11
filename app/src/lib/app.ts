@@ -7,6 +7,7 @@ import * as Sequelize from "sequelize";
 import { Messenger } from "./messenger";
 import { defaultRouter, getDataRouter, getUserRouter } from "../routes";
 import { createModels } from "../models";
+import { appendSessions } from "./session";
 
 export type Options = {
   logger: LoggerInstance
@@ -19,7 +20,7 @@ export const getApp = (opts: Options): express.Express => {
   const { logger, natsHost, natsPort, dbHost } = opts;
 
   // express init
-  const app = express();
+  let app = express();
   app.use(express.json());
 
   // messenger init
@@ -34,6 +35,9 @@ export const getApp = (opts: Options): express.Express => {
     operatorsAliases: false
   });
   const models = createModels(sequelize);
+
+  // session init
+  app = appendSessions(app, models.User);
 
   // request logging
   app.use((req, res, next) => {
