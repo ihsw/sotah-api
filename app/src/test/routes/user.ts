@@ -113,6 +113,17 @@ test("User creation endpoint Should succeed", async (t) => {
   t.true("token" in res.body);
 });
 
+test("User creation endpoint Should fail on duplicate user", async (t) => {
+  const user = await createUser(t, {
+    email: `login-fail+${uuidv4()}@test.com`,
+    password: "test"
+  });
+
+  const res = await request.post("/users").send({ email: user.email, password: "" });
+  t.is(res.status, HTTPStatus.BAD_REQUEST);
+  t.deepEqual(res.body, { email: "Email is already in use!" });
+});
+
 test("User creation endpoint Should return jwt when providing valid credentials", async (t) => {
   const password = "test";
   const user = await createUser(t, {
