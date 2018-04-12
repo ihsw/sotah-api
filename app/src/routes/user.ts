@@ -23,8 +23,8 @@ export const getRouter = (User: UserModel) => {
     user = await User.create({ email, hashed_password: password });
 
     res.status(HTTPStatus.CREATED).json({
-      ...withoutPassword(user),
-      token: generateJwtToken(user)
+      token: generateJwtToken(user),
+      user: withoutPassword(user)
     });
   }));
 
@@ -85,8 +85,8 @@ export const getRouter = (User: UserModel) => {
 
     // issuing a jwt token
     res.status(HTTPStatus.OK).json({
-      ...withoutPassword(user),
-      token: generateJwtToken(user)
+      token: generateJwtToken(user),
+      user: withoutPassword(user)
     });
   }));
 
