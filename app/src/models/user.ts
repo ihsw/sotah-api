@@ -1,5 +1,8 @@
 import * as SequelizeStatic from "sequelize";
 import { Instance, Sequelize, STRING } from "sequelize";
+import * as jwt from "jsonwebtoken";
+
+import { JwtPayload, jwtOptions } from "../lib/session";
 
 export type UserAttributes = {
   id?: number
@@ -29,4 +32,12 @@ export const withoutPassword = (user: UserInstance): UserAttributes => {
   delete data["hashed_password"];
 
   return data;
+};
+
+export const generateJwtToken = (user: UserInstance): string => {
+  return jwt.sign(
+    <JwtPayload>{ data: user.get("id") },
+    jwtOptions.secret,
+    { issuer: jwtOptions.issuer, audience: jwtOptions.audience }
+  );
 };

@@ -2,10 +2,9 @@ import { Request, Response, Router } from "express";
 import * as HTTPStatus from "http-status";
 import { wrap } from "async-middleware";
 import * as bcrypt from "bcrypt";
-import * as jwt from "jsonwebtoken";
 
-import { UserModel, withoutPassword, UserInstance } from "../models/user";
-import { jwtOptions, JwtPayload, auth } from "../lib/session";
+import { UserModel, withoutPassword, UserInstance, generateJwtToken } from "../models/user";
+import { auth } from "../lib/session";
 
 export const getRouter = (User: UserModel) => {
   const router = Router();
@@ -23,7 +22,10 @@ export const getRouter = (User: UserModel) => {
 
     user = await User.create({ email, hashed_password: password });
 
-    res.status(HTTPStatus.CREATED).json(withoutPassword(user));
+    res.status(HTTPStatus.CREATED).json({
+      ...withoutPassword(user),
+      token: generateJwtToken(user)
+    });
   }));
 
   router.get("/user/:id", wrap(async (req: Request, res: Response) => {
@@ -82,12 +84,10 @@ export const getRouter = (User: UserModel) => {
     }
 
     // issuing a jwt token
-    const token = jwt.sign(
-      <JwtPayload>{ data: user.get("id") },
-      jwtOptions.secret,
-      { issuer: jwtOptions.issuer, audience: jwtOptions.audience }
-    );
-    res.status(HTTPStatus.OK).json({ ...withoutPassword(user), token });
+    res.status(HTTPStatus.OK).json({
+      ...withoutPassword(user),
+      token: generateJwtToken(user)
+    });
   }));
 
   router.get("/user", auth, wrap(async (req: Request, res: Response) => {
