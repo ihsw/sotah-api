@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import { UserModel } from "../models/user";
 
 export const jwtOptions = {
-  audience: "sotah-api",
+  audience: "sotah-client",
   issuer: "sotah-api",
   secret: uuidv4()
 };
