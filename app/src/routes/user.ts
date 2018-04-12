@@ -78,7 +78,7 @@ export const getRouter = (User: UserModel) => {
     const password: string = req.body.password;
     const isMatching = await bcrypt.compare(password, user.get("hashed_password"));
     if (isMatching === false) {
-      res.status(HTTPStatus.BAD_REQUEST).json({ email: "Invalid password!" });
+      res.status(HTTPStatus.BAD_REQUEST).json({ password: "Invalid password!" });
 
       return;
     }
