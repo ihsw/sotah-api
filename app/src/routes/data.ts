@@ -11,8 +11,18 @@ export const getRouter = (messenger: Messenger): Router => {
     const msg = await messenger.getRegions();
     res.send(msg.data).end();
   }));
-  router.get("/status/:regionName", wrap(async (req, res) => {
+  router.get("/region/:regionName/realms", wrap(async (req, res) => {
     const msg = await messenger.getStatus(req.params["regionName"]);
+    if (msg.code === code.notFound) {
+      res.status(HttpStatus.NOT_FOUND).end();
+
+      return;
+    }
+
+    res.send(msg.data).end();
+  }));
+  router.get("/region/:regionName/realm/:realmSlug/auctions", wrap(async (req, res) => {
+    const msg = await messenger.getAuctions(req.params["regionName"], req.params["realmSlug"]);
     if (msg.code === code.notFound) {
       res.status(HttpStatus.NOT_FOUND).end();
 

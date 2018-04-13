@@ -31,7 +31,7 @@ test("Status Should return status information", async (t) => {
   const regions = (await messenger.getRegions()).data;
   t.true(regions.length > 0);
 
-  const res = await request.get(`/status/${regions[0].name}`);
+  const res = await request.get(`/region/${regions[0].name}/realms`);
   clearTimeout(tId);
 
   t.is(res.status, HttpStatus.OK, "Http status is OK");
@@ -40,7 +40,7 @@ test("Status Should return status information", async (t) => {
 test("Status Should return 404 on invalid region name", async (t) => {
   const tId = setTimeout(() => { throw new Error("Timed out!"); }, 5 * 1000);
 
-  const res = await request.get("/status/fdsfgs");
+  const res = await request.get("/region/fdsfgs");
   clearTimeout(tId);
 
   t.is(res.status, HttpStatus.NOT_FOUND, "Http status is NOT_FOUND");
