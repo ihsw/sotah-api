@@ -37,6 +37,17 @@ test("Status Should return status information", async (t) => {
   t.is(res.status, HttpStatus.OK, "Http status is OK");
 });
 
+test("Status Should return auction information", async (t) => {
+  const tId = setTimeout(() => { throw new Error("Timed out!"); }, 5 * 1000);
+
+  const [region] = (await messenger.getRegions()).data;
+  const [realm] = (await messenger.getStatus(region.name)).data.realms;
+  const res = await request.get(`/region/${region.name}/realm/${realm.slug}/auctions`);
+  clearTimeout(tId);
+
+  t.is(res.status, HttpStatus.OK, "Http status is OK");
+});
+
 test("Status Should return 404 on invalid region name", async (t) => {
   const tId = setTimeout(() => { throw new Error("Timed out!"); }, 5 * 1000);
 
