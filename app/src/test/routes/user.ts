@@ -21,11 +21,13 @@ const createUser = async (t: TestContext, body: IUserRequest): Promise<IUserResp
   const res = await requestUser(body);
   t.is(res.status, HTTPStatus.CREATED);
   t.not(String(res.header["content-type"]).match(/^application\/json/), null);
-  t.true("id" in res.body);
-  t.true(typeof res.body.id === "number");
-  t.is(res.body.email, body.email);
 
-  return res.body;
+  const responseBody = res.body;
+  t.true("user" in responseBody);
+  t.true("id" in responseBody.user);
+  t.is(typeof responseBody.user.id, "number");
+
+  return responseBody.user;
 };
 
 test("User creation endpoint Should create a new user", async (t) => {
@@ -35,8 +37,11 @@ test("User creation endpoint Should create a new user", async (t) => {
   });
   t.is(res.status, HTTPStatus.CREATED);
   t.not(String(res.header["content-type"]).match(/^application\/json/), null);
-  t.true("id" in res.body);
-  t.is(typeof res.body.id, "number");
+
+  const body = res.body;
+  t.true("user" in body);
+  t.true("id" in body.user);
+  t.is(typeof body.user.id, "number");
 });
 
 test("User creation endpoint Should return a user", async (t) => {
@@ -98,7 +103,7 @@ test("User creation endpoint Should fail on invalid password", async (t) => {
 
   const res = await request.post("/login").send({ email: user.email, password: "test2" });
   t.is(res.status, HTTPStatus.BAD_REQUEST);
-  t.is(res.body.email, "Invalid password!");
+  t.is(res.body.password, "Invalid password!");
 });
 
 test("User creation endpoint Should succeed", async (t) => {
