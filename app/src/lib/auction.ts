@@ -1,8 +1,8 @@
 import { realmSlug } from "./realm";
 
 export interface IAuctions {
-  realms: IAuctionRealm[];
-  auctions: IAuction[];
+  realms: IAuctionRealm[] | null;
+  auctions: IAuction[] | null;
 }
 
 export interface IAuctionRealm {
