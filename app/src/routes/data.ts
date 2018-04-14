@@ -24,7 +24,7 @@ export const getRouter = (messenger: Messenger): Router => {
   router.get("/region/:regionName/realm/:realmSlug/auctions", wrap(async (req, res) => {
     const msg = await messenger.getAuctions(req.params["regionName"], req.params["realmSlug"]);
     if (msg.code === code.notFound) {
-      res.status(HttpStatus.NOT_FOUND).end();
+      res.status(HttpStatus.NOT_FOUND).send(msg.error!.message).end();
 
       return;
     }
