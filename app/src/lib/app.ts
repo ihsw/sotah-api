@@ -3,6 +3,7 @@ import * as HttpStatus from "http-status";
 import * as nats from "nats";
 import { LoggerInstance } from "winston";
 import * as Sequelize from "sequelize";
+import * as compression from "compression";
 
 import { Messenger } from "./messenger";
 import { defaultRouter, getDataRouter, getUserRouter } from "../routes";
@@ -22,6 +23,7 @@ export const getApp = (opts: Options): express.Express => {
   // express init
   let app = express();
   app.use(express.json());
+  app.use(compression());
 
   // messenger init
   const messenger = new Messenger(nats.connect({ url: `nats://${natsHost}:${natsPort}` }), logger);
