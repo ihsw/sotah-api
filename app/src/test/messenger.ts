@@ -46,11 +46,13 @@ test("Messenger Should fetch region statuses", async (t) => {
   t.true(status.realms.length > 0);
 });
 
-test("Messenger Should fetch auctions", async (t) => {
+test.only("Messenger Should fetch auctions", async (t) => {
   const { messenger } = setup();
 
   const [reg] = (await messenger.getRegions()).data;
   const { realms } = (await messenger.getStatus(reg.name)).data;
   const auctions = (await messenger.getAuctions(reg.name, realms[0].slug)).data;
-  t.true(auctions.auctions.length > 0);
+  console.log(auctions);
+  t.not(auctions.auctions, null);
+  t.true(auctions.auctions !== null && auctions.auctions.length > 0);
 });

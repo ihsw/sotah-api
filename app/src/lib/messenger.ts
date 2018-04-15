@@ -1,3 +1,4 @@
+import * as zlib from "zlib";
 import * as nats from "nats";
 import { LoggerInstance } from "winston";
 
@@ -5,7 +6,21 @@ import { regionName, IRegion, IStatus } from "./region";
 import { realmSlug } from "./realm";
 import { IAuctions } from "./auction";
 
-const DEFAULT_TIMEOUT = 2.5 * 1000;
+const DEFAULT_TIMEOUT = 30 * 1000;
+
+export const gunzip = (data: Buffer): Promise<Buffer> => {
+  return new Promise<Buffer>((reslove, reject) => {
+    zlib.gunzip(data, (err, result) => {
+      if (err) {
+        reject(err);
+
+        return;
+      }
+
+      reslove(result);
+    });
+  });
+};
 
 export enum subjects {
   status = "status",
@@ -74,20 +89,22 @@ export class Messenger {
         body = "";
       }
 
-      this.logger.info("Sending messenger request", {subject, body});
+      this.logger.info("Sending messenger request", { subject, body });
       this.client.request(subject, body, (natsMsg: string) => {
-        clearTimeout(tId);
-        this.logger.info("Received messenger response", {subject});
+        (async () => {
+          clearTimeout(tId);
 
-        const parsedMsg: IMessage = JSON.parse(natsMsg);
-        const msg = new Message<T>(parsedMsg);
-        if (msg.error !== null && msg.code === code.genericError) {
-          reject(new MessageError(msg.error.message, msg.code));
+          const result = await gunzip(Buffer.from(natsMsg, "base64"));
+          const parsedMsg: IMessage = JSON.parse(result.toString());
+          const msg = new Message<T>(parsedMsg);
+          if (msg.error !== null && msg.code === code.genericError) {
+            reject(new MessageError(msg.error.message, msg.code));
 
-          return;
-        }
+            return;
+          }
 
-        resolve(msg);
+          resolve(msg);
+        })();
       });
     });
   }
