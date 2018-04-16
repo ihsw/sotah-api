@@ -33,7 +33,8 @@ export enum code {
   ok = 1,
   genericError = -1,
   msgJsonParseError = -2,
-  notFound = -3
+  notFound = -3,
+  userError = -4
 }
 
 export class MessageError {
