@@ -25,8 +25,8 @@ export const getRouter = (messenger: Messenger): Router => {
     const msg = await messenger.getAuctions({
       count: 10,
       page: 0,
-      realmSlug: req.params["realmSlug"],
-      regionName: req.params["regionName"]
+      realm_slug: req.params["realmSlug"],
+      region_name: req.params["regionName"]
     });
     switch (msg.code) {
       case code.ok:

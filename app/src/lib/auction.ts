@@ -2,8 +2,8 @@ import { regionName } from "./region";
 import { realmSlug } from "./realm";
 
 export type AuctionsRequest = {
-  regionName: regionName
-  realmSlug: realmSlug
+  region_name: regionName
+  realm_slug: realmSlug
   count: number
   page: number
 };
