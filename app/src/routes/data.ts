@@ -22,9 +22,11 @@ export const getRouter = (messenger: Messenger): Router => {
     res.send(msg.data).end();
   }));
   router.get("/region/:regionName/realm/:realmSlug/auctions", wrap(async (req, res) => {
+    const count = "count" in req.query ? Number(req.query.count) : 10;
+    const page = "page" in req.query ? Number(req.query.page) : 0;
     const msg = await messenger.getAuctions({
-      count: 10,
-      page: 0,
+      count,
+      page,
       realm_slug: req.params["realmSlug"],
       region_name: req.params["regionName"]
     });
