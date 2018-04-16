@@ -23,14 +23,24 @@ export const getRouter = (messenger: Messenger): Router => {
   }));
   router.get("/region/:regionName/realm/:realmSlug/auctions", wrap(async (req, res) => {
     const msg = await messenger.getAuctions(req.params["regionName"], req.params["realmSlug"]);
-    if (msg.code === code.notFound) {
-      res.status(HttpStatus.NOT_FOUND).send(msg.error!.message).end();
+    switch (msg.code) {
+      case code.ok:
+        res.send(msg.data).end();
 
-      return;
+        return;
+      case code.notFound:
+        res.status(HttpStatus.NOT_FOUND).send(msg.error!.message).end();
+
+        return;
+      case code.userError:
+        res.status(HttpStatus.BAD_REQUEST).send(msg.error!.message).end();
+
+        return;
+      default:
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(msg.error!.message).end();
+
+        return;
     }
-
-    const auctions = msg.data!;
-    res.send({x: auctions.auctions!.length}).end();
   }));
 
   return router;
