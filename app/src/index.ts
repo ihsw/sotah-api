@@ -5,7 +5,7 @@ import { getApp } from "./lib/app";
 import { getLogger } from "./lib/logger";
 
 // logger init
-const logger = getLogger("info");
+const logger = getLogger("debug");
 
 // app init
 const natsHost = process.env["NATS_HOST"] || "";
