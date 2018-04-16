@@ -48,7 +48,7 @@ export class MessageError {
 
 export class Message<T> {
   error: Error | null;
-  data: T;
+  data: T | null;
   code: code;
 
   constructor(msg: IMessage) {
@@ -89,13 +89,11 @@ export class Messenger {
         body = "";
       }
 
-      this.logger.info("Sending messenger request", { subject, body });
+      this.logger.debug("Sending messenger request", { subject, body });
       this.client.request(subject, body, (natsMsg: string) => {
         (async () => {
           clearTimeout(tId);
-
-          const result = await gunzip(Buffer.from(natsMsg, "base64"));
-          const parsedMsg: IMessage = JSON.parse(result.toString());
+          const parsedMsg: IMessage = JSON.parse(natsMsg.toString());
           const msg = new Message<T>(parsedMsg);
           if (msg.error !== null && msg.code === code.genericError) {
             reject(new MessageError(msg.error.message, msg.code));
@@ -117,10 +115,19 @@ export class Messenger {
     return this.request(subjects.regions);
   }
 
-  getAuctions(regionName: regionName, realmSlug: realmSlug): Promise<Message<IAuctions>> {
-    return this.request(
+  async getAuctions(regionName: regionName, realmSlug: realmSlug): Promise<Message<IAuctions>> {
+    const message = await this.request<string>(
       subjects.auctions,
       JSON.stringify({ region_name: regionName, realm_slug: realmSlug })
     );
+    if (message.code !== code.ok) {
+      return { code: message.code, data: null, error: message.error };
+    }
+
+    return {
+      code: code.ok,
+      data: JSON.parse((await gunzip(Buffer.from(message.data!, "base64"))).toString()),
+      error: null,
+    };
   }
 }

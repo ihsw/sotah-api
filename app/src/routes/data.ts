@@ -29,7 +29,8 @@ export const getRouter = (messenger: Messenger): Router => {
       return;
     }
 
-    res.send(msg.data).end();
+    const auctions = msg.data!;
+    res.send({x: auctions.auctions!.length}).end();
   }));
 
   return router;
