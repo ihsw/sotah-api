@@ -109,7 +109,6 @@ export class Messenger {
       }
       const { body, parseData } = settings;
 
-      this.logger.debug("Sending messenger request", { subject, body });
       this.client.request(subject, body, (natsMsg: string) => {
         (async () => {
           clearTimeout(tId);
