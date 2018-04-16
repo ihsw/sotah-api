@@ -1,25 +1,33 @@
+import { regionName } from "./region";
 import { realmSlug } from "./realm";
 
-export interface IAuctions {
-  realms: IAuctionRealm[] | null;
-  auctions: IAuction[] | null;
-}
+export type AuctionsRequest = {
+  regionName: regionName
+  realmSlug: realmSlug
+  count: number
+  page: number
+};
 
-export interface IAuctionRealm {
-  name: string;
-  slug: realmSlug;
-}
+export type AuctionsResponse = {
+  realms: AuctionRealm[] | null
+  auctions: Auction[] | null
+};
 
-export interface IAuction {
-  auc: number;
-  item: number;
-  owner: string;
-  ownerRealm: string;
-  bid: number;
-  buyout: number;
-  quantity: number;
-  timeLeft: string;
-  rand: number;
-  seed: number;
-  context: number;
-}
+export type AuctionRealm = {
+  name: string
+  slug: realmSlug
+};
+
+export type Auction = {
+  auc: number
+  item: number
+  owner: string
+  ownerRealm: string
+  bid: number
+  buyout: number
+  quantity: number
+  timeLeft: string
+  rand: number
+  seed: number
+  context: number
+};

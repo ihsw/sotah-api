@@ -3,8 +3,7 @@ import * as nats from "nats";
 import { LoggerInstance } from "winston";
 
 import { regionName, IRegion, IStatus } from "./region";
-import { realmSlug } from "./realm";
-import { IAuctions } from "./auction";
+import { AuctionsRequest, AuctionsResponse } from "./auction";
 
 const DEFAULT_TIMEOUT = 5 * 1000;
 
@@ -136,10 +135,10 @@ export class Messenger {
     return this.request(subjects.regions);
   }
 
-  async getAuctions(regionName: regionName, realmSlug: realmSlug): Promise<Message<IAuctions>> {
+  async getAuctions(request: AuctionsRequest): Promise<Message<AuctionsResponse>> {
     const message = await this.request<string>(
       subjects.auctions,
-      { body: JSON.stringify({ region_name: regionName, realm_slug: realmSlug }), parseData: false }
+      { body: JSON.stringify(request), parseData: false }
     );
     if (message.code !== code.ok) {
       return { code: message.code, error: message.error };
