@@ -9,7 +9,7 @@ export type AuctionsRequest = {
 };
 
 export type AuctionsResponse = {
-  realms: AuctionRealm[] | null
+  total: number
   auctions: Auction[] | null
 };
 
