@@ -10,6 +10,7 @@ export type AuctionsRequest = {
 
 export type AuctionsResponse = {
   total: number
+  total_count: number
   auctions: Auction[] | null
 };
 
@@ -19,7 +20,6 @@ export type AuctionRealm = {
 };
 
 export type Auction = {
-  auc: number
   item: number
   owner: string
   ownerRealm: string
@@ -27,7 +27,5 @@ export type Auction = {
   buyout: number
   quantity: number
   timeLeft: string
-  rand: number
-  seed: number
-  context: number
+  aucList: number[]
 };
