@@ -12,7 +12,7 @@ services:
     image: ihsw/sotah-server
     volumes:
     - ./sotah-server:/tmp/sotah-server
-    command: -c /tmp/sotah-server/config.json -v debug api
+    command: -c /tmp/sotah-server/config.json --cache-dir /tmp/sotah-server/data -v debug api
     environment:
     - API_KEY=$API_KEY
     - NATS_HOST=nats
@@ -24,7 +24,7 @@ services:
     extends: sotah-server-base
     depends_on:
     - nats
-    command: -c /tmp/sotah-server/config.json -v debug api-test -d /tmp/sotah-server/test-fixtures
+    command: -c /tmp/sotah-server/config.json --cache-dir /tmp/sotah-server/data -v debug api-test -d /tmp/sotah-server/test-fixtures
 
   sotah-api-base:
     build: .

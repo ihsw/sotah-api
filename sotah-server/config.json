@@ -17,5 +17,11 @@
             "name": "tw",
             "hostname": "tw.api.battle.net"
         }
-    ]
+    ],
+    "cache_dir": "",
+    "whitelist": {
+        "us": {
+            "aegwynn": true
+        }
+    }
 }
