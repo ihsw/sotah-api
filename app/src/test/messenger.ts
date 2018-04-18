@@ -54,8 +54,8 @@ test.only("Messenger Should fetch auctions", async (t) => {
   const auctions = (await messenger.getAuctions({
     count: 10,
     page: 0,
-    realmSlug: realms[0].slug,
-    regionName: reg.name
+    realm_slug: realms[0].slug,
+    region_name: reg.name
   })).data!;
   t.not(auctions.auctions, null);
   t.true(auctions.auctions !== null && auctions.auctions.length > 0);

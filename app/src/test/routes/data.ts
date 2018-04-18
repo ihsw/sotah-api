@@ -28,7 +28,7 @@ test("Regions Should return list of regions", async (t) => {
 test("Status Should return status information", async (t) => {
   const tId = setTimeout(() => { throw new Error("Timed out!"); }, 5 * 1000);
 
-  const regions = (await messenger.getRegions()).data;
+  const regions = (await messenger.getRegions()).data!;
   t.true(regions.length > 0);
 
   const res = await request.get(`/region/${regions[0].name}/realms`);
@@ -40,8 +40,8 @@ test("Status Should return status information", async (t) => {
 test("Status Should return auction information", async (t) => {
   const tId = setTimeout(() => { throw new Error("Timed out!"); }, 5 * 1000);
 
-  const [region] = (await messenger.getRegions()).data;
-  const [realm] = (await messenger.getStatus(region.name)).data.realms;
+  const [region] = (await messenger.getRegions()).data!;
+  const [realm] = (await messenger.getStatus(region.name)).data!.realms;
   const res = await request.get(`/region/${region.name}/realm/${realm.slug}/auctions`);
   clearTimeout(tId);
 
