@@ -3,6 +3,15 @@ import { wrap } from "async-middleware";
 import * as HttpStatus from "http-status";
 
 import { Messenger, code } from "../lib/messenger";
+import { IRealm } from "../lib/realm";
+
+interface StatusRealm extends IRealm {
+  regionName: string;
+}
+
+type StatusResponse = {
+  realms: StatusRealm[]
+};
 
 export const getRouter = (messenger: Messenger): Router => {
   const router = Router();
@@ -19,7 +28,13 @@ export const getRouter = (messenger: Messenger): Router => {
       return;
     }
 
-    res.send(msg.data).end();
+    const response: StatusResponse = {
+      realms: msg.data!.realms.map((realm) => {
+        return { ...realm, regionName: req.params["regionName"] };
+      })
+    };
+
+    res.send(response).end();
   }));
   router.get("/region/:regionName/realm/:realmSlug/auctions", wrap(async (req, res) => {
     const count = "count" in req.query ? Number(req.query.count) : 10;
