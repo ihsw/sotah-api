@@ -1,11 +1,24 @@
 import { regionName } from "./region";
 import { realmSlug } from "./realm";
 
+export enum SortDirection { none, up, down }
+
+export enum SortKind { none, item, quantity, bid, buyout, auctions, owner }
+
+export type AuctionsRequestBody = {
+  count: number
+  page: number
+  sortKind: SortKind
+  sortDirection: SortDirection
+};
+
 export type AuctionsRequest = {
   region_name: regionName
   realm_slug: realmSlug
   count: number
   page: number
+  sortKind: SortKind
+  sortDirection: SortDirection
 };
 
 export type AuctionsResponse = {

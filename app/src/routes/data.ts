@@ -4,6 +4,7 @@ import * as HttpStatus from "http-status";
 
 import { Messenger, code } from "../lib/messenger";
 import { IRealm } from "../lib/realm";
+import { AuctionsRequestBody } from "../lib/auction";
 
 interface StatusRealm extends IRealm {
   regionName: string;
@@ -37,13 +38,14 @@ export const getRouter = (messenger: Messenger): Router => {
     res.send(response).end();
   }));
   router.post("/region/:regionName/realm/:realmSlug/auctions", wrap(async (req, res) => {
-    const count: number = req.body.count;
-    const page: number = req.body.page;
+    const { count, page, sortDirection, sortKind } = <AuctionsRequestBody>req.body;
     const msg = await messenger.getAuctions({
       count,
       page,
       realm_slug: req.params["realmSlug"],
-      region_name: req.params["regionName"]
+      region_name: req.params["regionName"],
+      sortDirection,
+      sortKind
     });
     switch (msg.code) {
       case code.ok:
