@@ -36,9 +36,9 @@ export const getRouter = (messenger: Messenger): Router => {
 
     res.send(response).end();
   }));
-  router.get("/region/:regionName/realm/:realmSlug/auctions", wrap(async (req, res) => {
-    const count = "count" in req.query ? Number(req.query.count) : 10;
-    const page = "page" in req.query ? Number(req.query.page) : 0;
+  router.post("/region/:regionName/realm/:realmSlug/auctions", wrap(async (req, res) => {
+    const count: number = req.body.count;
+    const page: number = req.body.page;
     const msg = await messenger.getAuctions({
       count,
       page,
