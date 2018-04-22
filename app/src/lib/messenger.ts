@@ -59,7 +59,7 @@ export class Message<T> {
     }
 
     this.rawData = msg.data;
-    if (parseData) {
+    if (parseData && msg.data.length > 0) {
       this.data = JSON.parse(msg.data);
     }
 
