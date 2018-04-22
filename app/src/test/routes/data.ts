@@ -6,6 +6,7 @@ import * as HttpStatus from "http-status";
 import { getLogger } from "../../lib/logger";
 import { setup } from "../../lib/test-helper";
 import { IRegion } from "../../lib/region";
+import { AuctionsRequestBody, SortDirection, SortKind } from "../../lib/auction";
 
 const { request, messenger } = setup({
   dbHost: process.env["DB_HOST"] as string,
@@ -42,7 +43,12 @@ test("Status Should return auction information", async (t) => {
 
   const [region] = (await messenger.getRegions()).data!;
   const [realm] = (await messenger.getStatus(region.name)).data!.realms;
-  const res = await request.get(`/region/${region.name}/realm/${realm.slug}/auctions`);
+  const res = await request.post(`/region/${region.name}/realm/${realm.slug}/auctions`).send(<AuctionsRequestBody>{
+    count: 10,
+    page: 0,
+    sortDirection: SortDirection.none,
+    sortKind: SortKind.none
+  });
   clearTimeout(tId);
 
   t.is(res.status, HttpStatus.OK, "Http status is OK");
