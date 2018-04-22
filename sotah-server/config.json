@@ -19,6 +19,7 @@
         }
     ],
     "cache_dir": "",
+    "use_cache_dir": true,
     "whitelist": {
         "us": {
             "aegwynn": true
