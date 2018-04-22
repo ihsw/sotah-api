@@ -17,8 +17,8 @@ export type AuctionsRequest = {
   realm_slug: realmSlug
   count: number
   page: number
-  sortKind: SortKind
-  sortDirection: SortDirection
+  sort_kind: SortKind
+  sort_direction: SortDirection
 };
 
 export type AuctionsResponse = {

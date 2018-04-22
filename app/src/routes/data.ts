@@ -44,8 +44,8 @@ export const getRouter = (messenger: Messenger): Router => {
       page,
       realm_slug: req.params["realmSlug"],
       region_name: req.params["regionName"],
-      sortDirection,
-      sortKind
+      sort_direction: sortDirection,
+      sort_kind: sortKind
     });
     switch (msg.code) {
       case code.ok:
