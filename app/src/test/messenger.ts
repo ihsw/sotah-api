@@ -5,6 +5,7 @@ import * as nats from "nats";
 
 import { Messenger, MessageError, subjects, code } from "../lib/messenger";
 import { getLogger } from "../lib/logger";
+import { SortDirection, SortKind } from "../lib/auction";
 
 interface ISetupSettings {
   messenger: Messenger;
@@ -46,7 +47,7 @@ test("Messenger Should fetch region statuses", async (t) => {
   t.true(status.realms.length > 0);
 });
 
-test.only("Messenger Should fetch auctions", async (t) => {
+test("Messenger Should fetch auctions", async (t) => {
   const { messenger } = setup();
 
   const [reg] = (await messenger.getRegions()).data!;
@@ -55,7 +56,9 @@ test.only("Messenger Should fetch auctions", async (t) => {
     count: 10,
     page: 0,
     realm_slug: realms[0].slug,
-    region_name: reg.name
+    region_name: reg.name,
+    sort_direction: SortDirection.none,
+    sort_kind: SortKind.none
   })).data!;
   t.not(auctions.auctions, null);
   t.true(auctions.auctions !== null && auctions.auctions.length > 0);
