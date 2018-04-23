@@ -54,10 +54,31 @@ test("Status Should return auction information", async (t) => {
   t.is(res.status, HttpStatus.OK, "Http status is OK");
 });
 
+test("Status Should return return 404 on invalid region name in auctions", async (t) => {
+  const tId = setTimeout(() => { throw new Error("Timed out!"); }, 5 * 1000);
+
+  const res = await request.post("/region/fdsfgs/realm/fdsfgs/auctions");
+  clearTimeout(tId);
+
+  t.is(res.status, HttpStatus.NOT_FOUND, "Http status is NOT_FOUND");
+});
+
+test("Status Should return 400 on invalid count", async (t) => {
+  const tId = setTimeout(() => { throw new Error("Timed out!"); }, 5 * 1000);
+
+  const [region] = (await messenger.getRegions()).data!;
+  const [realm] = (await messenger.getStatus(region.name)).data!.realms;
+  const res = await request.post(`/region/${region.name}/realm/${realm.slug}/auctions`).send({ count: 0 });
+  clearTimeout(tId);
+
+  t.is(res.status, HttpStatus.BAD_REQUEST);
+  t.is(res.text, "Count must be >0");
+});
+
 test("Status Should return 404 on invalid region name", async (t) => {
   const tId = setTimeout(() => { throw new Error("Timed out!"); }, 5 * 1000);
 
-  const res = await request.get("/region/fdsfgs");
+  const res = await request.get("/region/fdsfgs/realms");
   clearTimeout(tId);
 
   t.is(res.status, HttpStatus.NOT_FOUND, "Http status is NOT_FOUND");
