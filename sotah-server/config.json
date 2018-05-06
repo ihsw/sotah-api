@@ -23,6 +23,12 @@
     "whitelist": {
         "us": {
             "aegwynn": true
+        },
+        "eu": {
+        },
+        "tw": {
+        },
+        "kr": {
         }
     }
 }
