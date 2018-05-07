@@ -3,7 +3,7 @@ import * as nats from "nats";
 import { LoggerInstance } from "winston";
 
 import { regionName, IRegion, IStatus } from "./region";
-import { AuctionsRequest, AuctionsResponse } from "./auction";
+import { AuctionsRequest, AuctionsResponse, OwnersRequest, OwnersResponse } from "./auction";
 
 const DEFAULT_TIMEOUT = 5 * 1000;
 
@@ -25,7 +25,8 @@ export enum subjects {
   status = "status",
   regions = "regions",
   genericTestErrors = "genericTestErrors",
-  auctions = "auctions"
+  auctions = "auctions",
+  owners = "owners"
 }
 
 export enum code {
@@ -137,6 +138,22 @@ export class Messenger {
   async getAuctions(request: AuctionsRequest): Promise<Message<AuctionsResponse>> {
     const message = await this.request<string>(
       subjects.auctions,
+      { body: JSON.stringify(request), parseData: false }
+    );
+    if (message.code !== code.ok) {
+      return { code: message.code, error: message.error };
+    }
+
+    return {
+      code: code.ok,
+      data: JSON.parse((await gunzip(Buffer.from(message.rawData!, "base64"))).toString()),
+      error: null,
+    };
+  }
+
+  async getOwners(request: OwnersRequest): Promise<Message<OwnersResponse>> {
+    const message = await this.request<string>(
+      subjects.owners,
       { body: JSON.stringify(request), parseData: false }
     );
     if (message.code !== code.ok) {

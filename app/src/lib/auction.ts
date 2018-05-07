@@ -42,3 +42,12 @@ export type Auction = {
   timeLeft: string
   aucList: number[]
 };
+
+export type OwnersRequest = {
+  region_name: regionName
+  realm_slug: realmSlug
+};
+
+export type OwnersResponse = {
+  owners: string[]
+};
