@@ -43,7 +43,12 @@ export type Auction = {
   aucList: number[]
 };
 
+export type OwnersRequestBody = {
+  query: string
+};
+
 export type OwnersRequest = {
+  query: string
   region_name: regionName
   realm_slug: realmSlug
 };
