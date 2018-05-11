@@ -152,18 +152,6 @@ export class Messenger {
   }
 
   async getOwners(request: OwnersRequest): Promise<Message<OwnersResponse>> {
-    const message = await this.request<string>(
-      subjects.owners,
-      { body: JSON.stringify(request), parseData: false }
-    );
-    if (message.code !== code.ok) {
-      return { code: message.code, error: message.error };
-    }
-
-    return {
-      code: code.ok,
-      data: JSON.parse((await gunzip(Buffer.from(message.rawData!, "base64"))).toString()),
-      error: null,
-    };
+    return this.request<OwnersResponse>(subjects.owners, { body: JSON.stringify(request) });
   }
 }
