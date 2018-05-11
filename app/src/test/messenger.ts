@@ -58,7 +58,8 @@ test("Messenger Should fetch auctions", async (t) => {
     realm_slug: realms[0].slug,
     region_name: reg.name,
     sort_direction: SortDirection.none,
-    sort_kind: SortKind.none
+    sort_kind: SortKind.none,
+    owner_filter: ""
   })).data!;
   t.not(auctions.auctions, null);
   t.true(auctions.auctions !== null && auctions.auctions.length > 0);

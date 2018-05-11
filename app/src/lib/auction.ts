@@ -5,6 +5,8 @@ export enum SortDirection { none, up, down }
 
 export enum SortKind { none, item, quantity, bid, buyout, auctions, owner }
 
+export type OwnerName = string;
+
 export type AuctionsRequestBody = {
   count: number
   page: number
@@ -19,6 +21,7 @@ export type AuctionsRequest = {
   page: number
   sort_kind: SortKind
   sort_direction: SortDirection
+  owner_filter: OwnerName
 };
 
 export type AuctionsResponse = {
@@ -34,7 +37,7 @@ export type AuctionRealm = {
 
 export type Auction = {
   item: number
-  owner: string
+  owner: OwnerName
   ownerRealm: string
   bid: number
   buyout: number
@@ -54,5 +57,5 @@ export type OwnersRequest = {
 };
 
 export type OwnersResponse = {
-  owners: string[]
+  owners: OwnerName[]
 };
