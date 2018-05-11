@@ -151,7 +151,7 @@ export class Messenger {
     };
   }
 
-  async getOwners(request: OwnersRequest): Promise<Message<OwnersResponse>> {
-    return this.request<OwnersResponse>(subjects.owners, { body: JSON.stringify(request) });
+  getOwners(request: OwnersRequest): Promise<Message<OwnersResponse>> {
+    return this.request(subjects.owners, { body: JSON.stringify(request) });
   }
 }
