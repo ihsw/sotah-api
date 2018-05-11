@@ -38,7 +38,7 @@ export const getRouter = (messenger: Messenger): Router => {
     res.send(response).end();
   }));
   router.post("/region/:regionName/realm/:realmSlug/auctions", wrap(async (req, res) => {
-    const { count, page, sortDirection, sortKind } = <AuctionsRequestBody>req.body;
+    const { count, page, sortDirection, sortKind, ownerFilter } = <AuctionsRequestBody>req.body;
     const msg = await messenger.getAuctions({
       count,
       page,
@@ -46,7 +46,7 @@ export const getRouter = (messenger: Messenger): Router => {
       region_name: req.params["regionName"],
       sort_direction: sortDirection,
       sort_kind: sortKind,
-      owner_filter: req.param["ownerFilter"]
+      owner_filter: ownerFilter
     });
     switch (msg.code) {
       case code.ok:

@@ -12,6 +12,7 @@ export type AuctionsRequestBody = {
   page: number
   sortKind: SortKind
   sortDirection: SortDirection
+  ownerFilter: OwnerName
 };
 
 export type AuctionsRequest = {
