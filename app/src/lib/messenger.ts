@@ -3,7 +3,7 @@ import * as nats from "nats";
 import { LoggerInstance } from "winston";
 
 import { regionName, IRegion, IStatus } from "./region";
-import { AuctionsRequest, AuctionsResponse, OwnersRequest, OwnersResponse } from "./auction";
+import { AuctionsRequest, AuctionsResponse, OwnersRequest, OwnersResponse, ItemsResponse } from "./auction";
 
 const DEFAULT_TIMEOUT = 5 * 1000;
 
@@ -26,7 +26,8 @@ export enum subjects {
   regions = "regions",
   genericTestErrors = "genericTestErrors",
   auctions = "auctions",
-  owners = "owners"
+  owners = "owners",
+  items = "items"
 }
 
 export enum code {
@@ -153,5 +154,9 @@ export class Messenger {
 
   getOwners(request: OwnersRequest): Promise<Message<OwnersResponse>> {
     return this.request(subjects.owners, { body: JSON.stringify(request) });
+  }
+
+  getItems(query: string): Promise<Message<ItemsResponse>> {
+    return this.request(subjects.items, { body: JSON.stringify({ query }) });
   }
 }

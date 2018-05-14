@@ -7,6 +7,8 @@ export enum SortKind { none, item, quantity, bid, buyout, auctions, owner }
 
 export type OwnerName = string;
 
+export type ItemId = number;
+
 export type AuctionsRequestBody = {
   count: number
   page: number
@@ -59,4 +61,17 @@ export type OwnersRequest = {
 
 export type OwnersResponse = {
   owners: OwnerName[]
+};
+
+export type ItemsRequestBody = {
+  query: string
+};
+
+export type Item = {
+  name: string
+  item_id: ItemId
+};
+
+export type ItemsResponse = {
+  items: Item[]
 };

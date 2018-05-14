@@ -3,7 +3,8 @@
     "regions": [
         {
             "name": "us",
-            "hostname": "us.api.battle.net"
+            "hostname": "us.api.battle.net",
+            "primary": true
         },
         {
             "name": "eu",
@@ -24,11 +25,8 @@
         "us": {
             "aegwynn": true
         },
-        "eu": {
-        },
-        "tw": {
-        },
-        "kr": {
-        }
+        "eu": {},
+        "kw": {},
+        "tw": {}
     }
 }
