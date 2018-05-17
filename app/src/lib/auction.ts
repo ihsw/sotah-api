@@ -15,6 +15,7 @@ export type AuctionsRequestBody = {
   sortKind: SortKind
   sortDirection: SortDirection
   ownerFilter: OwnerName
+  itemFilter: ItemId
 };
 
 export type AuctionsRequest = {
@@ -25,6 +26,7 @@ export type AuctionsRequest = {
   sort_kind: SortKind
   sort_direction: SortDirection
   owner_filter: OwnerName
+  item_filter: ItemId
 };
 
 export type AuctionsResponse = {
