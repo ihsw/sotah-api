@@ -5,34 +5,20 @@ export enum SortDirection { none, up, down }
 
 export enum SortKind { none, item, quantity, bid, buyout, auctions, owner }
 
+// various types
 export type OwnerName = string;
 
 export type ItemId = number;
 
-export type AuctionsRequestBody = {
-  count: number
-  page: number
-  sortKind: SortKind
-  sortDirection: SortDirection
-  ownerFilter: OwnerName
-  itemFilter: ItemId
+export type Item = {
+  id: ItemId
+  name: string
+  normalized_name: string
 };
 
-export type AuctionsRequest = {
-  region_name: regionName
-  realm_slug: realmSlug
-  count: number
-  page: number
-  sort_kind: SortKind
-  sort_direction: SortDirection
-  owner_filter: OwnerName
-  item_filter: ItemId
-};
-
-export type AuctionsResponse = {
-  total: number
-  total_count: number
-  auctions: Auction[] | null
+export type Owner = {
+  name: OwnerName
+  normalized_name: string
 };
 
 export type AuctionRealm = {
@@ -51,6 +37,37 @@ export type Auction = {
   aucList: number[]
 };
 
+/**
+ * request-body, request, and responses
+ */
+// auctions
+export type AuctionsRequestBody = {
+  count: number
+  page: number
+  sortKind: SortKind
+  sortDirection: SortDirection
+  ownerFilters: OwnerName[]
+  itemFilters: ItemId[]
+};
+
+export type AuctionsRequest = {
+  region_name: regionName
+  realm_slug: realmSlug
+  count: number
+  page: number
+  sort_kind: SortKind
+  sort_direction: SortDirection
+  owner_filters: OwnerName[]
+  item_filters: ItemId[]
+};
+
+export type AuctionsResponse = {
+  total: number
+  total_count: number
+  auctions: Auction[] | null
+};
+
+// owners
 export type OwnersRequestBody = {
   query: string
 };
@@ -65,15 +82,32 @@ export type OwnersResponse = {
   owners: OwnerName[]
 };
 
+// items
 export type ItemsRequestBody = {
   query: string
 };
 
-export type Item = {
-  name: string
-  item_id: ItemId
-};
-
 export type ItemsResponse = {
   items: Item[]
+};
+
+// auctions-query
+export type AuctionsQueryRequestBody = {
+  query: string
+};
+
+export type AuctionsQueryRequest = {
+  query: string
+  region_name: regionName
+  realm_slug: realmSlug
+};
+
+export type AuctionsQueryItem = {
+  target: string
+  item: Item
+  owner: Owner
+};
+
+export type AuctionsQueryResponse = {
+  items: AuctionsQueryItem[]
 };
