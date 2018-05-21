@@ -27,7 +27,7 @@ export type AuctionRealm = {
 };
 
 export type Auction = {
-  item: number
+  item: Item
   owner: OwnerName
   ownerRealm: string
   bid: number
