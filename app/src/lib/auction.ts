@@ -10,10 +10,22 @@ export type OwnerName = string;
 
 export type ItemId = number;
 
+export enum ItemQuality {
+  Poor,
+  Common,
+  Uncommon,
+  Rare,
+  Epic,
+  Legendary,
+  Artifact,
+  Heirloom
+}
+
 export type Item = {
   id: ItemId
   name: string
   normalized_name: string
+  quality: ItemQuality
 };
 
 export type Owner = {
