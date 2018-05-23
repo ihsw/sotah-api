@@ -3,7 +3,7 @@ import { realmSlug } from "./realm";
 
 export enum SortDirection { none, up, down }
 
-export enum SortKind { none, item, quantity, bid, buyout, auctions, owner }
+export enum SortKind { none, item, quantity, bid, buyout, buyoutPer, auctions, owner }
 
 // various types
 export type OwnerName = string;
@@ -32,6 +32,7 @@ export type Auction = {
   ownerRealm: string
   bid: number
   buyout: number
+  buyoutPer: number
   quantity: number
   timeLeft: string
   aucList: number[]
