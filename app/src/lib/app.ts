@@ -50,6 +50,9 @@ export const getApp = (opts: Options): express.Express => {
     next();
   });
 
+  // static assets
+  app.use("/item-icons", express.static("/tmp/item-icons"));
+
   // route init
   app.use("/", defaultRouter);
   app.use("/", getDataRouter(messenger));
