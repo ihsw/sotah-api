@@ -1,1 +1,6 @@
-data
+data/auctions/*
+!data/auctions/.gitkeep
+data/item-icons/*
+!data/item-icons/.gitkeep
+data/items/*
+!data/items/.gitkeep

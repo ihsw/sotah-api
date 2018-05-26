@@ -36,6 +36,7 @@ services:
     - DB_HOST=db
     volumes:
     - ./app:/srv/app
+    - ./sotah-server/data/item-icons:/tmp/item-icons
   sotah-api:
     extends: sotah-api-base
     depends_on:
