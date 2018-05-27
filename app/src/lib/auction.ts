@@ -27,6 +27,7 @@ export type Item = {
   normalized_name: string
   quality: ItemQuality
   icon: string
+  itemLevel: number
 };
 
 export type Owner = {
