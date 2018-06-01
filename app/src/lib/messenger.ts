@@ -7,7 +7,8 @@ import {
   AuctionsRequest, AuctionsResponse,
   OwnersRequest, OwnersResponse,
   ItemsResponse,
-  AuctionsQueryRequest, AuctionsQueryResponse
+  AuctionsQueryRequest, AuctionsQueryResponse,
+  ItemClassesResponse
 } from "./auction";
 
 const DEFAULT_TIMEOUT = 5 * 1000;
@@ -33,7 +34,8 @@ export enum subjects {
   auctions = "auctions",
   owners = "owners",
   items = "items",
-  auctionsQuery = "auctionsQuery"
+  auctionsQuery = "auctionsQuery",
+  itemClasses = "itemClasses"
 }
 
 export enum code {
@@ -168,5 +170,9 @@ export class Messenger {
 
   queryAuctions(request: AuctionsQueryRequest): Promise<Message<AuctionsQueryResponse>> {
     return this.request(subjects.auctionsQuery, { body: JSON.stringify(request) });
+  }
+
+  getItemClasses(): Promise<Message<ItemClassesResponse>> {
+    return this.request(subjects.itemClasses);
   }
 }

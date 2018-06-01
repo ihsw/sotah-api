@@ -52,6 +52,17 @@ export type Auction = {
   aucList: number[]
 };
 
+export type subItemClass = {
+  subclass: number
+  name: string
+};
+
+export type ItemClass = {
+  class: number
+  name: string
+  subclasses: subItemClass[]
+};
+
 /**
  * request-body, request, and responses
  */
@@ -125,4 +136,8 @@ export type AuctionsQueryItem = {
 
 export type AuctionsQueryResponse = {
   items: AuctionsQueryItem[]
+};
+
+export type ItemClassesResponse = {
+  classes: ItemClass[]
 };

@@ -142,6 +142,10 @@ export const getRouter = (messenger: Messenger): Router => {
         return;
     }
   }));
+  router.get("/item-classes", wrap(async (_, res) => {
+    const msg = await messenger.getItemClasses();
+    res.send(msg.data).end();
+  }));
 
   return router;
 };
