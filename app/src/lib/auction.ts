@@ -21,6 +21,89 @@ export enum ItemQuality {
   Heirloom
 }
 
+export enum InventoryType {
+  None,
+  Head,
+  Neck,
+  Shoulder,
+  Shirt,
+  Chest,
+  Waist,
+  Legs,
+  Feet,
+  Wrist,
+  Hands,
+  Finger,
+  Trinket,
+  OneHand,
+  Shield,
+  Ranged,
+  Cloak,
+  TwoHand,
+  Bag,
+  Tabard,
+  Robe,
+  MainHand,
+  OffHand,
+  HeldInOffHand,
+  Ammo,
+  Thrown,
+  RangedRight,
+  Relic
+}
+
+export enum ItemBind { none, bindOnPickup, bindOnEquip }
+
+type ItemClassClass = number;
+
+type SubItemClassClass = number;
+
+type ItemSpellId = number;
+
+type ItemSpellSpell = {
+  id: ItemSpellId
+  name: string
+  icon: string
+  description: string
+  castTime: string
+};
+
+export enum ItemSpellTrigger {
+  OnProc = 'ON_PROC',
+  OnUse = 'ON_USE',
+  OnLearn = 'ON_LEARN',
+  OnLooted = 'ON_LOOTED',
+  OnPickup = 'ON_PICKUP',
+  OnEquip = 'ON_EQUIP'
+}
+
+type ItemSpell = {
+  spellId: ItemSpellId
+  nCharges: number
+  consumable: boolean
+  categoryId: number
+  trigger: ItemSpellTrigger
+  spell: ItemSpellSpell
+};
+
+type ItemWeaponDamage = {
+  min: number
+  max: number
+  exactMin: number
+  exactMax: number
+};
+
+type ItemWeaponInfo = {
+  damage: ItemWeaponDamage
+  weaponSpeed: number
+  dps: number
+};
+
+type ItemBonusStat = {
+  stat: number
+  amount: number
+};
+
 export type Item = {
   id: ItemId
   name: string
@@ -28,6 +111,20 @@ export type Item = {
   quality: ItemQuality
   icon: string
   itemLevel: number
+  itemClass: ItemClassClass
+  itemSubClass: SubItemClassClass
+  inventoryType: InventoryType
+  itemBind: ItemBind
+  requiredLevel: number
+  armor: number
+  maxDurability: number
+  sellPrice: number
+  itemSpells: ItemSpell[]
+  equippable: boolean
+  stackable: number
+  weaponInfo: ItemWeaponInfo
+  bonusStats: ItemBonusStat[]
+  description: string
 };
 
 export type Owner = {
