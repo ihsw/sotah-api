@@ -1,4 +1,4 @@
-FROM node
+FROM node:8
 
 ENV DB_HOST 0.0.0.0
 ENV NATS_HOST 0.0.0.0
