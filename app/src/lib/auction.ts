@@ -210,8 +210,14 @@ export type ItemsRequestBody = {
   query: string
 };
 
+export type ItemsResponseItem = {
+  item: Item
+  target: string
+  rank: number
+};
+
 export type ItemsResponse = {
-  items: Item[]
+  items: ItemsResponseItem[]
 };
 
 // auctions-query
@@ -229,6 +235,7 @@ export type AuctionsQueryItem = {
   target: string
   item: Item
   owner: Owner
+  rank: number
 };
 
 export type AuctionsQueryResponse = {
