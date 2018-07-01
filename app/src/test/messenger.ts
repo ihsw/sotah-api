@@ -64,3 +64,10 @@ test("Messenger Should fetch auctions", async (t) => {
   })).data!;
   t.true(auctions.auctions.length > 0);
 });
+
+test("Messenger Should fetch items", async (t) => {
+  const { messenger } = setup();
+
+  const res = (await messenger.queryItems("")).data!;
+  t.true(res.items.length > 0);
+});
