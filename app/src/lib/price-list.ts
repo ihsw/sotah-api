@@ -1,6 +1,6 @@
-import { regionName } from './region';
-import { realmSlug } from './realm';
-import { ItemId } from './auction';
+import { regionName } from "./region";
+import { realmSlug } from "./realm";
+import { ItemId } from "./auction";
 
 export type PriceListRequestBody = {
   item_ids: ItemId[]

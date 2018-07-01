@@ -69,12 +69,12 @@ type ItemSpellSpell = {
 };
 
 export enum ItemSpellTrigger {
-  OnProc = 'ON_PROC',
-  OnUse = 'ON_USE',
-  OnLearn = 'ON_LEARN',
-  OnLooted = 'ON_LOOTED',
-  OnPickup = 'ON_PICKUP',
-  OnEquip = 'ON_EQUIP'
+  OnProc = "ON_PROC",
+  OnUse = "ON_USE",
+  OnLearn = "ON_LEARN",
+  OnLooted = "ON_LOOTED",
+  OnPickup = "ON_PICKUP",
+  OnEquip = "ON_EQUIP"
 }
 
 type ItemSpell = {

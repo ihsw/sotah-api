@@ -63,13 +63,13 @@ export const getRouter = (messenger: Messenger): Router => {
     const { count, page, sortDirection, sortKind, ownerFilters, itemFilters } = <AuctionsRequestBody>req.body;
     const msg = await messenger.getAuctions({
       count,
+      item_filters: itemFilters,
+      owner_filters: ownerFilters,
       page,
       realm_slug: req.params["realmSlug"],
       region_name: req.params["regionName"],
       sort_direction: sortDirection,
-      sort_kind: sortKind,
-      owner_filters: ownerFilters,
-      item_filters: itemFilters
+      sort_kind: sortKind
     });
     handleMessage(res, msg);
   }));
