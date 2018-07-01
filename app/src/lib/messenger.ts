@@ -6,7 +6,7 @@ import { regionName, IRegion, IStatus } from "./region";
 import {
   AuctionsRequest, AuctionsResponse,
   OwnersRequest, OwnersResponse,
-  ItemsResponse,
+  ItemsQueryResponse,
   AuctionsQueryRequest, AuctionsQueryResponse,
   ItemClassesResponse
 } from "./auction";
@@ -33,7 +33,7 @@ export enum subjects {
   genericTestErrors = "genericTestErrors",
   auctions = "auctions",
   owners = "owners",
-  items = "items",
+  itemsQuery = "itemsQuery",
   auctionsQuery = "auctionsQuery",
   itemClasses = "itemClasses"
 }
@@ -164,8 +164,8 @@ export class Messenger {
     return this.request(subjects.owners, { body: JSON.stringify(request) });
   }
 
-  getItems(query: string): Promise<Message<ItemsResponse>> {
-    return this.request(subjects.items, { body: JSON.stringify({ query }) });
+  queryItems(query: string): Promise<Message<ItemsQueryResponse>> {
+    return this.request(subjects.itemsQuery, { body: JSON.stringify({ query }) });
   }
 
   queryAuctions(request: AuctionsQueryRequest): Promise<Message<AuctionsQueryResponse>> {

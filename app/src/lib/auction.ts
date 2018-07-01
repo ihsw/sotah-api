@@ -216,7 +216,7 @@ export type ItemsResponseItem = {
   rank: number
 };
 
-export type ItemsResponse = {
+export type ItemsQueryResponse = {
   items: ItemsResponseItem[]
 };
 

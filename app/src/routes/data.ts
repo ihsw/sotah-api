@@ -96,7 +96,7 @@ export const getRouter = (messenger: Messenger): Router => {
   }));
   router.post("/items", wrap(async (req, res) => {
     const { query } = <ItemsRequestBody>req.body;
-    const msg = await messenger.getItems(query);
+    const msg = await messenger.queryItems(query);
     switch (msg.code) {
       case code.ok:
         res.send(msg.data).end();
