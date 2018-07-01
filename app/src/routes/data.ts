@@ -1,10 +1,11 @@
-import { Router } from "express";
+import { Router, Response } from "express";
 import { wrap } from "async-middleware";
 import * as HttpStatus from "http-status";
 
-import { Messenger, code } from "../lib/messenger";
+import { Messenger, Message, code } from "../lib/messenger";
 import { IRealm } from "../lib/realm";
 import { AuctionsRequestBody, OwnersRequestBody, ItemsRequestBody, AuctionsQueryRequestBody } from "../lib/auction";
+import { PriceListRequestBody } from "../lib/price-list";
 
 interface StatusRealm extends IRealm {
   regionName: string;
@@ -12,6 +13,27 @@ interface StatusRealm extends IRealm {
 
 type StatusResponse = {
   realms: StatusRealm[]
+};
+
+export const handleMessage = <T>(res: Response, msg: Message<T>) => {
+  switch (msg.code) {
+    case code.ok:
+      res.send(msg.data).end();
+
+      return;
+    case code.notFound:
+      res.status(HttpStatus.NOT_FOUND).send(msg.error!.message).end();
+
+      return;
+    case code.userError:
+      res.status(HttpStatus.BAD_REQUEST).send(msg.error!.message).end();
+
+      return;
+    default:
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(msg.error!.message).end();
+
+      return;
+  }
 };
 
 export const getRouter = (messenger: Messenger): Router => {
@@ -49,24 +71,7 @@ export const getRouter = (messenger: Messenger): Router => {
       owner_filters: ownerFilters,
       item_filters: itemFilters
     });
-    switch (msg.code) {
-      case code.ok:
-        res.send(msg.data).end();
-
-        return;
-      case code.notFound:
-        res.status(HttpStatus.NOT_FOUND).send(msg.error!.message).end();
-
-        return;
-      case code.userError:
-        res.status(HttpStatus.BAD_REQUEST).send(msg.error!.message).end();
-
-        return;
-      default:
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(msg.error!.message).end();
-
-        return;
-    }
+    handleMessage(res, msg);
   }));
   router.post("/region/:regionName/realm/:realmSlug/owners", wrap(async (req, res) => {
     const { query } = <OwnersRequestBody>req.body;
@@ -75,46 +80,12 @@ export const getRouter = (messenger: Messenger): Router => {
       realm_slug: req.params["realmSlug"],
       region_name: req.params["regionName"]
     });
-    switch (msg.code) {
-      case code.ok:
-        res.send(msg.data).end();
-
-        return;
-      case code.notFound:
-        res.status(HttpStatus.NOT_FOUND).send(msg.error!.message).end();
-
-        return;
-      case code.userError:
-        res.status(HttpStatus.BAD_REQUEST).send(msg.error!.message).end();
-
-        return;
-      default:
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(msg.error!.message).end();
-
-        return;
-    }
+    handleMessage(res, msg);
   }));
   router.post("/items", wrap(async (req, res) => {
     const { query } = <ItemsRequestBody>req.body;
     const msg = await messenger.queryItems(query);
-    switch (msg.code) {
-      case code.ok:
-        res.send(msg.data).end();
-
-        return;
-      case code.notFound:
-        res.status(HttpStatus.NOT_FOUND).send(msg.error!.message).end();
-
-        return;
-      case code.userError:
-        res.status(HttpStatus.BAD_REQUEST).send(msg.error!.message).end();
-
-        return;
-      default:
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(msg.error!.message).end();
-
-        return;
-    }
+    handleMessage(res, msg);
   }));
   router.post("/region/:regionName/realm/:realmSlug/query-auctions", wrap(async (req, res) => {
     const { query } = <AuctionsQueryRequestBody>req.body;
@@ -123,24 +94,16 @@ export const getRouter = (messenger: Messenger): Router => {
       realm_slug: req.params["realmSlug"],
       region_name: req.params["regionName"]
     });
-    switch (msg.code) {
-      case code.ok:
-        res.send(msg.data).end();
-
-        return;
-      case code.notFound:
-        res.status(HttpStatus.NOT_FOUND).send(msg.error!.message).end();
-
-        return;
-      case code.userError:
-        res.status(HttpStatus.BAD_REQUEST).send(msg.error!.message).end();
-
-        return;
-      default:
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(msg.error!.message).end();
-
-        return;
-    }
+    handleMessage(res, msg);
+  }));
+  router.post("/region/:regionName/realm/:realmSlug/price-list", wrap(async (req, res) => {
+    const { item_ids } = <PriceListRequestBody>req.body;
+    const msg = await messenger.getPriceList({
+      item_ids,
+      realm_slug: req.params["realmSlug"],
+      region_name: req.params["regionName"]
+    });
+    handleMessage(res, msg);
   }));
   router.get("/item-classes", wrap(async (_, res) => {
     const msg = await messenger.getItemClasses();

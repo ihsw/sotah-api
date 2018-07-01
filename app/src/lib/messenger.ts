@@ -10,6 +10,7 @@ import {
   AuctionsQueryRequest, AuctionsQueryResponse,
   ItemClassesResponse
 } from "./auction";
+import { PriceListRequest, PriceListResponse } from "./price-list";
 
 const DEFAULT_TIMEOUT = 5 * 1000;
 
@@ -35,7 +36,8 @@ export enum subjects {
   owners = "owners",
   itemsQuery = "itemsQuery",
   auctionsQuery = "auctionsQuery",
-  itemClasses = "itemClasses"
+  itemClasses = "itemClasses",
+  priceList = "priceList"
 }
 
 export enum code {
@@ -174,5 +176,9 @@ export class Messenger {
 
   getItemClasses(): Promise<Message<ItemClassesResponse>> {
     return this.request(subjects.itemClasses);
+  }
+
+  getPriceList(request: PriceListRequest): Promise<Message<PriceListResponse>> {
+    return this.request(subjects.priceList, { body: JSON.stringify(request) });
   }
 }
