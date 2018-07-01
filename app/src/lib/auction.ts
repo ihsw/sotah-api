@@ -176,8 +176,8 @@ export type AuctionsRequestBody = {
 export type AuctionsRequest = {
   region_name: regionName
   realm_slug: realmSlug
-  count: number
   page: number
+  count: number
   sort_kind: SortKind
   sort_direction: SortDirection
   owner_filters: OwnerName[]
@@ -185,9 +185,9 @@ export type AuctionsRequest = {
 };
 
 export type AuctionsResponse = {
+  auctions: Auction[]
   total: number
   total_count: number
-  auctions: Auction[] | null
 };
 
 // owners

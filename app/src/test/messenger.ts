@@ -59,9 +59,8 @@ test("Messenger Should fetch auctions", async (t) => {
     region_name: reg.name,
     sort_direction: SortDirection.none,
     sort_kind: SortKind.none,
-    owner_filters: [""],
-    item_filters: [0]
+    owner_filters: [],
+    item_filters: []
   })).data!;
-  t.not(auctions.auctions, null);
-  t.true(auctions.auctions !== null && auctions.auctions.length > 0);
+  t.true(auctions.auctions.length > 0);
 });
