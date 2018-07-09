@@ -2,11 +2,12 @@ import * as SequelizeStatic from "sequelize";
 import { Instance, Sequelize, STRING } from "sequelize";
 
 import { UserModel } from "./user";
+import { regionName } from "../lib/region";
 
 export type PreferenceAttributes = {
   id?: number
   user_id: number
-  currentRegion: string
+  currentRegion: regionName
 };
 
 export interface PreferenceInstance extends Instance<PreferenceAttributes> {
