@@ -11,7 +11,7 @@ import {
   appendRelationships as appendPreferenceRelationships
 } from "./preference";
 
-type Models = {
+export type Models = {
   User: UserModel
   Preference: PreferenceModel
 };

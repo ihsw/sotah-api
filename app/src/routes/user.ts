@@ -3,11 +3,13 @@ import * as HTTPStatus from "http-status";
 import { wrap } from "async-middleware";
 import * as bcrypt from "bcrypt";
 
-import { UserModel, withoutPassword, UserInstance, generateJwtToken } from "../models/user";
+import { Models } from "../models";
+import { withoutPassword, UserInstance, generateJwtToken } from "../models/user";
 import { auth } from "../lib/session";
 
-export const getRouter = (User: UserModel) => {
+export const getRouter = (models: Models) => {
   const router = Router();
+  const { User } = models;
 
   router.post("/users", wrap(async (req: Request, res: Response) => {
     const email: string = req.body.email;
