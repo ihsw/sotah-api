@@ -9,7 +9,7 @@ import { auth } from "../lib/session";
 
 export const getRouter = (models: Models) => {
   const router = Router();
-  const { User } = models;
+  const { User, Preference } = models;
 
   router.post("/users", wrap(async (req: Request, res: Response) => {
     const email: string = req.body.email;
@@ -94,6 +94,19 @@ export const getRouter = (models: Models) => {
 
   router.get("/user", auth, wrap(async (req: Request, res: Response) => {
     res.json(withoutPassword(req.user as UserInstance));
+  }));
+
+  router.get("/user/preferences", auth, wrap(async (req: Request, res: Response) => {
+    const user = req.user as UserInstance;
+    const preference = await Preference.findOne({ where: { user_id: user.id } });
+
+    if (preference === null) {
+      res.status(HTTPStatus.NOT_FOUND).send();
+
+      return;
+    }
+
+    res.json({ preference: preference.toJSON() });
   }));
 
   return router;

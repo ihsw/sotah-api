@@ -166,3 +166,17 @@ test("User creation endpoint Should fail on valid jwt token but invalid payload"
   const res = await (request.get("/user").set("Authorization", `Bearer ${token}`));
   t.is(res.status, HTTPStatus.UNAUTHORIZED);
 });
+
+test.only("User creation endpoint Should return not found on existing user but no preferences", async (t) => {
+  const password = "test";
+  const user = await createUser(t, {
+    email: `no-preferences+${uuidv4()}@test.com`,
+    password
+  });
+
+  let res = await request.post("/login").send({ email: user.email, password });
+  t.is(res.status, HTTPStatus.OK);
+
+  res = await (request.get("/user/preferences").set("Authorization", `Bearer ${res.body.token}`));
+  t.is(res.status, HTTPStatus.NOT_FOUND);
+});
