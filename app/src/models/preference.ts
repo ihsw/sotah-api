@@ -18,7 +18,7 @@ export type PreferenceModel = SequelizeStatic.Model<PreferenceInstance, Preferen
 
 export const createModel = (sequelize: Sequelize): PreferenceModel => {
   return sequelize.define<PreferenceInstance, PreferenceAttributes>("preference", {
-    current_region: { type: STRING, allowNull: false }
+    current_region: { type: STRING, allowNull: true }
   });
 };
 
