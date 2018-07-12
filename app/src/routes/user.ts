@@ -65,7 +65,7 @@ export const getRouter = (models: Models) => {
     }
 
     preference = await Preference.create({ ...result!, user_id: user.id });
-    res.status(HTTPStatus.CREATED).json(preference.toJSON());
+    res.status(HTTPStatus.CREATED).json({ preference: preference.toJSON() });
   }));
 
   router.put("/user/preferences", auth, wrap(async (req: Request, res: Response) => {
@@ -78,18 +78,17 @@ export const getRouter = (models: Models) => {
       return;
     }
 
-    const allowed = Object.keys(preference.toJSON());
-    const raw = req.body;
-    const filtered = Object.keys(raw)
-      .filter((key) => allowed.includes(key))
-      .reduce((result, key) => {
-        result[key] = raw[key];
-        return result;
-      }, {});
-    preference.setAttributes(filtered);
-    preference.save();
-    res.json(preference.toJSON());
+    let result: PreferenceAttributes | null = null;
+    try {
+      result = await PreferenceRules.validate(req.body) as PreferenceAttributes;
+    } catch (err) {
+      res.status(HTTPStatus.BAD_REQUEST).json(err.errors);
 
+      return;
+    }
+
+    preference.setAttributes({ ...result });
+    preference.save();
     res.json({ preference: preference.toJSON() });
   }));
 

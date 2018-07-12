@@ -191,9 +191,11 @@ test("User creation endpoint Should create preferences", async (t) => {
   let res = await request.post("/login").send({ email: user.email, password });
   t.is(res.status, HTTPStatus.OK);
 
+  const { token } = res.body;
+
   res = await (request
     .post("/user/preferences")
-    .set("Authorization", `Bearer ${res.body.token}`)
+    .set("Authorization", `Bearer ${token}`)
     .send({ current_region: "test" })
   );
   t.is(res.status, HTTPStatus.CREATED);
@@ -209,17 +211,19 @@ test("User creation endpoint Should update preferences", async (t) => {
   let res = await request.post("/login").send({ email: user.email, password });
   t.is(res.status, HTTPStatus.OK);
 
+  const { token } = res.body;
+
   res = await (request
     .post("/user/preferences")
-    .set("Authorization", `Bearer ${res.body.token}`)
-    .send({ currentRegion: "test" })
+    .set("Authorization", `Bearer ${token}`)
+    .send({ current_region: "test" })
   );
   t.is(res.status, HTTPStatus.CREATED);
 
   res = await (request
     .put("/user/preferences")
-    .set("Authorization", `Bearer ${res.body.token}`)
-    .send({ currentRegion: "test2" })
+    .set("Authorization", `Bearer ${token}`)
+    .send({ current_region: "test2" })
   );
   t.is(res.status, HTTPStatus.OK);
 });
