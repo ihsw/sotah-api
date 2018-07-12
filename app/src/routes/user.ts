@@ -30,6 +30,19 @@ export const getRouter = (models: Models) => {
     });
   }));
 
+  router.get("/user/preferences", auth, wrap(async (req: Request, res: Response) => {
+    const user = req.user as UserInstance;
+    const preference = await Preference.findOne({ where: { user_id: user.id } });
+
+    if (preference === null) {
+      res.status(HTTPStatus.NOT_FOUND).send();
+
+      return;
+    }
+
+    res.json({ preference: preference.toJSON() });
+  }));
+
   router.get("/user/:id", wrap(async (req: Request, res: Response) => {
     const user = await User.findById(req.params["id"]);
     if (user === null) {
@@ -94,19 +107,6 @@ export const getRouter = (models: Models) => {
 
   router.get("/user", auth, wrap(async (req: Request, res: Response) => {
     res.json(withoutPassword(req.user as UserInstance));
-  }));
-
-  router.get("/user/preferences", auth, wrap(async (req: Request, res: Response) => {
-    const user = req.user as UserInstance;
-    const preference = await Preference.findOne({ where: { user_id: user.id } });
-
-    if (preference === null) {
-      res.status(HTTPStatus.NOT_FOUND).send();
-
-      return;
-    }
-
-    res.json({ preference: preference.toJSON() });
   }));
 
   return router;

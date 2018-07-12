@@ -167,7 +167,7 @@ test("User creation endpoint Should fail on valid jwt token but invalid payload"
   t.is(res.status, HTTPStatus.UNAUTHORIZED);
 });
 
-test.only("User creation endpoint Should return not found on existing user but no preferences", async (t) => {
+test("User creation endpoint Should return not found on existing user but no preferences", async (t) => {
   const password = "test";
   const user = await createUser(t, {
     email: `no-preferences+${uuidv4()}@test.com`,
