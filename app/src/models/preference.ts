@@ -7,7 +7,7 @@ import { regionName } from "../lib/region";
 export type PreferenceAttributes = {
   id?: number
   user_id: number
-  current_region: regionName
+  current_region: regionName | null
 };
 
 export interface PreferenceInstance extends Instance<PreferenceAttributes> {

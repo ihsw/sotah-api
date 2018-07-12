@@ -201,6 +201,26 @@ test("User creation endpoint Should create preferences", async (t) => {
   t.is(res.status, HTTPStatus.CREATED);
 });
 
+test("User creation endpoint Should create blank preferences", async (t) => {
+  const password = "test";
+  const user = await createUser(t, {
+    email: `create-blank-preference+${uuidv4()}@test.com`,
+    password
+  });
+
+  let res = await request.post("/login").send({ email: user.email, password });
+  t.is(res.status, HTTPStatus.OK);
+
+  const { token } = res.body;
+
+  res = await (request
+    .post("/user/preferences")
+    .set("Authorization", `Bearer ${token}`)
+    .send({})
+  );
+  t.is(res.status, HTTPStatus.CREATED);
+});
+
 test("User creation endpoint Should update preferences", async (t) => {
   const password = "test";
   const user = await createUser(t, {
