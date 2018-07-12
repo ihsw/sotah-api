@@ -180,3 +180,46 @@ test("User creation endpoint Should return not found on existing user but no pre
   res = await (request.get("/user/preferences").set("Authorization", `Bearer ${res.body.token}`));
   t.is(res.status, HTTPStatus.NOT_FOUND);
 });
+
+test("User creation endpoint Should create preferences", async (t) => {
+  const password = "test";
+  const user = await createUser(t, {
+    email: `create-preference+${uuidv4()}@test.com`,
+    password
+  });
+
+  let res = await request.post("/login").send({ email: user.email, password });
+  t.is(res.status, HTTPStatus.OK);
+
+  res = await (request
+    .post("/user/preferences")
+    .set("Authorization", `Bearer ${res.body.token}`)
+    .send({ current_region: "test" })
+  );
+  t.is(res.status, HTTPStatus.CREATED);
+});
+
+test("User creation endpoint Should update preferences", async (t) => {
+  const password = "test";
+  const user = await createUser(t, {
+    email: `create-preference+${uuidv4()}@test.com`,
+    password
+  });
+
+  let res = await request.post("/login").send({ email: user.email, password });
+  t.is(res.status, HTTPStatus.OK);
+
+  res = await (request
+    .post("/user/preferences")
+    .set("Authorization", `Bearer ${res.body.token}`)
+    .send({ currentRegion: "test" })
+  );
+  t.is(res.status, HTTPStatus.CREATED);
+
+  res = await (request
+    .put("/user/preferences")
+    .set("Authorization", `Bearer ${res.body.token}`)
+    .send({ currentRegion: "test2" })
+  );
+  t.is(res.status, HTTPStatus.OK);
+});

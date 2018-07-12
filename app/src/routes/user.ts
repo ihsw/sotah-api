@@ -5,7 +5,9 @@ import * as bcrypt from "bcrypt";
 
 import { Models } from "../models";
 import { withoutPassword, UserInstance, generateJwtToken } from "../models/user";
+import { PreferenceAttributes } from "../models/preference";
 import { auth } from "../lib/session";
+import { PreferenceRules } from "../lib/validator-rules";
 
 export const getRouter = (models: Models) => {
   const router = Router();
@@ -53,8 +55,16 @@ export const getRouter = (models: Models) => {
       return;
     }
 
-    preference = await Preference.create(req.body);
-    preference.set("user_id", user.id);
+    let result: PreferenceAttributes | null = null;
+    try {
+      result = await PreferenceRules.validate(req.body) as PreferenceAttributes;
+    } catch (err) {
+      res.status(HTTPStatus.BAD_REQUEST).json(err.errors);
+
+      return;
+    }
+
+    preference = await Preference.create({ ...result!, user_id: user.id });
     res.status(HTTPStatus.CREATED).json(preference.toJSON());
   }));
 
