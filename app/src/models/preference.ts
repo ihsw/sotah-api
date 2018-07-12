@@ -7,7 +7,7 @@ import { regionName } from "../lib/region";
 export type PreferenceAttributes = {
   id?: number
   user_id: number
-  currentRegion: regionName
+  current_region: regionName
 };
 
 export interface PreferenceInstance extends Instance<PreferenceAttributes> {
@@ -18,7 +18,7 @@ export type PreferenceModel = SequelizeStatic.Model<PreferenceInstance, Preferen
 
 export const createModel = (sequelize: Sequelize): PreferenceModel => {
   return sequelize.define<PreferenceInstance, PreferenceAttributes>("preference", {
-    currentRegion: { type: STRING, allowNull: false }
+    current_region: { type: STRING, allowNull: false }
   });
 };
 
