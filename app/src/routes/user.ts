@@ -43,6 +43,46 @@ export const getRouter = (models: Models) => {
     res.json({ preference: preference.toJSON() });
   }));
 
+  router.post("/user/preferences", auth, wrap(async (req: Request, res: Response) => {
+    const user = req.user as UserInstance;
+    let preference = await Preference.findOne({ where: { user_id: user.id } });
+
+    if (preference !== null) {
+      res.status(HTTPStatus.BAD_REQUEST).json({ error: "User already has preferences." });
+
+      return;
+    }
+
+    preference = await Preference.create(req.body);
+    preference.set("user_id", user.id);
+    res.status(HTTPStatus.CREATED).json(preference.toJSON());
+  }));
+
+  router.put("/user/preferences", auth, wrap(async (req: Request, res: Response) => {
+    const user = req.user as UserInstance;
+    const preference = await Preference.findOne({ where: { user_id: user.id } });
+
+    if (preference === null) {
+      res.status(HTTPStatus.NOT_FOUND).send();
+
+      return;
+    }
+
+    const allowed = Object.keys(preference.toJSON());
+    const raw = req.body;
+    const filtered = Object.keys(raw)
+      .filter((key) => allowed.includes(key))
+      .reduce((result, key) => {
+        result[key] = raw[key];
+        return result;
+      }, {});
+    preference.setAttributes(filtered);
+    preference.save();
+    res.json(preference.toJSON());
+
+    res.json({ preference: preference.toJSON() });
+  }));
+
   router.get("/user/:id", wrap(async (req: Request, res: Response) => {
     const user = await User.findById(req.params["id"]);
     if (user === null) {
