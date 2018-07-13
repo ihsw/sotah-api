@@ -224,7 +224,7 @@ test("User creation endpoint Should return preferences", async (t) => {
     .get("/user/preferences")
     .set("Authorization", `Bearer ${token}`)
   );
-  t.is(res.status, HTTPStatus.CREATED);
+  t.is(res.status, HTTPStatus.OK);
   t.is(res.body.preference.current_region, "test");
 });
 
