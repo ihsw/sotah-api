@@ -23,5 +23,5 @@ script:
 - npm run -s lint
 - npm run -s migrate-up
 - ./bin/run-tests-coverage && npm run -s coveralls-coverage
-- npm run -s test-coverage-report && npm run -s test-coverage-check
+- npm run -s test-coverage-report
 - git clean -xfd && docker build -t $DOCKER_IMAGE_NAME ../
