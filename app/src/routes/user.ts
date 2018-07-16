@@ -13,6 +13,9 @@ export const getRouter = (models: Models) => {
   const router = Router();
   const { User } = models;
 
+  router.use("/user/preferences", getPreferencesRouter(models));
+  router.use("/user/:id", getCrudRouter(models));
+
   router.post("/users", wrap(async (req: Request, res: Response) => {
     const email: string = req.body.email;
     const password: string = await bcrypt.hash(req.body.password, 10);
@@ -31,9 +34,6 @@ export const getRouter = (models: Models) => {
       user: withoutPassword(user)
     });
   }));
-
-  router.use("/user/preferences", getPreferencesRouter(models));
-  router.use("/user/:id", getCrudRouter(models));
 
   router.post("/login", wrap(async (req: Request, res: Response) => {
     // validating provided email
