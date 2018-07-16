@@ -17,7 +17,7 @@ const { request } = setup({
 });
 const { requestUser } = getTestHelper(request);
 
-const createUser = async (t: TestContext, body: IUserRequest): Promise<IUserResponse> => {
+export const createUser = async (t: TestContext, body: IUserRequest): Promise<IUserResponse> => {
   const res = await requestUser(body);
   t.is(res.status, HTTPStatus.CREATED);
   t.not(String(res.header["content-type"]).match(/^application\/json/), null);
@@ -42,51 +42,6 @@ test("User creation endpoint Should create a new user", async (t) => {
   t.true("user" in body);
   t.true("id" in body.user);
   t.is(typeof body.user.id, "number");
-});
-
-test("User creation endpoint Should return a user", async (t) => {
-  const user = await createUser(t, {
-    email: `return-new-user+${uuidv4()}@test.com`,
-    password: "test"
-  });
-  const res = await request.get(`/user/${user.id}`);
-  t.is(res.status, HTTPStatus.OK);
-});
-
-test("User creation endpoint Should error on fetching user by invalid id", async (t) => {
-  const res = await request.get("/user/-1");
-  t.is(res.status, HTTPStatus.NOT_FOUND);
-});
-
-test("User creation endpoint Should delete a user", async (t) => {
-  const user = await createUser(t, {
-    email: `delete-user+${uuidv4()}@test.com`,
-    password: "test"
-  });
-  const res = await request.delete(`/user/${user.id}`);
-  t.is(res.status, HTTPStatus.OK);
-  t.not(String(res.header["content-type"]).match(/^application\/json/), null);
-});
-
-test("User creation endpoint Should error on deleting user by invalid id", async (t) => {
-  const res = await request.delete("/user/-1");
-  t.is(res.status, HTTPStatus.NOT_FOUND);
-});
-
-test("User creation endpoint Should update a user", async (t) => {
-  const user = await createUser(t, {
-    email: `update-user+${uuidv4()}@test.com`,
-    password: "test"
-  });
-  const newBody = { email: `update-user+${uuidv4()}@test.com` };
-  const res = await request.put(`/user/${user.id}`).send(newBody);
-  t.is(res.status, HTTPStatus.OK);
-  t.is(res.body.email, newBody.email);
-});
-
-test("User creation endpoint Should error on updating a user by invalid id", async (t) => {
-  const res = await request.put("/user/-1");
-  t.is(res.status, HTTPStatus.NOT_FOUND);
 });
 
 test("User creation endpoint Should fail on invalid username", async (t) => {
@@ -165,112 +120,4 @@ test("User creation endpoint Should fail on valid jwt token but invalid payload"
 
   const res = await (request.get("/user").set("Authorization", `Bearer ${token}`));
   t.is(res.status, HTTPStatus.UNAUTHORIZED);
-});
-
-test("User creation endpoint Should return not found on existing user but no preferences", async (t) => {
-  const password = "test";
-  const user = await createUser(t, {
-    email: `no-preferences+${uuidv4()}@test.com`,
-    password
-  });
-
-  let res = await request.post("/login").send({ email: user.email, password });
-  t.is(res.status, HTTPStatus.OK);
-
-  res = await (request.get("/user/preferences").set("Authorization", `Bearer ${res.body.token}`));
-  t.is(res.status, HTTPStatus.NOT_FOUND);
-});
-
-test("User creation endpoint Should create preferences", async (t) => {
-  const password = "test";
-  const user = await createUser(t, {
-    email: `create-preference+${uuidv4()}@test.com`,
-    password
-  });
-
-  let res = await request.post("/login").send({ email: user.email, password });
-  t.is(res.status, HTTPStatus.OK);
-
-  const { token } = res.body;
-
-  res = await (request
-    .post("/user/preferences")
-    .set("Authorization", `Bearer ${token}`)
-    .send({ current_region: "test" })
-  );
-  t.is(res.status, HTTPStatus.CREATED);
-});
-
-test("User creation endpoint Should return preferences", async (t) => {
-  const password = "test";
-  const user = await createUser(t, {
-    email: `create-preference+${uuidv4()}@test.com`,
-    password
-  });
-
-  let res = await request.post("/login").send({ email: user.email, password });
-  t.is(res.status, HTTPStatus.OK);
-
-  const { token } = res.body;
-
-  res = await (request
-    .post("/user/preferences")
-    .set("Authorization", `Bearer ${token}`)
-    .send({ current_region: "test" })
-  );
-  t.is(res.status, HTTPStatus.CREATED);
-
-  res = await (request
-    .get("/user/preferences")
-    .set("Authorization", `Bearer ${token}`)
-  );
-  t.is(res.status, HTTPStatus.OK);
-  t.is(res.body.preference.current_region, "test");
-});
-
-test("User creation endpoint Should create blank preferences", async (t) => {
-  const password = "test";
-  const user = await createUser(t, {
-    email: `create-blank-preference+${uuidv4()}@test.com`,
-    password
-  });
-
-  let res = await request.post("/login").send({ email: user.email, password });
-  t.is(res.status, HTTPStatus.OK);
-
-  const { token } = res.body;
-
-  res = await (request
-    .post("/user/preferences")
-    .set("Authorization", `Bearer ${token}`)
-    .send({})
-  );
-  t.is(res.status, HTTPStatus.CREATED);
-});
-
-test("User creation endpoint Should update preferences", async (t) => {
-  const password = "test";
-  const user = await createUser(t, {
-    email: `create-preference+${uuidv4()}@test.com`,
-    password
-  });
-
-  let res = await request.post("/login").send({ email: user.email, password });
-  t.is(res.status, HTTPStatus.OK);
-
-  const { token } = res.body;
-
-  res = await (request
-    .post("/user/preferences")
-    .set("Authorization", `Bearer ${token}`)
-    .send({ current_region: "test" })
-  );
-  t.is(res.status, HTTPStatus.CREATED);
-
-  res = await (request
-    .put("/user/preferences")
-    .set("Authorization", `Bearer ${token}`)
-    .send({ current_region: "test2" })
-  );
-  t.is(res.status, HTTPStatus.OK);
 });

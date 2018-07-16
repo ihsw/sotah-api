@@ -5,13 +5,13 @@ import * as bcrypt from "bcrypt";
 
 import { Models } from "../models";
 import { withoutPassword, UserInstance, generateJwtToken } from "../models/user";
-import { PreferenceAttributes } from "../models/preference";
 import { auth } from "../lib/session";
-import { PreferenceRules } from "../lib/validator-rules";
+import { getRouter as getPreferencesRouter } from "./user/preferences";
+import { getRouter as getCrudRouter } from "./user/crud";
 
 export const getRouter = (models: Models) => {
   const router = Router();
-  const { User, Preference } = models;
+  const { User } = models;
 
   router.post("/users", wrap(async (req: Request, res: Response) => {
     const email: string = req.body.email;
@@ -32,101 +32,8 @@ export const getRouter = (models: Models) => {
     });
   }));
 
-  router.get("/user/preferences", auth, wrap(async (req: Request, res: Response) => {
-    const user = req.user as UserInstance;
-    const preference = await Preference.findOne({ where: { user_id: user.id } });
-
-    if (preference === null) {
-      res.status(HTTPStatus.NOT_FOUND).send();
-
-      return;
-    }
-
-    res.json({ preference: preference.toJSON() });
-  }));
-
-  router.post("/user/preferences", auth, wrap(async (req: Request, res: Response) => {
-    const user = req.user as UserInstance;
-    let preference = await Preference.findOne({ where: { user_id: user.id } });
-
-    if (preference !== null) {
-      res.status(HTTPStatus.BAD_REQUEST).json({ error: "User already has preferences." });
-
-      return;
-    }
-
-    let result: PreferenceAttributes | null = null;
-    try {
-      result = await PreferenceRules.validate(req.body) as PreferenceAttributes;
-    } catch (err) {
-      res.status(HTTPStatus.BAD_REQUEST).json(err.errors);
-
-      return;
-    }
-
-    preference = await Preference.create({ ...result!, user_id: user.id });
-    res.status(HTTPStatus.CREATED).json({ preference: preference.toJSON() });
-  }));
-
-  router.put("/user/preferences", auth, wrap(async (req: Request, res: Response) => {
-    const user = req.user as UserInstance;
-    const preference = await Preference.findOne({ where: { user_id: user.id } });
-
-    if (preference === null) {
-      res.status(HTTPStatus.NOT_FOUND).send();
-
-      return;
-    }
-
-    let result: PreferenceAttributes | null = null;
-    try {
-      result = await PreferenceRules.validate(req.body) as PreferenceAttributes;
-    } catch (err) {
-      res.status(HTTPStatus.BAD_REQUEST).json(err.errors);
-
-      return;
-    }
-
-    preference.setAttributes({ ...result });
-    preference.save();
-    res.json({ preference: preference.toJSON() });
-  }));
-
-  router.get("/user/:id", wrap(async (req: Request, res: Response) => {
-    const user = await User.findById(req.params["id"]);
-    if (user === null) {
-      res.status(HTTPStatus.NOT_FOUND).send();
-
-      return;
-    }
-
-    res.json(withoutPassword(user));
-  }));
-
-  router.delete("/user/:id", wrap(async (req: Request, res: Response) => {
-    const user = await User.findById(req.params["id"]);
-    if (user === null) {
-      res.status(HTTPStatus.NOT_FOUND).send();
-
-      return;
-    }
-
-    await User.destroy({ where: { id: user.id } });
-    res.json({});
-  }));
-
-  router.put("/user/:id", wrap(async (req: Request, res: Response) => {
-    const user = await User.findById(req.params["id"]);
-    if (user === null) {
-      res.status(HTTPStatus.NOT_FOUND).send();
-
-      return;
-    }
-
-    user.set("email", req.body.email);
-    user.save();
-    res.json(withoutPassword(user));
-  }));
+  router.use("/user/preferences", getPreferencesRouter(models));
+  router.use("/user/:id", getCrudRouter(models));
 
   router.post("/login", wrap(async (req: Request, res: Response) => {
     // validating provided email
