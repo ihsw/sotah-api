@@ -7,17 +7,9 @@ export const up = async (query: QueryInterface) => {
       primaryKey: true,
       type: INTEGER
     },
-    item_id: {
+    name: {
       allowNull: false,
-      type: INTEGER
-    },
-    order_index: {
-      allowNull: false,
-      type: INTEGER
-    },
-    quantity_modifier: {
-      allowNull: false,
-      type: INTEGER
+      type: STRING
     },
     realm: {
       allowNull: false,
