@@ -9,7 +9,7 @@ export const getRouter = (models: Models) => {
   const router = Router();
   const { User } = models;
 
-  router.get("/user/:id", wrap(async (req: Request, res: Response) => {
+  router.get("/", wrap(async (req: Request, res: Response) => {
     const user = await User.findById(req.params["id"]);
     if (user === null) {
       res.status(HTTPStatus.NOT_FOUND).send();
@@ -20,7 +20,7 @@ export const getRouter = (models: Models) => {
     res.json(withoutPassword(user));
   }));
 
-  router.delete("/user/:id", wrap(async (req: Request, res: Response) => {
+  router.delete("/", wrap(async (req: Request, res: Response) => {
     const user = await User.findById(req.params["id"]);
     if (user === null) {
       res.status(HTTPStatus.NOT_FOUND).send();
@@ -32,7 +32,7 @@ export const getRouter = (models: Models) => {
     res.json({});
   }));
 
-  router.put("/user/:id", wrap(async (req: Request, res: Response) => {
+  router.put("/", wrap(async (req: Request, res: Response) => {
     const user = await User.findById(req.params["id"]);
     if (user === null) {
       res.status(HTTPStatus.NOT_FOUND).send();
