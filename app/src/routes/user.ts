@@ -6,14 +6,16 @@ import * as bcrypt from "bcrypt";
 import { Models } from "../models";
 import { withoutPassword, UserInstance, generateJwtToken } from "../models/user";
 import { auth } from "../lib/session";
-import { getRouter as getPreferencesRouter } from "./user/preferences";
 import { getRouter as getCrudRouter } from "./user/crud";
+import { getRouter as getPreferencesRouter } from "./user/preferences";
+import { getRouter as getPricelistsCrudRouter } from "./user/pricelists-crud";
 
 export const getRouter = (models: Models) => {
   const router = Router();
   const { User } = models;
 
   router.use("/user/preferences", getPreferencesRouter(models));
+  router.use("/user/pricelists", getPricelistsCrudRouter(models));
   router.use("/user/:id", getCrudRouter(models));
 
   router.post("/users", wrap(async (req: Request, res: Response) => {
