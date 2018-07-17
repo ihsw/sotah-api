@@ -17,7 +17,7 @@ const { request } = setup({
 });
 const { requestUser } = getTestHelper(request);
 
-export const createUser = async (t: TestContext, body: IUserRequest): Promise<IUserResponse> => {
+const createUser = async (t: TestContext, body: IUserRequest): Promise<IUserResponse> => {
   const res = await requestUser(body);
   t.is(res.status, HTTPStatus.CREATED);
   t.not(String(res.header["content-type"]).match(/^application\/json/), null);
