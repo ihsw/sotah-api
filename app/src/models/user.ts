@@ -4,6 +4,7 @@ import * as jwt from "jsonwebtoken";
 
 import { JwtPayload, jwtOptions } from "../lib/session";
 import { PreferenceModel } from "./preference";
+import { PricelistModel } from "./pricelist";
 
 export type UserAttributes = {
   id?: number
@@ -24,8 +25,13 @@ export const createModel = (sequelize: Sequelize): UserModel => {
   });
 };
 
-export const appendRelationships = (User: UserModel, Preference: PreferenceModel): UserModel => {
+export const appendRelationships = (
+  User: UserModel,
+  Preference: PreferenceModel,
+  Pricelist: PricelistModel
+): UserModel => {
   User.hasMany(Preference, { foreignKey: "user_id" });
+  User.hasMany(Pricelist, { foreignKey: "user_id" });
 
   return User;
 };
