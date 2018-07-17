@@ -4,8 +4,8 @@
   "description": "",
   "main": "./dist/index.js",
   "scripts": {
-    "test": "ava -vs ./dist/test/*.js ./dist/test/**/*.js",
-    "test:w": "ava -vsw ./dist/test/*.js ./dist/test/**/*.js",
+    "test": "ava -vs './dist/test/**/*.js'",
+    "test:w": "ava -vsw './dist/test/**/*.js'",
     "test-coverage": "nyc --reporter=lcov npm test",
     "test-coverage-report": "nyc report",
     "test-coverage-check": "nyc check-coverage --lines 95 --functions 75 --branches 95",
