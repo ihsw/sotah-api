@@ -3,13 +3,18 @@ import * as HTTPStatus from "http-status";
 import { wrap } from "async-middleware";
 
 import { Models } from "../../models";
-import { withoutPassword } from "../../models/user";
+import { auth } from "../../lib/session";
+import { withoutPassword, UserInstance } from "../../models/user";
 
 export const getRouter = (models: Models) => {
   const router = Router();
   const { User } = models;
 
-  router.get("/", wrap(async (req: Request, res: Response) => {
+  router.get("/", auth, wrap(async (req: Request, res: Response) => {
+    res.json(withoutPassword(req.user as UserInstance));
+  }));
+
+  router.get("/:id", wrap(async (req: Request, res: Response) => {
     const user = await User.findById(req.params["id"]);
     if (user === null) {
       res.status(HTTPStatus.NOT_FOUND).send();
@@ -20,7 +25,7 @@ export const getRouter = (models: Models) => {
     res.json(withoutPassword(user));
   }));
 
-  router.delete("/", wrap(async (req: Request, res: Response) => {
+  router.delete("/:id", wrap(async (req: Request, res: Response) => {
     const user = await User.findById(req.params["id"]);
     if (user === null) {
       res.status(HTTPStatus.NOT_FOUND).send();
@@ -32,7 +37,7 @@ export const getRouter = (models: Models) => {
     res.json({});
   }));
 
-  router.put("/", wrap(async (req: Request, res: Response) => {
+  router.put("/:id", wrap(async (req: Request, res: Response) => {
     const user = await User.findById(req.params["id"]);
     if (user === null) {
       res.status(HTTPStatus.NOT_FOUND).send();

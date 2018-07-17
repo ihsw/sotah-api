@@ -4,8 +4,7 @@ import { wrap } from "async-middleware";
 import * as bcrypt from "bcrypt";
 
 import { Models } from "../models";
-import { withoutPassword, UserInstance, generateJwtToken } from "../models/user";
-import { auth } from "../lib/session";
+import { withoutPassword, generateJwtToken } from "../models/user";
 import { getRouter as getCrudRouter } from "./user/crud";
 import { getRouter as getPreferencesRouter } from "./user/preferences";
 import { getRouter as getPricelistsCrudRouter } from "./user/pricelists-crud";
@@ -16,7 +15,7 @@ export const getRouter = (models: Models) => {
 
   router.use("/user/preferences", getPreferencesRouter(models));
   router.use("/user/pricelists", getPricelistsCrudRouter(models));
-  router.use("/user/:id", getCrudRouter(models));
+  router.use("/user", getCrudRouter(models));
 
   router.post("/users", wrap(async (req: Request, res: Response) => {
     const email: string = req.body.email;
@@ -61,10 +60,6 @@ export const getRouter = (models: Models) => {
       token: generateJwtToken(user),
       user: withoutPassword(user)
     });
-  }));
-
-  router.get("/user", auth, wrap(async (req: Request, res: Response) => {
-    res.json(withoutPassword(req.user as UserInstance));
   }));
 
   return router;
