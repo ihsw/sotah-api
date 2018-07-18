@@ -49,7 +49,7 @@ test("Pricelists crud endpoint Should create a pricelist", async (t) => {
 test("Pricelists crud endpoint Should return a pricelist", async (t) => {
   const password = "test";
   const user = await createUser(t, {
-    email: `create-pricelist+${uuidv4()}@test.com`,
+    email: `get-pricelist+${uuidv4()}@test.com`,
     password
   });
 
@@ -70,4 +70,31 @@ test("Pricelists crud endpoint Should return a pricelist", async (t) => {
     .set("Authorization", `Bearer ${token}`)
   );
   t.is(res.status, HTTPStatus.OK);
+});
+
+test("Pricelists crud endpoint Should return pricelists", async (t) => {
+  const password = "test";
+  const user = await createUser(t, {
+    email: `get-pricelists+${uuidv4()}@test.com`,
+    password
+  });
+
+  let res = await request.post("/login").send({ email: user.email, password });
+  t.is(res.status, HTTPStatus.OK);
+
+  const { token } = res.body;
+
+  res = await (request
+    .post("/user/pricelists")
+    .set("Authorization", `Bearer ${token}`)
+    .send({ name: "test", region: "test", realm: "test" })
+  );
+  t.is(res.status, HTTPStatus.CREATED);
+
+  res = await (request
+    .get(`/user/pricelists`)
+    .set("Authorization", `Bearer ${token}`)
+  );
+  t.is(res.status, HTTPStatus.OK);
+  t.is(res.body.pricelists.length, 1);
 });

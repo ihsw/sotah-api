@@ -41,5 +41,13 @@ export const getRouter = (models: Models) => {
     res.json({ pricelist: pricelist.toJSON });
   }));
 
+  router.get("/", auth, wrap(async (req: Request, res: Response) => {
+    const user = req.user as UserInstance;
+    const pricelists = await Pricelist.findAll({
+      where: { user_id: user.id }
+    });
+    res.json({ pricelists: pricelists.map((v) => v.toJSON()) });
+  }));
+
   return router;
 };
