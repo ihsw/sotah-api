@@ -27,6 +27,14 @@ export const getRouter = (models: Models) => {
     res.status(HTTPStatus.CREATED).json({ pricelist: pricelist.toJSON() });
   }));
 
+  router.get("/", auth, wrap(async (req: Request, res: Response) => {
+    const user = req.user as UserInstance;
+    const pricelists = await Pricelist.findAll({
+      where: { user_id: user.id }
+    });
+    res.json({ pricelists: pricelists.map((v) => v.toJSON()) });
+  }));
+
   router.get("/:id", auth, wrap(async (req: Request, res: Response) => {
     const user = req.user as UserInstance;
     const pricelist = await Pricelist.findOne({
@@ -41,12 +49,29 @@ export const getRouter = (models: Models) => {
     res.json({ pricelist: pricelist.toJSON });
   }));
 
-  router.get("/", auth, wrap(async (req: Request, res: Response) => {
+  router.put("/:id", auth, wrap(async (req: Request, res: Response) => {
     const user = req.user as UserInstance;
-    const pricelists = await Pricelist.findAll({
-      where: { user_id: user.id }
+    const pricelist = await Pricelist.findOne({
+      where: { id: req.params["id"], user_id: user.id }
     });
-    res.json({ pricelists: pricelists.map((v) => v.toJSON()) });
+    if (pricelist === null) {
+      res.status(HTTPStatus.NOT_FOUND);
+
+      return;
+    }
+
+    let result: PricelistAttributes | null = null;
+    try {
+      result = await PricelistRules.validate(req.body) as PricelistAttributes;
+    } catch (err) {
+      res.status(HTTPStatus.BAD_REQUEST).json(err.errors);
+
+      return;
+    }
+
+    pricelist.setAttributes({ ...result });
+    pricelist.save();
+    res.json({ pricelist: pricelist.toJSON });
   }));
 
   return router;

@@ -98,3 +98,30 @@ test("Pricelists crud endpoint Should return pricelists", async (t) => {
   t.is(res.status, HTTPStatus.OK);
   t.is(res.body.pricelists.length, 1);
 });
+
+test("Pricelists crud endpoint Should update a pricelist", async (t) => {
+  const password = "test";
+  const user = await createUser(t, {
+    email: `update-pricelist+${uuidv4()}@test.com`,
+    password
+  });
+
+  let res = await request.post("/login").send({ email: user.email, password });
+  t.is(res.status, HTTPStatus.OK);
+
+  const { token } = res.body;
+
+  res = await (request
+    .post("/user/pricelists")
+    .set("Authorization", `Bearer ${token}`)
+    .send({ name: "test", region: "test", realm: "test" })
+  );
+  t.is(res.status, HTTPStatus.CREATED);
+
+  res = await (request
+    .put(`/user/pricelists/${res.body.pricelist.id}`)
+    .set("Authorization", `Bearer ${token}`)
+    .send({ name: "test2" })
+  );
+  t.is(res.status, HTTPStatus.OK);
+});
