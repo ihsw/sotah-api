@@ -27,5 +27,19 @@ export const getRouter = (models: Models) => {
     res.status(HTTPStatus.CREATED).json({ pricelist: pricelist.toJSON() });
   }));
 
+  router.get("/:id", auth, wrap(async (req: Request, res: Response) => {
+    const user = req.user as UserInstance;
+    const pricelist = await Pricelist.findOne({
+      where: { id: req.params["id"], user_id: user.id }
+    });
+    if (pricelist === null) {
+      res.status(HTTPStatus.NOT_FOUND);
+
+      return;
+    }
+
+    res.json({ pricelist: pricelist.toJSON });
+  }));
+
   return router;
 };
