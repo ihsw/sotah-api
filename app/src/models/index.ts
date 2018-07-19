@@ -5,21 +5,9 @@ import {
   createModel as createUserModel,
   appendRelationships as appendUserRelationships
 } from "./user";
-import {
-  PreferenceModel,
-  createModel as createPreferenceModel,
-  appendRelationships as appendPreferenceRelationships
-} from "./preference";
-import {
-  PricelistModel,
-  createModel as createPricelistModel,
-  appendRelationships as appendPricelistRelationships
-} from "./pricelist";
-import {
-  PricelistEntryModel,
-  createModel as createPricelistEntryModel,
-  appendRelationships as appendPricelistEntryRelationships
-} from "./pricelist-entry";
+import { PreferenceModel, createPreferenceModel, appendPreferenceRelationships } from "./preference";
+import { PricelistModel, createPricelistModel, appendPricelistRelationships } from "./pricelist";
+import { PricelistEntryModel, createPricelistEntryModel, appendPricelistEntryRelationships } from "./pricelist-entry";
 
 export type Models = {
   User: UserModel

@@ -18,14 +18,14 @@ export interface PreferenceInstance extends Instance<PreferenceAttributes> {
 
 export type PreferenceModel = SequelizeStatic.Model<PreferenceInstance, PreferenceAttributes>;
 
-export const createModel = (sequelize: Sequelize): PreferenceModel => {
+export const createPreferenceModel = (sequelize: Sequelize): PreferenceModel => {
   return sequelize.define<PreferenceInstance, PreferenceAttributes>("preference", {
     current_realm: { type: STRING, allowNull: true },
     current_region: { type: STRING, allowNull: true }
   });
 };
 
-export const appendRelationships = (Preference: PreferenceModel, User: UserModel): PreferenceModel => {
+export const appendPreferenceRelationships = (Preference: PreferenceModel, User: UserModel): PreferenceModel => {
   Preference.belongsTo(User, { foreignKey: "user_id" });
 
   return Preference;

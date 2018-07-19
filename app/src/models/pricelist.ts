@@ -20,7 +20,7 @@ export interface PricelistInstance extends Instance<PricelistAttributes> {
 
 export type PricelistModel = SequelizeStatic.Model<PricelistInstance, PricelistAttributes>;
 
-export const createModel = (sequelize: Sequelize): PricelistModel => {
+export const createPricelistModel = (sequelize: Sequelize): PricelistModel => {
   return sequelize.define<PricelistInstance, PricelistAttributes>("pricelist", {
     name: { type: STRING, allowNull: false },
     realm: { type: STRING, allowNull: false },
@@ -28,7 +28,7 @@ export const createModel = (sequelize: Sequelize): PricelistModel => {
   });
 };
 
-export const appendRelationships = (
+export const appendPricelistRelationships = (
   Pricelist: PricelistModel,
   PricelistEntry: PricelistEntryModel,
   User: UserModel
