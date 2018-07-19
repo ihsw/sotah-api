@@ -28,7 +28,7 @@ const createUser = async (t: TestContext, body: IUserRequest): Promise<IUserResp
   return responseBody.user;
 };
 
-test("Pricelists crud endpoint Should create a pricelist", async (t) => {
+test.only("Pricelists crud endpoint Should create a pricelist", async (t) => {
   const password = "test";
   const user = await createUser(t, {
     email: `create-pricelist+${uuidv4()}@test.com`,
@@ -41,8 +41,12 @@ test("Pricelists crud endpoint Should create a pricelist", async (t) => {
   res = await (request
     .post("/user/pricelists")
     .set("Authorization", `Bearer ${res.body.token}`)
-    .send({ name: "test", region: "test", realm: "test" })
+    .send({
+      entries: [{item_id: -1, quantity_modifier: -1}],
+      pricelist: { name: "test", realm: "test", region: "test" }
+    })
   );
+  console.log(res.body);
   t.is(res.status, HTTPStatus.CREATED);
 });
 
@@ -61,7 +65,7 @@ test("Pricelists crud endpoint Should return a pricelist", async (t) => {
   res = await (request
     .post("/user/pricelists")
     .set("Authorization", `Bearer ${token}`)
-    .send({ name: "test", region: "test", realm: "test" })
+    .send({ name: "test", region: "test", realm: "test", entries: [] })
   );
   t.is(res.status, HTTPStatus.CREATED);
 
@@ -89,7 +93,7 @@ test("Pricelists crud endpoint Should return pricelists", async (t) => {
     res = await (request
       .post("/user/pricelists")
       .set("Authorization", `Bearer ${token}`)
-      .send({ name: "test", region: "test", realm: "test" })
+      .send({ name: "test", region: "test", realm: "test", entries: [] })
     );
     t.is(res.status, HTTPStatus.CREATED);
   }
@@ -117,7 +121,7 @@ test("Pricelists crud endpoint Should update a pricelist", async (t) => {
   res = await (request
     .post("/user/pricelists")
     .set("Authorization", `Bearer ${token}`)
-    .send({ name: "test", region: "test", realm: "test" })
+    .send({ name: "test", region: "test", realm: "test", entries: [] })
   );
   t.is(res.status, HTTPStatus.CREATED);
 
