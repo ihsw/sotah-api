@@ -1,11 +1,11 @@
 import * as process from "process";
 
-import test, { TestContext } from "ava";
+import test from "ava";
 import * as HTTPStatus from "http-status";
 import { v4 as uuidv4 } from "uuid";
 
 import { getLogger } from "../../../lib/logger";
-import { setup, getTestHelper, IUserRequest, IUserResponse } from "../../../lib/test-helper";
+import { setup, getTestHelper } from "../../../lib/test-helper";
 
 const { request } = setup({
   dbHost: process.env["DB_HOST"] as string,
@@ -13,20 +13,7 @@ const { request } = setup({
   natsHost: process.env["NATS_HOST"] as string,
   natsPort: process.env["NATS_PORT"] as string
 });
-const { requestUser } = getTestHelper(request);
-
-const createUser = async (t: TestContext, body: IUserRequest): Promise<IUserResponse> => {
-  const res = await requestUser(body);
-  t.is(res.status, HTTPStatus.CREATED);
-  t.not(String(res.header["content-type"]).match(/^application\/json/), null);
-
-  const responseBody = res.body;
-  t.true("user" in responseBody);
-  t.true("id" in responseBody.user);
-  t.is(typeof responseBody.user.id, "number");
-
-  return responseBody.user;
-};
+const { createUser } = getTestHelper(request);
 
 test("User creation endpoint Should return not found on existing user but no preferences", async (t) => {
   const password = "test";
