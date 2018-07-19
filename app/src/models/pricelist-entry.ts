@@ -6,6 +6,7 @@ import { ItemId } from "../lib/auction";
 
 export type PricelistEntryAttributes = {
   id?: number
+  pricelist_id: number
   item_id: ItemId
   quantity_modifier: number
 };
