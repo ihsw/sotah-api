@@ -23,7 +23,10 @@ export const createPricelistEntryModel = (sequelize: Sequelize): PricelistEntryM
   });
 };
 
-export const appendPricelistEntryRelationships = (PricelistEntry: PricelistEntryModel, Pricelist: PricelistModel): PricelistEntryModel => {
+export const appendPricelistEntryRelationships = (
+  PricelistEntry: PricelistEntryModel,
+  Pricelist: PricelistModel
+): PricelistEntryModel => {
   PricelistEntry.belongsTo(Pricelist, { foreignKey: "pricelist_id" });
 
   return PricelistEntry;
