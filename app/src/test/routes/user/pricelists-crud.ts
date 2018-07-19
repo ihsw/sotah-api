@@ -84,19 +84,22 @@ test("Pricelists crud endpoint Should return pricelists", async (t) => {
 
   const { token } = res.body;
 
-  res = await (request
-    .post("/user/pricelists")
-    .set("Authorization", `Bearer ${token}`)
-    .send({ name: "test", region: "test", realm: "test" })
-  );
-  t.is(res.status, HTTPStatus.CREATED);
+  const count = 5;
+  for (let i = 0; i < count; i++) {
+    res = await (request
+      .post("/user/pricelists")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ name: "test", region: "test", realm: "test" })
+    );
+    t.is(res.status, HTTPStatus.CREATED);
+  }
 
   res = await (request
     .get(`/user/pricelists`)
     .set("Authorization", `Bearer ${token}`)
   );
   t.is(res.status, HTTPStatus.OK);
-  t.is(res.body.pricelists.length, 1);
+  t.is(res.body.pricelists.length, 5);
 });
 
 test("Pricelists crud endpoint Should update a pricelist", async (t) => {
