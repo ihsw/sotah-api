@@ -15,21 +15,29 @@ import {
   createModel as createPricelistModel,
   appendRelationships as appendPricelistRelationships
 } from "./pricelist";
+import {
+  PricelistEntryModel,
+  createModel as createPricelistEntryModel,
+  appendRelationships as appendPricelistEntryRelationships
+} from "./pricelist-entry";
 
 export type Models = {
   User: UserModel
   Preference: PreferenceModel
   Pricelist: PricelistModel
+  PricelistEntry: PricelistEntryModel
 };
 
 export const createModels = (sequelize: Sequelize): Models => {
   let User = createUserModel(sequelize);
   let Preference = createPreferenceModel(sequelize);
   let Pricelist = createPricelistModel(sequelize);
+  let PricelistEntry = createPricelistEntryModel(sequelize);
 
   User = appendUserRelationships(User, Preference, Pricelist);
   Preference = appendPreferenceRelationships(Preference, User);
-  Pricelist = appendPricelistRelationships(Pricelist, User);
+  Pricelist = appendPricelistRelationships(Pricelist, PricelistEntry, User);
+  PricelistEntry = appendPricelistEntryRelationships(PricelistEntry, Pricelist);
 
-  return { User, Preference, Pricelist };
+  return { User, Preference, Pricelist, PricelistEntry };
 };
