@@ -29,11 +29,11 @@ test("Pricelists crud endpoint Should create a pricelist", async (t) => {
     entries: [{item_id: -1, quantity_modifier: -1}],
     pricelist: { name: "test", realm: "test", region: "test" }
   });
-  const { body } = res;
-  t.is(res.status, HTTPStatus.CREATED);
-  t.is(res.body.pricelist.name, "test");
+  const { status, body } = res;
+  t.is(status, HTTPStatus.CREATED);
+  t.is(body.pricelist.name, "test");
   t.true("entries" in body);
-  t.is(res.body.entries.length, 1);
+  t.is(body.entries.length, 1);
 });
 
 test("Pricelists crud endpoint Should return a pricelist", async (t) => {
@@ -57,7 +57,8 @@ test("Pricelists crud endpoint Should return a pricelist", async (t) => {
     .get(`/user/pricelists/${pricelist.id}`)
     .set("Authorization", `Bearer ${token}`)
   );
-  t.is(res.status, HTTPStatus.OK);
+  const { status } = res;
+  t.is(status, HTTPStatus.OK);
 });
 
 test("Pricelists crud endpoint Should return pricelists", async (t) => {
@@ -84,8 +85,13 @@ test("Pricelists crud endpoint Should return pricelists", async (t) => {
     .get(`/user/pricelists`)
     .set("Authorization", `Bearer ${token}`)
   );
-  t.is(res.status, HTTPStatus.OK);
-  t.is(res.body.pricelists.length, 5);
+  const { body, status } = res;
+  t.is(status, HTTPStatus.OK);
+  t.is(body.pricelists.length, 5);
+  t.is(
+    body.pricelists.reduce((total, v) => total + v.pricelist_entries.length, 0),
+    5
+  );
 });
 
 test("Pricelists crud endpoint Should update a pricelist", async (t) => {
