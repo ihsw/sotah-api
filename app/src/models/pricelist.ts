@@ -38,3 +38,10 @@ export const appendPricelistRelationships = (
 
   return Pricelist;
 };
+
+export const withoutEntries = (pricelist: PricelistInstance): PricelistAttributes => {
+  const data = pricelist.toJSON();
+  delete data["pricelist_entries"];
+
+  return data;
+};
