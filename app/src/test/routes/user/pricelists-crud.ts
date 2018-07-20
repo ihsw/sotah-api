@@ -21,11 +21,11 @@ test("Pricelists crud endpoint Should create a pricelist", async (t) => {
     email: `create-pricelist+${uuidv4()}@test.com`,
     password
   });
-
   let res = await request.post("/login").send({ email: user.email, password });
   t.is(res.status, HTTPStatus.OK);
+  const { token } = res.body;
 
-  res = await requestPricelist(res.body.token, {
+  res = await requestPricelist(token, {
     entries: [{item_id: -1, quantity_modifier: -1}],
     pricelist: { name: "test", realm: "test", region: "test" }
   });
@@ -42,10 +42,8 @@ test("Pricelists crud endpoint Should return a pricelist", async (t) => {
     email: `get-pricelist+${uuidv4()}@test.com`,
     password
   });
-
   let res = await request.post("/login").send({ email: user.email, password });
   t.is(res.status, HTTPStatus.OK);
-
   const { token } = res.body;
 
   const { pricelist } = await createPricelist(t, res.body.token, {
@@ -67,10 +65,8 @@ test("Pricelists crud endpoint Should return pricelists", async (t) => {
     email: `get-pricelists+${uuidv4()}@test.com`,
     password
   });
-
   let res = await request.post("/login").send({ email: user.email, password });
   t.is(res.status, HTTPStatus.OK);
-
   const { token } = res.body;
 
   const count = 5;
@@ -100,10 +96,8 @@ test("Pricelists crud endpoint Should update a pricelist", async (t) => {
     email: `update-pricelist+${uuidv4()}@test.com`,
     password
   });
-
   let res = await request.post("/login").send({ email: user.email, password });
   t.is(res.status, HTTPStatus.OK);
-
   const { token } = res.body;
 
   const { pricelist, entries } = await createPricelist(t, res.body.token, {
@@ -124,5 +118,81 @@ test("Pricelists crud endpoint Should update a pricelist", async (t) => {
       pricelist: { name: "test2", region: "test2", realm: "test2" }
     })
   );
+  let { status, body } = res;
+  t.is(status, HTTPStatus.OK);
+  t.true("entries" in body);
+  t.is(body.entries.length, 1);
+});
+
+test("Pricelists crud endpoint Should update all entries", async (t) => {
+  const password = "test";
+  const user = await createUser(t, {
+    email: `update-pricelist+${uuidv4()}@test.com`,
+    password
+  });
+  let res = await request.post("/login").send({ email: user.email, password });
   t.is(res.status, HTTPStatus.OK);
+  const { token } = res.body;
+
+  const { pricelist, entries } = await createPricelist(t, res.body.token, {
+    entries: [{item_id: -1, quantity_modifier: -1}],
+    pricelist: { name: "test", realm: "test", region: "test" }
+  });
+
+  res = await (request
+    .put(`/user/pricelists/${pricelist.id}`)
+    .set("Authorization", `Bearer ${token}`)
+    .send({
+      entries: entries.map((v) => {
+        return {
+          ...v,
+          quantity_modifier: v.quantity_modifier + 5
+        };
+      }),
+      pricelist: { name: "test2", region: "test2", realm: "test2" }
+    })
+  );
+  let { status, body } = res;
+  t.is(status, HTTPStatus.OK);
+  t.true("entries" in body);
+  t.is(body.entries.length, 1);
+  t.is(body.entries[0].quantity_modifier, 4);
+});
+
+test("Pricelists crud endpoint Should remove absent entries", async (t) => {
+  // creating the user
+  const password = "test";
+  const user = await createUser(t, {
+    email: `update-pricelist+${uuidv4()}@test.com`,
+    password
+  });
+  let res = await request.post("/login").send({ email: user.email, password });
+  t.is(res.status, HTTPStatus.OK);
+  const { token } = res.body;
+
+  // creating the pricelist
+  const { pricelist, entries } = await createPricelist(t, res.body.token, {
+    entries: [{item_id: -1, quantity_modifier: -1}, {item_id: -1, quantity_modifier: -1}],
+    pricelist: { name: "test", realm: "test", region: "test" }
+  });
+
+  // updating the pricelist with missing entries
+  res = await (request
+    .put(`/user/pricelists/${pricelist.id}`)
+    .set("Authorization", `Bearer ${token}`)
+    .send({
+      entries: entries.slice(0, 1),
+      pricelist: { name: "test2", region: "test2", realm: "test2" }
+    })
+  );
+  t.is(res.status, HTTPStatus.OK);
+
+  // fetching the pricelist and verifying that it has fewer entries
+  res = await (request
+    .get(`/user/pricelists/${pricelist.id}`)
+    .set("Authorization", `Bearer ${token}`)
+  );
+  const { status, body } = res;
+  t.is(status, HTTPStatus.OK);
+  t.is(body.pricelist.pricelist_entries.length, 1);
 });

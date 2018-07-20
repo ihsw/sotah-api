@@ -5,7 +5,7 @@ import { wrap } from "async-middleware";
 import { Models } from "../../models";
 import { UserInstance } from "../../models/user";
 import { PricelistAttributes, withoutEntries } from "../../models/pricelist";
-import { PricelistEntryAttributes } from "../../models/pricelist-entry";
+import { PricelistEntryAttributes, PricelistEntryInstance } from "../../models/pricelist-entry";
 import { auth } from "../../lib/session";
 import { PricelistRequestBodyRules } from "../../lib/validator-rules";
 
@@ -91,20 +91,28 @@ export const getRouter = (models: Models) => {
     pricelist.setAttributes({ ...result.pricelist });
     pricelist.save();
 
+    // misc
+    const entries = pricelist.get("pricelist_entries") as PricelistEntryInstance[];
+
     // creating new entries
     // const newRequestEntries = result.entries.filter((v) => !!v.id === false);
 
     // updating existing entries
-    const existingRequestEntries = result.entries.filter((v) => !!v.id);
-    const existingEntries = await PricelistEntry.findAll({
-      where: { id: existingRequestEntries.map((v) => v.id!) }
+    const receivedRequestEntries = result.entries.filter((v) => !!v.id);
+    const receivedEntries = await PricelistEntry.findAll({
+      where: { id: receivedRequestEntries.map((v) => v.id!) }
     });
-    existingEntries.map((v, i) => v.setAttributes({ ...existingRequestEntries[i] }));
-    await Promise.all(existingEntries.map((v) => v.save()));
+    receivedEntries.map((v, i) => v.setAttributes({ ...receivedRequestEntries[i] }));
+    await Promise.all(receivedEntries.map((v) => v.save()));
+
+    // gathering removed entries and deleting them
+    const receivedEntryIds = receivedEntries.map((v) => v.id);
+    const removedEntries = entries.filter((v) => receivedEntryIds.indexOf(v.id) === -1);
+    await Promise.all(removedEntries.map((v) => v.destroy()));
 
     // dumping out a response
     res.json({
-      entries: existingEntries.map((v) => v.toJSON()),
+      entries: receivedEntries.map((v) => v.toJSON()),
       pricelist: withoutEntries(pricelist),
     });
   }));
