@@ -106,7 +106,7 @@ test("Pricelists crud endpoint Should update a pricelist", async (t) => {
 
   const { token } = res.body;
 
-  const { pricelist } = await createPricelist(t, res.body.token, {
+  const { pricelist, entries } = await createPricelist(t, res.body.token, {
     entries: [{item_id: -1, quantity_modifier: -1}],
     pricelist: { name: "test", realm: "test", region: "test" }
   });
@@ -114,7 +114,10 @@ test("Pricelists crud endpoint Should update a pricelist", async (t) => {
   res = await (request
     .put(`/user/pricelists/${pricelist.id}`)
     .set("Authorization", `Bearer ${token}`)
-    .send({ name: "test2", region: "test2", realm: "test2" })
+    .send({
+      entries,
+      pricelist: { name: "test2", region: "test2", realm: "test2" }
+    })
   );
   t.is(res.status, HTTPStatus.OK);
 });

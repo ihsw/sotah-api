@@ -7,7 +7,7 @@ import { UserInstance } from "../../models/user";
 import { PricelistAttributes } from "../../models/pricelist";
 import { PricelistEntryAttributes } from "../../models/pricelist-entry";
 import { auth } from "../../lib/session";
-import { PricelistRules, PricelistRequestBodyRules } from "../../lib/validator-rules";
+import { PricelistRequestBodyRules } from "../../lib/validator-rules";
 
 type PricelistRequestBody = {
   pricelist: PricelistAttributes
@@ -67,6 +67,7 @@ export const getRouter = (models: Models) => {
   router.put("/:id", auth, wrap(async (req: Request, res: Response) => {
     const user = req.user as UserInstance;
     const pricelist = await Pricelist.findOne({
+      include: [PricelistEntry],
       where: { id: req.params["id"], user_id: user.id }
     });
     if (pricelist === null) {
@@ -77,12 +78,14 @@ export const getRouter = (models: Models) => {
 
     let result: PricelistRequestBody | null = null;
     try {
-      result = await PricelistRules.validate(req.body) as PricelistRequestBody;
+      result = await PricelistRequestBodyRules.validate(req.body) as PricelistRequestBody;
     } catch (err) {
       res.status(HTTPStatus.BAD_REQUEST).json(err.errors);
 
       return;
     }
+
+    console.log(result);
 
     pricelist.setAttributes({ ...result.pricelist });
     pricelist.save();
