@@ -6,6 +6,7 @@ export const PreferenceRules = yup.object().shape({
 }).noUnknown();
 
 export const PriceListEntryRules = yup.object().shape({
+  id: yup.number(),
   item_id: yup.number().required(),
   quantity_modifier: yup.number().required()
 }).noUnknown();
