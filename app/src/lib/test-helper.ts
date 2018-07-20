@@ -81,13 +81,20 @@ const getPricelistTestHelper = (request: SuperTest<Test>) => {
   };
   const createPricelist = async (t: TestContext, token: string, body: IPricelistRequest): Promise<IPricelistResponse> => {
     const res = await requestPricelist(token, body);
-    t.is(res.status, HTTPStatus.CREATED);
-    t.not(String(res.header["content-type"]).match(/^application\/json/), null);
-    t.is(res.body.pricelist.name, "test");
-    t.true("entries" in body);
-    t.is(res.body.entries.length, body.entries.length);
+    const { status, body: responseBody, header } = res;
+    t.is(status, HTTPStatus.CREATED);
+    t.not(String(header["content-type"]).match(/^application\/json/), null);
 
-    return res.body;
+    t.true("pricelist" in responseBody);
+    const { pricelist } = responseBody;
+    t.is(pricelist.name, body.pricelist.name);
+
+    t.true("entries" in body);
+    const { entries } = responseBody;
+    t.is(entries.length, body.entries.length);
+    t.not(entries[0].id, null);
+
+    return responseBody;
   };
 
   return { requestPricelist, createPricelist };
