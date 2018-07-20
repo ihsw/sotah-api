@@ -16,7 +16,7 @@ type PricelistRequestBody = {
 
 export const getRouter = (models: Models) => {
   const router = Router();
-  const { Pricelist } = models;
+  const { Pricelist, PricelistEntry } = models;
 
   router.post("/", auth, wrap(async (req: Request, res: Response) => {
     const user = req.user as UserInstance;
@@ -30,7 +30,14 @@ export const getRouter = (models: Models) => {
     }
 
     const pricelist = await Pricelist.create({ ...result!.pricelist, user_id: user.id });
-    res.status(HTTPStatus.CREATED).json({ pricelist: pricelist.toJSON() });
+    const entries = await Promise.all(result.entries.map((v) => PricelistEntry.create({
+      pricelist_id: pricelist.id,
+      ...v
+    })));
+    res.status(HTTPStatus.CREATED).json({
+      pricelist: pricelist.toJSON(),
+      entries: entries.map((v) => v.toJSON())
+    });
   }));
 
   router.get("/", auth, wrap(async (req: Request, res: Response) => {

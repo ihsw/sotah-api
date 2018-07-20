@@ -83,6 +83,9 @@ const getPricelistTestHelper = (request: SuperTest<Test>) => {
     const res = await requestPricelist(token, body);
     t.is(res.status, HTTPStatus.CREATED);
     t.not(String(res.header["content-type"]).match(/^application\/json/), null);
+    t.is(res.body.pricelist.name, "test");
+    t.true("entries" in body);
+    t.is(res.body.entries.length, body.entries.length);
   
     return res.body;
   };

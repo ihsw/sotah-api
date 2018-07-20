@@ -13,7 +13,7 @@ const { request } = setup({
   natsHost: process.env["NATS_HOST"] as string,
   natsPort: process.env["NATS_PORT"] as string
 });
-const { createUser, requestPricelist } = getTestHelper(request);
+const { createUser, requestPricelist, createPricelist } = getTestHelper(request);
 
 test("Pricelists crud endpoint Should create a pricelist", async (t) => {
   const password = "test";
@@ -29,7 +29,11 @@ test("Pricelists crud endpoint Should create a pricelist", async (t) => {
     entries: [{item_id: -1, quantity_modifier: -1}],
     pricelist: { name: "test", realm: "test", region: "test" }
   });
+  const { body } = res;
   t.is(res.status, HTTPStatus.CREATED);
+  t.is(res.body.pricelist.name, "test");
+  t.true("entries" in body);
+  t.is(res.body.entries.length, 1);
 });
 
 test("Pricelists crud endpoint Should return a pricelist", async (t) => {
@@ -44,14 +48,13 @@ test("Pricelists crud endpoint Should return a pricelist", async (t) => {
 
   const { token } = res.body;
 
-  res = await requestPricelist(res.body.token, {
+  const { pricelist } = await createPricelist(t, res.body.token, {
     entries: [{item_id: -1, quantity_modifier: -1}],
     pricelist: { name: "test", realm: "test", region: "test" }
   });
-  t.is(res.status, HTTPStatus.CREATED);
 
   res = await (request
-    .get(`/user/pricelists/${res.body.pricelist.id}`)
+    .get(`/user/pricelists/${pricelist.id}`)
     .set("Authorization", `Bearer ${token}`)
   );
   t.is(res.status, HTTPStatus.OK);
@@ -71,11 +74,10 @@ test("Pricelists crud endpoint Should return pricelists", async (t) => {
 
   const count = 5;
   for (let i = 0; i < count; i++) {
-    res = await requestPricelist(token, {
+    await createPricelist(t, res.body.token, {
       entries: [{item_id: -1, quantity_modifier: -1}],
       pricelist: { name: "test", realm: "test", region: "test" }
     });
-    t.is(res.status, HTTPStatus.CREATED);
   }
 
   res = await (request
@@ -98,14 +100,13 @@ test("Pricelists crud endpoint Should update a pricelist", async (t) => {
 
   const { token } = res.body;
 
-  res = await requestPricelist(token, {
+  const { pricelist } = await createPricelist(t, res.body.token, {
     entries: [{item_id: -1, quantity_modifier: -1}],
     pricelist: { name: "test", realm: "test", region: "test" }
   });
-  t.is(res.status, HTTPStatus.CREATED);
 
   res = await (request
-    .put(`/user/pricelists/${res.body.pricelist.id}`)
+    .put(`/user/pricelists/${pricelist.id}`)
     .set("Authorization", `Bearer ${token}`)
     .send({ name: "test2", region: "test2", realm: "test2" })
   );

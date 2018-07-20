@@ -18,7 +18,7 @@ export interface PricelistEntryInstance extends Instance<PricelistEntryAttribute
 export type PricelistEntryModel = SequelizeStatic.Model<PricelistEntryInstance, PricelistEntryAttributes>;
 
 export const createPricelistEntryModel = (sequelize: Sequelize): PricelistEntryModel => {
-  return sequelize.define<PricelistEntryInstance, PricelistEntryAttributes>("pricelist", {
+  return sequelize.define<PricelistEntryInstance, PricelistEntryAttributes>("pricelist_entries", {
     item_id: { type: INTEGER, allowNull: false },
     quantity_modifier: { type: INTEGER, allowNull: false }
   });
