@@ -115,7 +115,12 @@ test("Pricelists crud endpoint Should update a pricelist", async (t) => {
     .put(`/user/pricelists/${pricelist.id}`)
     .set("Authorization", `Bearer ${token}`)
     .send({
-      entries,
+      entries: entries.map((v) => {
+        return {
+          ...v,
+          quantity_modifier: v.quantity_modifier + 1
+        };
+      }),
       pricelist: { name: "test2", region: "test2", realm: "test2" }
     })
   );

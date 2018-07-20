@@ -4,7 +4,7 @@ import { wrap } from "async-middleware";
 
 import { Models } from "../../models";
 import { UserInstance } from "../../models/user";
-import { PricelistAttributes } from "../../models/pricelist";
+import { PricelistAttributes, withoutEntries } from "../../models/pricelist";
 import { PricelistEntryAttributes } from "../../models/pricelist-entry";
 import { auth } from "../../lib/session";
 import { PricelistRequestBodyRules } from "../../lib/validator-rules";
@@ -36,7 +36,7 @@ export const getRouter = (models: Models) => {
     })));
     res.status(HTTPStatus.CREATED).json({
       entries: entries.map((v) => v.toJSON()),
-      pricelist: pricelist.toJSON()
+      pricelist: withoutEntries(pricelist)
     });
   }));
 
@@ -65,6 +65,7 @@ export const getRouter = (models: Models) => {
   }));
 
   router.put("/:id", auth, wrap(async (req: Request, res: Response) => {
+    // resolving the pricelist
     const user = req.user as UserInstance;
     const pricelist = await Pricelist.findOne({
       include: [PricelistEntry],
@@ -76,6 +77,7 @@ export const getRouter = (models: Models) => {
       return;
     }
 
+    // validating the request body
     let result: PricelistRequestBody | null = null;
     try {
       result = await PricelistRequestBodyRules.validate(req.body) as PricelistRequestBody;
@@ -85,9 +87,26 @@ export const getRouter = (models: Models) => {
       return;
     }
 
+    // saving the pricelist
     pricelist.setAttributes({ ...result.pricelist });
     pricelist.save();
-    res.json({ pricelist: pricelist.toJSON() });
+
+    // creating new entries
+    // const newRequestEntries = result.entries.filter((v) => !!v.id === false);
+
+    // updating existing entries
+    const existingRequestEntries = result.entries.filter((v) => !!v.id);
+    const existingEntries = await PricelistEntry.findAll({
+      where: { id: existingRequestEntries.map((v) => v.id!) }
+    });
+    existingEntries.map((v, i) => v.setAttributes({ ...existingRequestEntries[i] }));
+    await Promise.all(existingEntries.map((v) => v.save()));
+
+    // dumping out a response
+    res.json({
+      entries: existingEntries.map((v) => v.toJSON()),
+      pricelist: withoutEntries(pricelist),
+    });
   }));
 
   return router;
