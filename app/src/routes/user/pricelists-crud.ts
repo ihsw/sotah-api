@@ -52,7 +52,7 @@ export const getRouter = (models: Models) => {
       return;
     }
 
-    res.json({ pricelist: pricelist.toJSON });
+    res.json({ pricelist: pricelist.toJSON() });
   }));
 
   router.put("/:id", auth, wrap(async (req: Request, res: Response) => {
@@ -66,18 +66,18 @@ export const getRouter = (models: Models) => {
       return;
     }
 
-    let result: PricelistAttributes | null = null;
+    let result: PricelistRequestBody | null = null;
     try {
-      result = await PricelistRules.validate(req.body) as PricelistAttributes;
+      result = await PricelistRules.validate(req.body) as PricelistRequestBody;
     } catch (err) {
       res.status(HTTPStatus.BAD_REQUEST).json(err.errors);
 
       return;
     }
 
-    pricelist.setAttributes({ ...result });
+    pricelist.setAttributes({ ...result.pricelist });
     pricelist.save();
-    res.json({ pricelist: pricelist.toJSON });
+    res.json({ pricelist: pricelist.toJSON() });
   }));
 
   return router;
