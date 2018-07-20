@@ -42,12 +42,12 @@ const getUserTestHelper = (request: SuperTest<Test>) => {
     const res = await requestUser(body);
     t.is(res.status, HTTPStatus.CREATED);
     t.not(String(res.header["content-type"]).match(/^application\/json/), null);
-  
+
     const responseBody = res.body;
     t.true("user" in responseBody);
     t.true("id" in responseBody.user);
     t.is(typeof responseBody.user.id, "number");
-  
+
     return responseBody.user;
   };
 
@@ -56,8 +56,8 @@ const getUserTestHelper = (request: SuperTest<Test>) => {
 
 // pricelist test-helper
 export interface IPricelistResponse {
-  pricelist: PricelistAttributes
-  entries: PricelistEntryAttributes[]
+  pricelist: PricelistAttributes;
+  entries: PricelistEntryAttributes[];
 }
 
 export interface IPricelistRequest {
@@ -65,11 +65,11 @@ export interface IPricelistRequest {
     name: string
     realm: string
     region: string
-  }
+  };
   entries: {
     item_id: number
     quantity_modifier: number
-  }[]
+  }[];
 }
 
 const getPricelistTestHelper = (request: SuperTest<Test>) => {
@@ -86,7 +86,7 @@ const getPricelistTestHelper = (request: SuperTest<Test>) => {
     t.is(res.body.pricelist.name, "test");
     t.true("entries" in body);
     t.is(res.body.entries.length, body.entries.length);
-  
+
     return res.body;
   };
 
