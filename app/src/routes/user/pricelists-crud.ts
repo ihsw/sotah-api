@@ -30,10 +30,12 @@ export const getRouter = (models: Models) => {
     }
 
     const pricelist = await Pricelist.create({ ...result!.pricelist, user_id: user.id });
-    const entries = await Promise.all(result.entries.map((v) => PricelistEntry.create({
-      pricelist_id: pricelist.id,
-      ...v
-    })));
+    const entries = await PricelistEntry.bulkCreate(result.entries.map((v) => {
+      return {
+        pricelist_id: pricelist.id,
+        ...v
+      };
+    }));
     res.status(HTTPStatus.CREATED).json({
       entries: entries.map((v) => v.toJSON()),
       pricelist: withoutEntries(pricelist)
@@ -95,7 +97,8 @@ export const getRouter = (models: Models) => {
     const entries = pricelist.get("pricelist_entries") as PricelistEntryInstance[];
 
     // creating new entries
-    // const newRequestEntries = result.entries.filter((v) => !!v.id === false);
+    const newRequestEntries = result.entries.filter((v) => !!v.id === false);
+    const newEntries = await PricelistEntry.bulkCreate(newRequestEntries);
 
     // updating existing entries
     const receivedRequestEntries = result.entries.filter((v) => !!v.id);
@@ -112,7 +115,7 @@ export const getRouter = (models: Models) => {
 
     // dumping out a response
     res.json({
-      entries: receivedEntries.map((v) => v.toJSON()),
+      entries: [...receivedEntries, ...newEntries].map((v) => v.toJSON()),
       pricelist: withoutEntries(pricelist),
     });
   }));
