@@ -35,16 +35,16 @@ export const getRouter = (models: Models) => {
       ...v
     })));
     res.status(HTTPStatus.CREATED).json({
-      pricelist: pricelist.toJSON(),
-      entries: entries.map((v) => v.toJSON())
+      entries: entries.map((v) => v.toJSON()),
+      pricelist: pricelist.toJSON()
     });
   }));
 
   router.get("/", auth, wrap(async (req: Request, res: Response) => {
     const user = req.user as UserInstance;
     const pricelists = await Pricelist.findAll({
-      where: { user_id: user.id },
-      include: [PricelistEntry]
+      include: [PricelistEntry],
+      where: { user_id: user.id }
     });
     res.json({ pricelists: pricelists.map((v) => v.toJSON()) });
   }));
@@ -52,8 +52,8 @@ export const getRouter = (models: Models) => {
   router.get("/:id", auth, wrap(async (req: Request, res: Response) => {
     const user = req.user as UserInstance;
     const pricelist = await Pricelist.findOne({
-      where: { id: req.params["id"], user_id: user.id },
-      include: [PricelistEntry]
+      include: [PricelistEntry],
+      where: { id: req.params["id"], user_id: user.id }
     });
     if (pricelist === null) {
       res.status(HTTPStatus.NOT_FOUND);
