@@ -30,7 +30,7 @@ export const appendRelationships = (
   Preference: PreferenceModel,
   Pricelist: PricelistModel
 ): UserModel => {
-  User.hasMany(Preference, { foreignKey: "user_id" });
+  User.hasOne(Preference, { foreignKey: "user_id" });
   User.hasMany(Pricelist, { foreignKey: "user_id" });
 
   return User;
