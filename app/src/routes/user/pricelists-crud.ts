@@ -30,12 +30,10 @@ export const getRouter = (models: Models) => {
     }
 
     const pricelist = await Pricelist.create({ ...result!.pricelist, user_id: user.id });
-    const entries = await PricelistEntry.bulkCreate(result.entries.map((v) => {
-      return {
-        pricelist_id: pricelist.id,
-        ...v
-      };
-    }));
+    const entries = await Promise.all(result.entries.map((v) => PricelistEntry.create({
+      pricelist_id: pricelist.id,
+      ...v
+    })));
     res.status(HTTPStatus.CREATED).json({
       entries: entries.map((v) => v.toJSON()),
       pricelist: withoutEntries(pricelist)
