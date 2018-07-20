@@ -85,8 +85,6 @@ export const getRouter = (models: Models) => {
       return;
     }
 
-    console.log(result);
-
     pricelist.setAttributes({ ...result.pricelist });
     pricelist.save();
     res.json({ pricelist: pricelist.toJSON() });
