@@ -90,6 +90,37 @@ test("Pricelists crud endpoint Should return pricelists", async (t) => {
   );
 });
 
+test("Pricelists crud endpoint Should return pricelists for a region/realm", async (t) => {
+  const password = "test";
+  const user = await createUser(t, {
+    email: `get-pricelists+${uuidv4()}@test.com`,
+    password
+  });
+  let res = await request.post("/login").send({ email: user.email, password });
+  t.is(res.status, HTTPStatus.OK);
+  const { token } = res.body;
+
+  const count = 5;
+  for (let i = 0; i < count; i++) {
+    await createPricelist(t, res.body.token, {
+      entries: [{item_id: -1, quantity_modifier: -1}],
+      pricelist: { name: "test", realm: "test-realm", region: "test-region" }
+    });
+  }
+
+  res = await (request
+    .get("/user/pricelists/region/test-region/realm/test-realm")
+    .set("Authorization", `Bearer ${token}`)
+  );
+  const { body, status } = res;
+  t.is(status, HTTPStatus.OK);
+  t.is(body.pricelists.length, 5);
+  t.is(
+    body.pricelists.reduce((total, v) => total + v.pricelist_entries.length, 0),
+    5
+  );
+});
+
 test("Pricelists crud endpoint Should update a pricelist", async (t) => {
   const password = "test";
   const user = await createUser(t, {

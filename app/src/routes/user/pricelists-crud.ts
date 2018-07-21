@@ -49,6 +49,15 @@ export const getRouter = (models: Models) => {
     res.json({ pricelists: pricelists.map((v) => v.toJSON()) });
   }));
 
+  router.get("/region/:regionName/realm/:realmSlug", auth, wrap(async (req: Request, res: Response) => {
+    const user = req.user as UserInstance;
+    const pricelists = await Pricelist.findAll({
+      include: [PricelistEntry],
+      where: { user_id: user.id, region: req.params["regionName"], realm: req.params["realmSlug"] }
+    });
+    res.json({ pricelists: pricelists.map((v) => v.toJSON()) });
+  }));
+
   router.get("/:id", auth, wrap(async (req: Request, res: Response) => {
     const user = req.user as UserInstance;
     const pricelist = await Pricelist.findOne({
