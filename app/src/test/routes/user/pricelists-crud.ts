@@ -196,3 +196,41 @@ test("Pricelists crud endpoint Should remove absent entries", async (t) => {
   t.is(status, HTTPStatus.OK);
   t.is(body.pricelist.pricelist_entries.length, 1);
 });
+
+test("Pricelists crud endpoint Should add new entries", async (t) => {
+  // creating the user
+  const password = "test";
+  const user = await createUser(t, {
+    email: `update-pricelist+${uuidv4()}@test.com`,
+    password
+  });
+  let res = await request.post("/login").send({ email: user.email, password });
+  t.is(res.status, HTTPStatus.OK);
+  const { token } = res.body;
+
+  // creating the pricelist
+  const { pricelist, entries } = await createPricelist(t, res.body.token, {
+    entries: [{item_id: -1, quantity_modifier: -1}, {item_id: -1, quantity_modifier: -1}],
+    pricelist: { name: "test", realm: "test", region: "test" }
+  });
+
+  // updating the pricelist with missing entries
+  res = await (request
+    .put(`/user/pricelists/${pricelist.id}`)
+    .set("Authorization", `Bearer ${token}`)
+    .send({
+      entries: [...entries.slice(0, 1), {item_id: -2, quantity_modifier: -2}],
+      pricelist: { name: "test2", region: "test2", realm: "test2" }
+    })
+  );
+  t.is(res.status, HTTPStatus.OK);
+
+  // fetching the pricelist and verifying that it has fewer entries
+  res = await (request
+    .get(`/user/pricelists/${pricelist.id}`)
+    .set("Authorization", `Bearer ${token}`)
+  );
+  const { status, body } = res;
+  t.is(status, HTTPStatus.OK);
+  t.is(body.pricelist.pricelist_entries.length, 2);
+});

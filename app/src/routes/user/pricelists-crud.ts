@@ -96,7 +96,9 @@ export const getRouter = (models: Models) => {
 
     // creating new entries
     const newRequestEntries = result.entries.filter((v) => !!v.id === false);
-    const newEntries = await PricelistEntry.bulkCreate(newRequestEntries);
+    const newEntries = await Promise.all(newRequestEntries.map(
+      (v) => PricelistEntry.create({ ...v, pricelist_id: pricelist.id })
+    ));
 
     // updating existing entries
     const receivedRequestEntries = result.entries.filter((v) => !!v.id);
