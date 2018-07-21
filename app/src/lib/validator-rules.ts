@@ -20,4 +20,4 @@ export const PricelistRules = yup.object().shape({
 export const PricelistRequestBodyRules = yup.object().shape({
   entries: yup.array(PriceListEntryRules).required(),
   pricelist: PricelistRules.required()
-});
+}).noUnknown();
