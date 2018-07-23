@@ -4,13 +4,17 @@ import { wrap } from "async-middleware";
 
 import { Models } from "../../models";
 import { UserInstance } from "../../models/user";
-import { PricelistAttributes, withoutEntries } from "../../models/pricelist";
+import { withoutEntries } from "../../models/pricelist";
 import { PricelistEntryAttributes, PricelistEntryInstance } from "../../models/pricelist-entry";
 import { auth } from "../../lib/session";
 import { PricelistRequestBodyRules } from "../../lib/validator-rules";
 
 type PricelistRequestBody = {
-  pricelist: PricelistAttributes
+  pricelist: {
+    name: string
+    region: string
+    realm: string
+  }
   entries: PricelistEntryAttributes[]
 };
 
