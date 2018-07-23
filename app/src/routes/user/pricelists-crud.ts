@@ -5,7 +5,7 @@ import { wrap } from "async-middleware";
 import { Models } from "../../models";
 import { UserInstance } from "../../models/user";
 import { withoutEntries } from "../../models/pricelist";
-import { PricelistEntryAttributes, PricelistEntryInstance } from "../../models/pricelist-entry";
+import { PricelistEntryInstance } from "../../models/pricelist-entry";
 import { auth } from "../../lib/session";
 import { PricelistRequestBodyRules } from "../../lib/validator-rules";
 
@@ -15,7 +15,11 @@ type PricelistRequestBody = {
     region: string
     realm: string
   }
-  entries: PricelistEntryAttributes[]
+  entries: {
+    id?: number
+    item_id: number
+    quantity_modifier: number
+  }[]
 };
 
 export const getRouter = (models: Models) => {
