@@ -6,14 +6,16 @@ import { Models } from "../../models";
 import { UserInstance } from "../../models/user";
 import { withoutEntries } from "../../models/pricelist";
 import { PricelistEntryInstance } from "../../models/pricelist-entry";
+import { regionName } from "../../lib/region";
+import { realmSlug } from "../../lib/realm";
 import { auth } from "../../lib/session";
 import { PricelistRequestBodyRules } from "../../lib/validator-rules";
 
 type PricelistRequestBody = {
   pricelist: {
     name: string
-    region: string
-    realm: string
+    region: regionName
+    realm: realmSlug
   }
   entries: {
     id?: number
