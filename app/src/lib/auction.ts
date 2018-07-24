@@ -245,3 +245,11 @@ export type AuctionsQueryResponse = {
 export type ItemClassesResponse = {
   classes: ItemClass[]
 };
+
+export type ItemsMap = {
+  [key: number]: Item
+}
+
+export type ItemsResponse = {
+  items: ItemsMap
+};

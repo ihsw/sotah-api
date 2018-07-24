@@ -8,7 +8,9 @@ import {
   OwnersRequest, OwnersResponse,
   ItemsQueryResponse,
   AuctionsQueryRequest, AuctionsQueryResponse,
-  ItemClassesResponse
+  ItemClassesResponse,
+  ItemId,
+  ItemsResponse
 } from "./auction";
 import { PriceListRequest, PriceListResponse } from "./price-list";
 
@@ -37,7 +39,8 @@ export enum subjects {
   itemsQuery = "itemsQuery",
   auctionsQuery = "auctionsQuery",
   itemClasses = "itemClasses",
-  priceList = "priceList"
+  priceList = "priceList",
+  items = "items"
 }
 
 export enum code {
@@ -180,5 +183,9 @@ export class Messenger {
 
   getPriceList(request: PriceListRequest): Promise<Message<PriceListResponse>> {
     return this.request(subjects.priceList, { body: JSON.stringify(request) });
+  }
+
+  getItems(itemIds: ItemId[]): Promise<Message<ItemsResponse>> {
+    return this.request(subjects.items, { body: JSON.stringify({ itemIds }) });
   }
 }
