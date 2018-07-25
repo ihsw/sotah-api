@@ -71,16 +71,16 @@ export const getRouter = (models: Models, messenger: Messenger) => {
     });
 
     // gathering related items
-    const entriesLists: PricelistEntryInstance[][] = pricelists.map((v) => v.get("pricelist_entries"));
-    const itemIds: ItemId[] = [];
-    for (const entries of entriesLists) {
-      for (const entry of entries) {
+    const itemIds: ItemId[] = pricelists.reduce((itemIds: ItemId[], pricelist) => {
+      return pricelist.get("pricelist_entries").reduce((itemIds: ItemId[], entry: PricelistEntryInstance) => {
         const entryJson = entry.toJSON();
         if (itemIds.indexOf(entryJson.item_id) === -1) {
           itemIds.push(entryJson.item_id);
         }
-      }
-    }
+
+        return itemIds;
+      }, itemIds);
+    }, []);
     const items = (await messenger.getItems(itemIds)).data!.items;
 
     // dumping out a response

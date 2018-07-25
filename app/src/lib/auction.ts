@@ -248,7 +248,7 @@ export type ItemClassesResponse = {
 
 export type ItemsMap = {
   [key: number]: Item
-}
+};
 
 export type ItemsResponse = {
   items: ItemsMap

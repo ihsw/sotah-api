@@ -3,7 +3,7 @@ import * as HTTPStatus from "http-status";
 import { wrap } from "async-middleware";
 import * as bcrypt from "bcrypt";
 
-import { Messenger } from '../lib/messenger';
+import { Messenger } from "../lib/messenger";
 import { Models } from "../models";
 import { withoutPassword, generateJwtToken } from "../models/user";
 import { getRouter as getBaseRouter } from "./user/base";
