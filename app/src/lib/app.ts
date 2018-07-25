@@ -57,7 +57,7 @@ export const getApp = (opts: Options): express.Express => {
   // route init
   app.use("/", defaultRouter);
   app.use("/", getDataRouter(messenger));
-  app.use("/", getUserRouter(models));
+  app.use("/", getUserRouter(models, messenger));
 
   // error handler
   app.use((err: Error, _: express.Request, res: express.Response, next: Function) => {

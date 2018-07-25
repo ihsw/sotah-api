@@ -3,18 +3,19 @@ import * as HTTPStatus from "http-status";
 import { wrap } from "async-middleware";
 import * as bcrypt from "bcrypt";
 
+import { Messenger } from '../lib/messenger';
 import { Models } from "../models";
 import { withoutPassword, generateJwtToken } from "../models/user";
 import { getRouter as getBaseRouter } from "./user/base";
 import { getRouter as getPreferencesRouter } from "./user/preferences";
 import { getRouter as getPricelistsCrudRouter } from "./user/pricelists-crud";
 
-export const getRouter = (models: Models) => {
+export const getRouter = (models: Models, messenger: Messenger) => {
   const router = Router();
   const { User } = models;
 
   router.use("/user/preferences", getPreferencesRouter(models));
-  router.use("/user/pricelists", getPricelistsCrudRouter(models));
+  router.use("/user/pricelists", getPricelistsCrudRouter(models, messenger));
   router.use("/user", getBaseRouter(models));
 
   router.post("/users", wrap(async (req: Request, res: Response) => {

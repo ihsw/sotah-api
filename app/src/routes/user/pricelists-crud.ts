@@ -6,10 +6,12 @@ import { Models } from "../../models";
 import { UserInstance } from "../../models/user";
 import { withoutEntries } from "../../models/pricelist";
 import { PricelistEntryInstance } from "../../models/pricelist-entry";
+import { ItemId } from "../../lib/auction";
 import { regionName } from "../../lib/region";
 import { realmSlug } from "../../lib/realm";
 import { auth } from "../../lib/session";
 import { PricelistRequestBodyRules } from "../../lib/validator-rules";
+import { Messenger } from "../../lib/messenger";
 
 type PricelistRequestBody = {
   pricelist: {
@@ -24,7 +26,7 @@ type PricelistRequestBody = {
   }[]
 };
 
-export const getRouter = (models: Models) => {
+export const getRouter = (models: Models, messenger: Messenger) => {
   const router = Router();
   const { Pricelist, PricelistEntry } = models;
 
@@ -61,11 +63,28 @@ export const getRouter = (models: Models) => {
 
   router.get("/region/:regionName/realm/:realmSlug", auth, wrap(async (req: Request, res: Response) => {
     const user = req.user as UserInstance;
+
+    // gathering pricelists associated with this user, region, and realm
     const pricelists = await Pricelist.findAll({
       include: [PricelistEntry],
       where: { user_id: user.id, region: req.params["regionName"], realm: req.params["realmSlug"] }
     });
-    res.json({ pricelists: pricelists.map((v) => v.toJSON()) });
+
+    // gathering related items
+    const entriesLists: PricelistEntryInstance[][] = pricelists.map((v) => v.get("pricelist_entries"));
+    const itemIds: ItemId[] = [];
+    for (const entries of entriesLists) {
+      for (const entry of entries) {
+        const entryJson = entry.toJSON();
+        if (itemIds.indexOf(entryJson.item_id) === -1) {
+          itemIds.push(entryJson.item_id);
+        }
+      }
+    }
+    const items = (await messenger.getItems(itemIds)).data!.items;
+
+    // dumping out a response
+    res.json({ pricelists: pricelists.map((v) => v.toJSON()), items });
   }));
 
   router.get("/:id", auth, wrap(async (req: Request, res: Response) => {
