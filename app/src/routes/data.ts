@@ -98,12 +98,14 @@ export const getRouter = (messenger: Messenger): Router => {
   }));
   router.post("/region/:regionName/realm/:realmSlug/price-list", wrap(async (req, res) => {
     const { item_ids } = <PriceListRequestBody>req.body;
-    const msg = await messenger.getPriceList({
+    const price_list = (await messenger.getPriceList({
       item_ids,
       realm_slug: req.params["realmSlug"],
       region_name: req.params["regionName"]
-    });
-    handleMessage(res, msg);
+    })).data!.price_list;
+    const items = (await messenger.getItems(item_ids)).data!.items;
+
+    res.json({ price_list, items });
   }));
   router.get("/item-classes", wrap(async (_, res) => {
     const msg = await messenger.getItemClasses();
