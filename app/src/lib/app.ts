@@ -47,7 +47,7 @@ export const getApp = (opts: Options): express.Express => {
 
     res.set("access-control-allow-origin", "*");
     res.set("access-control-allow-headers", "content-type,authorization");
-    res.set("access-control-allow-methods", "GET,POST,PUT");
+    res.set("access-control-allow-methods", "GET,POST,PUT,DELETE");
     next();
   });
 

@@ -158,5 +158,23 @@ export const getRouter = (models: Models, messenger: Messenger) => {
     });
   }));
 
+  router.delete("/:id", auth, wrap(async (req: Request, res: Response) => {
+    // resolving the pricelist
+    const user = req.user as UserInstance;
+    const pricelist = await Pricelist.findOne({
+      include: [PricelistEntry],
+      where: { id: req.params["id"], user_id: user.id }
+    });
+    if (pricelist === null) {
+      res.status(HTTPStatus.NOT_FOUND);
+
+      return;
+    }
+
+    await Promise.all(pricelist.get("pricelist_entries").map((v: PricelistEntryInstance) => v.destroy()));
+    await pricelist.destroy();
+    res.json({});
+  }));
+
   return router;
 };
