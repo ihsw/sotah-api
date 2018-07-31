@@ -11,4 +11,5 @@ export interface IRealm {
   locale: string;
   timezone: string;
   connected_realms: realmSlug[];
+  last_modified: number;
 }
