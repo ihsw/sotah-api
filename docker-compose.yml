@@ -7,6 +7,28 @@ services:
     image: nats
     ports:
     - "4222:4222"
+  
+  influxdb:
+    image: influxdb:1.6
+    ports:
+    - "8086:8086"
+    volumes:
+    - ./influxdb:/var/lib/influxdb
+  telegraf:
+    image: telegraf:1.7
+    depends_on:
+    - influxdb
+    volumes:
+    - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+  chronograf:
+    image: chronograf:1.6
+    depends_on:
+    - influxdb
+    ports:
+    - "8888:8888"
+    volumes:
+    - ./chronograf:/var/lib/chronograf
+    command: --influxdb-url=http://influxdb:8086
 
   sotah-server-base:
     image: ihsw/sotah-server
