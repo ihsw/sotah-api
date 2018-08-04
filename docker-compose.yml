@@ -61,18 +61,26 @@ services:
     - NATS_HOST=nats
     - NATS_PORT=4222
     - DB_HOST=db
-    volumes:
-    - ./app:/srv/app
-    - ./sotah-server/data/item-icons:/tmp/item-icons
   sotah-api:
     extends: sotah-api-base
     depends_on:
     - sotah-server
     - nats
     - db
+    volumes:
+    - ./app:/srv/app
+    - ./sotah-server/data/item-icons:/tmp/item-icons
   sotah-api-test:
     extends: sotah-api-base
     depends_on:
     - sotah-server-test
     - nats
     - db
+  sotah-api-production:
+    extends: sotah-api-base
+    depends_on:
+    - sotah-server-test
+    - nats
+    - db
+    volumes:
+    - ./sotah-server/data/item-icons:/tmp/item-icons
