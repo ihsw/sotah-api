@@ -28,34 +28,3 @@ test("User creation endpoint Should error on fetching user by invalid id", async
   const res = await request.get("/user/-1");
   t.is(res.status, HTTPStatus.NOT_FOUND);
 });
-
-test("User creation endpoint Should delete a user", async (t) => {
-  const user = await createUser(t, {
-    email: `delete-user+${uuidv4()}@test.com`,
-    password: "test"
-  });
-  const res = await request.delete(`/user/${user.id}`);
-  t.is(res.status, HTTPStatus.OK);
-  t.not(String(res.header["content-type"]).match(/^application\/json/), null);
-});
-
-test("User creation endpoint Should error on deleting user by invalid id", async (t) => {
-  const res = await request.delete("/user/-1");
-  t.is(res.status, HTTPStatus.NOT_FOUND);
-});
-
-test("User creation endpoint Should update a user", async (t) => {
-  const user = await createUser(t, {
-    email: `update-user+${uuidv4()}@test.com`,
-    password: "test"
-  });
-  const newBody = { email: `update-user+${uuidv4()}@test.com` };
-  const res = await request.put(`/user/${user.id}`).send(newBody);
-  t.is(res.status, HTTPStatus.OK);
-  t.is(res.body.email, newBody.email);
-});
-
-test("User creation endpoint Should error on updating a user by invalid id", async (t) => {
-  const res = await request.put("/user/-1");
-  t.is(res.status, HTTPStatus.NOT_FOUND);
-});
