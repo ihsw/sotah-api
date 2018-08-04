@@ -22,7 +22,6 @@ services:
     volumes:
     - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
     - /:/hostfs:ro
-    - /run/udev:/run/udev:ro
     privileged: true
     environment:
     - HOST_PROC=/hostfs/proc
