@@ -8,8 +8,6 @@ ENV APP_PORT 8080
 COPY ./app /srv/app
 WORKDIR /srv/app
 
-COPY ./sotah-server/data/item-icons /tmp/item-icons
-
 RUN npm install -s \
   && npm run -s build
 
