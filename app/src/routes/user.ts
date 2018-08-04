@@ -9,6 +9,12 @@ import { withoutPassword, generateJwtToken } from "../models/user";
 import { getRouter as getBaseRouter } from "./user/base";
 import { getRouter as getPreferencesRouter } from "./user/preferences";
 import { getRouter as getPricelistsCrudRouter } from "./user/pricelists-crud";
+import { UserRequestBodyRules } from '../lib/validator-rules';
+
+type UserCreateBody = {
+  email: string
+  password: string
+};
 
 export const getRouter = (models: Models, messenger: Messenger) => {
   const router = Router();
@@ -19,17 +25,25 @@ export const getRouter = (models: Models, messenger: Messenger) => {
   router.use("/user", getBaseRouter(models));
 
   router.post("/users", wrap(async (req: Request, res: Response) => {
-    const email: string = req.body.email;
-    const password: string = await bcrypt.hash(req.body.password, 10);
+    let result: UserCreateBody | null = null;
+    try {
+      result = await UserRequestBodyRules.validate(req.body) as UserCreateBody;
+    } catch (err) {
+      res.status(HTTPStatus.BAD_REQUEST).json(err.errors);
 
-    let user = await User.findOne({ where: { email } });
-    if (user !== null) {
+      return;
+    }
+
+    if (await User.findOne({ where: { email: result.email } }) !== null) {
       res.status(HTTPStatus.BAD_REQUEST).json({ email: "Email is already in use!" });
 
       return;
     }
 
-    user = await User.create({ email, hashed_password: password });
+    const user = await User.create({
+      email: result.email,
+      hashed_password: await bcrypt.hash(result.password, 10)
+    });
 
     res.status(HTTPStatus.CREATED).json({
       token: generateJwtToken(user),

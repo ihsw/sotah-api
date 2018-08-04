@@ -21,3 +21,8 @@ export const PricelistRequestBodyRules = yup.object().shape({
   entries: yup.array(PriceListEntryRules).required(),
   pricelist: PricelistRules.required()
 }).noUnknown();
+
+export const UserRequestBodyRules = yup.object().shape({
+  email: yup.string().email().required(),
+  password: yup.string().min(6).required()
+}).noUnknown();
