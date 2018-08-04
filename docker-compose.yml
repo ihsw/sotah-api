@@ -34,6 +34,12 @@ services:
     volumes:
     - ./chronograf:/var/lib/chronograf
     command: --influxdb-url=http://influxdb:8086
+    environment:
+    - GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
+    - GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
+    - GOOGLE_DOMAINS=$GOOGLE_DOMAINS
+    - PUBLIC_URL=$PUBLIC_URL
+    - TOKEN_SECRET=$TOKEN_SECRET
 
   sotah-server-base:
     image: ihsw/sotah-server
