@@ -74,7 +74,7 @@ services:
     - nats
     - db
     volumes:
-    - ./app:/srv/app
+    - ./sotah-api/app:/srv/app
     - ./sotah-server/data/item-icons:/tmp/item-icons
   sotah-api-test:
     extends: sotah-api-base
