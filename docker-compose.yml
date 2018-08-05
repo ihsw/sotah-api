@@ -91,3 +91,9 @@ services:
     - db
     volumes:
     - ./sotah-server/data/item-icons:/tmp/item-icons
+  
+  sotah-client:
+    image: ihsw/sotah-client
+    ports: "80:5000"
+    depends_on:
+    - sotah-api-production
