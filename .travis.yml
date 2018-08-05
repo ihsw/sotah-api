@@ -15,7 +15,7 @@ env:
   - secure: hx40d0IHT8UfA1OUP1JbID1h9hpwQhlynwpzduv87pQJ87QMqK/L1xeCKGl6gFZItH+dIz/C+VaohR1xNBdXWdi6M4A0w6hYe1Xb/9SOnBRjGLI7Fy8oiFgYe/xQvb/zHgXNporTXPP6uiB1JA3B/iesJP4k0iwf7hM5v+hP21ckHbQxqWatEwlEFxx+bPz0+Si/iLWdlb2zEi8SEmLIJfQzfSefbsvZUrwQ7ib6F7e1rayg2eirK+oGarJbrasUVnWvzsRN9/4Gr40D441xWw1N9E2nBIVJaLv+cLfR39/rrvd2mNKXkBZ7xwq2ekAF2yfsAXl2Qleyxi81XRvvk17FkUJ3+wuGq/14dI5KmOiUF7Ls+SggnJTr612qquYNyK7qUvD9+yeGhX4cXlnKE0uPrlhDei3xWS+IpAuewirt3b5MzHmLKJ1CPqTiF+/kJKpEHCz6DBdy30y8xEJIO8INZYXnXy+tx7GdgM8ryfbe4cauPYM2GncAhIYa3ihAp8QY4cJ8Wd/yCboL3shGi7CKj3F0ZUpUeSS0OdLaLJU/iqYMw0EMyPALEI0v/UkRIZmC4vTr+rEW9OlM4svxHrb4Mvqu0P51VOUeMEPbqgh27WijUqqqFwO//K+PFlTc/VHs0lcR21j0aTLZAmQA6DZKlmBsHCQhKYgVhz3pXAk=
 
 install:
-- cd ./app && npm install -s
+- cd ./sotah-api/app && npm install -s
 before_script:
 - cd ../ && docker-compose up -d sotah-server-test && cd ./app
 script:
