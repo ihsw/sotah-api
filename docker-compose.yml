@@ -19,6 +19,7 @@ services:
     depends_on:
     - influxdb
     - nats
+    - db
     volumes:
     - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
     - /:/hostfs:ro
