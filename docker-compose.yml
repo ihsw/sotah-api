@@ -85,7 +85,7 @@ services:
   sotah-api-production:
     extends: sotah-api-base
     depends_on:
-    - sotah-server-test
+    - sotah-server
     - nats
     - db
     volumes:
