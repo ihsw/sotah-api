@@ -94,6 +94,7 @@ services:
   
   sotah-client:
     image: ihsw/sotah-client
-    ports: "80:5000"
+    ports:
+    - "80:5000"
     depends_on:
     - sotah-api-production
