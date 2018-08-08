@@ -23,6 +23,6 @@ export const PricelistRequestBodyRules = yup.object().shape({
 }).noUnknown();
 
 export const UserRequestBodyRules = yup.object().shape({
-  email: yup.string().email().required(),
-  password: yup.string().min(6).required()
+  email: yup.string().email("Email must be a valid email").required("Email is required"),
+  password: yup.string().min(6, "Password must be at least 6 characters").required("Password is required")
 }).noUnknown();

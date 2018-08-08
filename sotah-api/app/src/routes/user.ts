@@ -29,7 +29,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
     try {
       result = await UserRequestBodyRules.validate(req.body) as UserCreateBody;
     } catch (err) {
-      res.status(HTTPStatus.BAD_REQUEST).json(err.errors);
+      res.status(HTTPStatus.BAD_REQUEST).json({ [err.path]: err.message });
 
       return;
     }
