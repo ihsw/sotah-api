@@ -9,7 +9,7 @@ import { withoutPassword, generateJwtToken } from "../models/user";
 import { getRouter as getBaseRouter } from "./user/base";
 import { getRouter as getPreferencesRouter } from "./user/preferences";
 import { getRouter as getPricelistsCrudRouter } from "./user/pricelists-crud";
-import { UserRequestBodyRules } from '../lib/validator-rules';
+import { UserRequestBodyRules } from "../lib/validator-rules";
 
 type UserCreateBody = {
   email: string
