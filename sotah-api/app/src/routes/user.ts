@@ -9,7 +9,7 @@ import { withoutPassword, generateJwtToken } from "../models/user";
 import { getRouter as getBaseRouter } from "./user/base";
 import { getRouter as getPreferencesRouter } from "./user/preferences";
 import { getRouter as getPricelistsCrudRouter } from "./user/pricelists-crud";
-import { UserRequestBodyRules } from '../lib/validator-rules';
+import { UserRequestBodyRules } from "../lib/validator-rules";
 
 type UserCreateBody = {
   email: string
@@ -29,7 +29,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
     try {
       result = await UserRequestBodyRules.validate(req.body) as UserCreateBody;
     } catch (err) {
-      res.status(HTTPStatus.BAD_REQUEST).json(err.errors);
+      res.status(HTTPStatus.BAD_REQUEST).json({ [err.path]: err.message });
 
       return;
     }
