@@ -8,6 +8,16 @@ services:
     ports:
     - "4222:4222"
   
+  reverse-proxy:
+    image: nginx
+    ports:
+    - "8090:80"
+    environment:
+    - NGINX_HOST=sotah.info
+    - NGINX_PORT=80
+    volumes:
+    - ./reverse-proxy/nginx.conf:/etc/nginx/nginx.conf
+  
   influxdb:
     image: influxdb:1.6
     ports:
