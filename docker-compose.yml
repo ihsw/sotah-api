@@ -67,6 +67,7 @@ services:
     - API_KEY=$API_KEY
     - NATS_HOST=nats
     - GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcloud-app-credentials.json
+    - PROJECT_ID=$PROJECT_ID
   sotah-server:
     extends: sotah-server-base
     depends_on:
