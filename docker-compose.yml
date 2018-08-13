@@ -12,6 +12,7 @@ services:
     image: nginx
     ports:
     - "80:80"
+    - "5050:5050"
     environment:
     - NGINX_HOST=sotah.info
     - NGINX_PORT=80
