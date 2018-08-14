@@ -43,6 +43,14 @@ export const getRouter = (messenger: Messenger): Router => {
     const msg = await messenger.getRegions();
     res.send(msg.data).end();
   }));
+  router.get("/item-classes", wrap(async (_, res) => {
+    const msg = await messenger.getItemClasses();
+    res.send(msg.data).end();
+  }));
+  router.get("/boot", wrap(async (_, res) => {
+    const msg = await messenger.getBoot();
+    res.send(msg.data).end();
+  }));
   router.get("/region/:regionName/realms", wrap(async (req, res) => {
     const msg = await messenger.getStatus(req.params["regionName"]);
     if (msg.code === code.notFound) {
@@ -106,10 +114,6 @@ export const getRouter = (messenger: Messenger): Router => {
     const items = (await messenger.getItems(item_ids)).data!.items;
 
     res.json({ price_list, items });
-  }));
-  router.get("/item-classes", wrap(async (_, res) => {
-    const msg = await messenger.getItemClasses();
-    res.send(msg.data).end();
   }));
 
   return router;

@@ -13,6 +13,7 @@ import {
   ItemsResponse
 } from "./auction";
 import { PriceListRequest, PriceListResponse } from "./price-list";
+import { BootResponse } from "./boot";
 
 const DEFAULT_TIMEOUT = 5 * 1000;
 
@@ -40,7 +41,8 @@ export enum subjects {
   auctionsQuery = "auctionsQuery",
   itemClasses = "itemClasses",
   priceList = "priceList",
-  items = "items"
+  items = "items",
+  boot = "boot"
 }
 
 export enum code {
@@ -187,5 +189,9 @@ export class Messenger {
 
   getItems(itemIds: ItemId[]): Promise<Message<ItemsResponse>> {
     return this.request(subjects.items, { body: JSON.stringify({ itemIds }) });
+  }
+
+  getBoot(): Promise<Message<BootResponse>> {
+    return this.request(subjects.boot);
   }
 }
