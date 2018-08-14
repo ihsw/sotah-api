@@ -28,5 +28,15 @@
         "eu": {},
         "kr": {},
         "tw": {}
-    }
+    },
+    "expansions": [
+        { "name": "bfa", "label": "Battle for Azeroth", "primary": true },
+        { "name": "legion", "label": "Legion" },
+        { "name": "warlords", "label": "Warlords of Draenor" },
+        { "name": "pandaria", "label": "Mists of Pandaria" },
+        { "name": "cataclysm", "label": "Cataclysm" },
+        { "name": "wotlk", "label": "Wrath of the Lich King" },
+        { "name": "tbc", "label": "The Burning Crusade" },
+        { "name": "vanilla", "label": "Vanilla" }
+    ]
 }
