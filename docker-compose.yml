@@ -61,17 +61,23 @@ services:
     image: ihsw/sotah-server
     volumes:
     - ./sotah-server:/tmp/sotah-server
-    - $GOOGLE_APPLICATION_CREDENTIALS:/tmp/gcloud-app-credentials.json
     command: -c /tmp/sotah-server/config.json --cache-dir /tmp/sotah-server/data -v debug api
     environment:
     - API_KEY=$API_KEY
     - NATS_HOST=nats
-    - GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcloud-app-credentials.json
-    - PROJECT_ID=$PROJECT_ID
   sotah-server:
     extends: sotah-server-base
     depends_on:
     - nats
+  sotah-server-prod:
+    extends: sotah-server-base
+    depends_on:
+    - nats
+    environment:
+    - GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcloud-app-credentials.json
+    - PROJECT_ID=$PROJECT_ID
+    volumes:
+    - $GOOGLE_APPLICATION_CREDENTIALS:/tmp/gcloud-app-credentials.json
   sotah-server-test:
     extends: sotah-server-base
     depends_on:
