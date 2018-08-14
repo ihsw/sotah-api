@@ -38,5 +38,22 @@
         { "name": "wotlk", "label": "Wrath of the Lich King" },
         { "name": "tbc", "label": "The Burning Crusade" },
         { "name": "vanilla", "label": "Vanilla" }
+    ],
+    "professions": [
+        { "name": "alchemy", "label": "Alchemy" },
+        { "name": "archaeology", "label": "Archaeology" },
+        { "name": "blacksmithing", "label": "Blacksmithing" },
+        { "name": "cooking", "label": "Cooking" },
+        { "name": "enchanting", "label": "Enchanting" },
+        { "name": "engineering", "label": "Engineering" },
+        { "name": "fishing", "label": "Fishing" },
+        { "name": "herbalism", "label": "Herbalism" },
+        { "name": "inscription", "label": "Inscription" },
+        { "name": "jewelcrafting", "label": "Jewelcrafting" },
+        { "name": "leatherworking", "label": "Leatherworking" },
+        { "name": "mining", "label": "Mining" },
+        { "name": "skinning", "label": "Skinning" },
+        { "name": "tailoring", "label": "Tailoring" },
+        { "name": "first-aid", "label": "First Aid" }
     ]
 }
