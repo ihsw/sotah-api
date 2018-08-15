@@ -3,6 +3,7 @@ import { Instance, Sequelize, STRING } from "sequelize";
 
 import { UserModel } from "./user";
 import { PricelistEntryModel } from "./pricelist-entry";
+import { ProfessionPricelistModel } from "./profession-pricelist";
 import { regionName } from "../lib/region";
 import { realmSlug } from "../lib/realm";
 
@@ -31,10 +32,12 @@ export const createPricelistModel = (sequelize: Sequelize): PricelistModel => {
 export const appendPricelistRelationships = (
   Pricelist: PricelistModel,
   PricelistEntry: PricelistEntryModel,
-  User: UserModel
+  User: UserModel,
+  ProfessionPricelist: ProfessionPricelistModel
 ): PricelistModel => {
   Pricelist.belongsTo(User, { foreignKey: "user_id" });
   Pricelist.hasMany(PricelistEntry, { foreignKey: "pricelist_id" });
+  Pricelist.hasOne(ProfessionPricelist, { foreignKey: "pricelist_id" });
 
   return Pricelist;
 };

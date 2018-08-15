@@ -7,7 +7,7 @@ import { ProfessionName } from "../lib/profession";
 export type ProfessionPricelistAttributes = {
   id?: number
   pricelist_id: number
-  profession_name: ProfessionName
+  name: ProfessionName
 };
 
 export interface ProfessionPricelistInstance extends Instance<ProfessionPricelistAttributes> {
@@ -18,7 +18,7 @@ export type ProfessionPricelistModel = SequelizeStatic.Model<ProfessionPricelist
 
 export const createProfessionPricelistModel = (sequelize: Sequelize): ProfessionPricelistModel => {
   return sequelize.define<ProfessionPricelistInstance, ProfessionPricelistAttributes>("profession_pricelist", {
-    profession_name: { type: STRING, allowNull: false }
+    name: { type: STRING, allowNull: false }
   });
 };
 
