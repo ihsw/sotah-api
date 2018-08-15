@@ -9,6 +9,7 @@ import { withoutPassword, generateJwtToken } from "../models/user";
 import { getRouter as getBaseRouter } from "./user/base";
 import { getRouter as getPreferencesRouter } from "./user/preferences";
 import { getRouter as getPricelistsCrudRouter } from "./user/pricelists-crud";
+import { getRouter as getProfessionPricelistsCrudRouter } from "./user/profession-pricelists-crud";
 import { UserRequestBodyRules } from "../lib/validator-rules";
 
 type UserCreateBody = {
@@ -22,6 +23,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
 
   router.use("/user/preferences", getPreferencesRouter(models));
   router.use("/user/pricelists", getPricelistsCrudRouter(models, messenger));
+  router.use("/user/profession-pricelists", getProfessionPricelistsCrudRouter(models, messenger));
   router.use("/user", getBaseRouter(models));
 
   router.post("/users", wrap(async (req: Request, res: Response) => {
