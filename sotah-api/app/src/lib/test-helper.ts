@@ -9,6 +9,8 @@ import { Messenger } from "./messenger";
 import { getApp, Options } from "./app";
 import { PricelistAttributes } from "../models/pricelist";
 import { PricelistEntryAttributes } from "../models/pricelist-entry";
+import { ProfessionPricelistAttributes } from "../models/profession-pricelist";
+import { ProfessionName } from "../lib/profession";
 
 // setup func
 type SetupSettings = {
@@ -100,10 +102,57 @@ const getPricelistTestHelper = (request: SuperTest<Test>) => {
   return { requestPricelist, createPricelist };
 };
 
+// profession-pricelist test-helper
+export interface IProfessionPricelistResponse {
+  profession_pricelist: ProfessionPricelistAttributes;
+  pricelist: PricelistAttributes;
+  entries: PricelistEntryAttributes[];
+}
+
+export interface IProfessionPricelistRequest extends IPricelistRequest {
+  profession_name: ProfessionName;
+}
+
+const getProfessionPricelistTestHelper = (request: SuperTest<Test>) => {
+  const requestProfessionPricelist = (token: string, body: IProfessionPricelistRequest) => {
+    return request
+      .post("/user/profession-pricelists")
+      .set("Authorization", `Bearer ${token}`)
+      .send(body);
+  };
+  const createProfessionPricelist = async (
+    t: TestContext, token: string,
+    body: IProfessionPricelistRequest
+  ): Promise<IProfessionPricelistResponse> => {
+    const res = await requestProfessionPricelist(token, body);
+    const { status, body: responseBody, header } = res;
+    t.is(status, HTTPStatus.CREATED);
+    t.not(String(header["content-type"]).match(/^application\/json/), null);
+
+    t.true("profession_pricelist" in responseBody);
+    const { professionPricelist } = responseBody;
+    t.is(professionPricelist.name, body.profession_name);
+
+    t.true("pricelist" in responseBody);
+    const { pricelist } = responseBody;
+    t.is(pricelist.name, body.pricelist.name);
+
+    t.true("entries" in body);
+    const { entries } = responseBody;
+    t.is(entries.length, body.entries.length);
+    t.not(entries[0].id, null);
+
+    return responseBody;
+  };
+
+  return { requestProfessionPricelist, createProfessionPricelist };
+};
+
 // final test-helper
 export const getTestHelper = (request: SuperTest<Test>) => {
   return {
     ...getUserTestHelper(request),
-    ...getPricelistTestHelper(request)
+    ...getPricelistTestHelper(request),
+    ...getProfessionPricelistTestHelper(request)
   };
 };
