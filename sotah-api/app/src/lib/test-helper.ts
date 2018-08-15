@@ -130,14 +130,14 @@ const getProfessionPricelistTestHelper = (request: SuperTest<Test>) => {
     t.not(String(header["content-type"]).match(/^application\/json/), null);
 
     t.true("profession_pricelist" in responseBody);
-    const { professionPricelist } = responseBody;
-    t.is(professionPricelist.name, body.profession_name);
+    const { profession_pricelist } = responseBody;
+    t.is(profession_pricelist.name, body.profession_name);
 
     t.true("pricelist" in responseBody);
     const { pricelist } = responseBody;
     t.is(pricelist.name, body.pricelist.name);
 
-    t.true("entries" in body);
+    t.true("entries" in responseBody);
     const { entries } = responseBody;
     t.is(entries.length, body.entries.length);
     t.not(entries[0].id, null);
