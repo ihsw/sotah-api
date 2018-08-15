@@ -4,7 +4,7 @@ import { wrap } from "async-middleware";
 
 import { Models } from "../../models";
 import { UserInstance } from "../../models/user";
-import { withoutEntries } from "../../models/pricelist";
+import { withoutEntries, PricelistInstance } from "../../models/pricelist";
 import { PricelistEntryInstance } from "../../models/pricelist-entry";
 import { withoutPricelist } from "../../models/profession-pricelist";
 import { ItemId } from "../../lib/auction";
@@ -94,7 +94,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
   }));
 
   router.delete("/:id", auth, wrap(async (req: Request, res: Response) => {
-    // resolving the pricelist
+    // resolving the profession-pricelist
     const user = req.user as UserInstance;
     const professionPricelist = await ProfessionPricelist.findOne({
       include: [{
@@ -110,7 +110,13 @@ export const getRouter = (models: Models, messenger: Messenger) => {
       return;
     }
 
-    const pricelist = professionPricelist.get("pricelist");
+    const pricelist: PricelistInstance = professionPricelist.get("pricelist");
+    if (pricelist.get("user_id") !== user.id) {
+      res.status(HTTPStatus.UNAUTHORIZED);
+
+      return;
+    }
+
     await Promise.all(pricelist.get("pricelist_entries").map((v: PricelistEntryInstance) => v.destroy()));
     await pricelist.destroy();
     await professionPricelist.destroy();
