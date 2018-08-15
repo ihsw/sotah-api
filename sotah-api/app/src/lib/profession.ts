@@ -1,4 +1,6 @@
+export type ProfessionName = string;
+
 export interface IProfession {
-  name: string;
+  name: ProfessionName;
   label: string;
 }
