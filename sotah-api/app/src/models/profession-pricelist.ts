@@ -30,3 +30,10 @@ export const appendProfessionPricelistRelationships = (
 
   return ProfessionPricelist;
 };
+
+export const withoutPricelist = (professionPricelist: ProfessionPricelistInstance): ProfessionPricelistAttributes => {
+  const data = professionPricelist.toJSON();
+  delete data["pricelist"];
+
+  return data;
+};
