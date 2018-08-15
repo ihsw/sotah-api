@@ -26,7 +26,7 @@ type ProfessionPricelistRequestBody = {
     item_id: number
     quantity_modifier: number
   }[]
-  name: ProfessionName
+  profession_name: ProfessionName
 };
 
 export const getRouter = (models: Models, messenger: Messenger) => {
@@ -50,7 +50,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
       ...v
     })));
     const professionPricelist = await ProfessionPricelist.create({
-        name: result.name,
+        name: result.profession_name,
         pricelist_id: pricelist.id
     });
 
