@@ -99,27 +99,26 @@ export const getRouter = (models: Models, messenger: Messenger) => {
     const professionPricelist = await ProfessionPricelist.findOne({
       include: [{
         include: [{ model: PricelistEntry }],
-        model: Pricelist,
-        where: { user_id: user.id }
+        model: Pricelist
       }],
       where: { id: req.params["id"] }
     });
     if (professionPricelist === null) {
-      res.status(HTTPStatus.NOT_FOUND);
+      res.status(HTTPStatus.NOT_FOUND).json({});
 
       return;
     }
 
     const pricelist: PricelistInstance = professionPricelist.get("pricelist");
     if (pricelist.get("user_id") !== user.id) {
-      res.status(HTTPStatus.UNAUTHORIZED);
+      res.status(HTTPStatus.UNAUTHORIZED).json({});
 
       return;
     }
 
     await Promise.all(pricelist.get("pricelist_entries").map((v: PricelistEntryInstance) => v.destroy()));
-    await pricelist.destroy();
     await professionPricelist.destroy();
+    await pricelist.destroy();
     res.json({});
   }));
 
