@@ -28,7 +28,7 @@ type PricelistRequestBody = {
 
 export const getRouter = (models: Models, messenger: Messenger) => {
   const router = Router();
-  const { Pricelist, PricelistEntry } = models;
+  const { Pricelist, PricelistEntry, ProfessionPricelist } = models;
 
   router.post("/", auth, wrap(async (req: Request, res: Response) => {
     const user = req.user as UserInstance;
@@ -65,10 +65,13 @@ export const getRouter = (models: Models, messenger: Messenger) => {
     const user = req.user as UserInstance;
 
     // gathering pricelists associated with this user, region, and realm
-    const pricelists = await Pricelist.findAll({
-      include: [PricelistEntry],
+    let pricelists = await Pricelist.findAll({
+      include: [PricelistEntry, ProfessionPricelist],
       where: { user_id: user.id, region: req.params["regionName"], realm: req.params["realmSlug"] }
     });
+
+    // filtering out profession-pricelists
+    pricelists = pricelists.filter(v => !!v.get("profession_pricelist") === false);
 
     // gathering related items
     const itemIds: ItemId[] = pricelists.reduce((itemIds: ItemId[], pricelist) => {
