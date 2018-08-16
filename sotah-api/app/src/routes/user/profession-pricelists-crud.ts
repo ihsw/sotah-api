@@ -61,9 +61,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
     });
   }));
 
-  router.get("/region/:regionName/realm/:realmSlug", auth, wrap(async (req: Request, res: Response) => {
-    const user = req.user as UserInstance;
-
+  router.get("/region/:regionName/realm/:realmSlug/:profession_name", wrap(async (req: Request, res: Response) => {
     // gathering pricelists associated with this user, region, and realm
     const professionPricelists = await ProfessionPricelist.findAll({
       include: [
@@ -71,9 +69,10 @@ export const getRouter = (models: Models, messenger: Messenger) => {
           include: [{ model: PricelistEntry, required: true }],
           model: Pricelist,
           required: true,
-          where: { user_id: user.id, region: req.params["regionName"], realm: req.params["realmSlug"] }
+          where: { region: req.params["regionName"], realm: req.params["realmSlug"] }
         }
-      ]
+      ],
+      where: { name: req.params["profession_name"] }
     });
 
     // gathering related items
