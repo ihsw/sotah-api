@@ -10,7 +10,7 @@ import { getApp, Options } from "./app";
 import { PricelistAttributes } from "../models/pricelist";
 import { PricelistEntryAttributes } from "../models/pricelist-entry";
 import { ProfessionPricelistAttributes } from "../models/profession-pricelist";
-import { ProfessionName } from "../lib/profession";
+import { ProfessionName } from "./profession";
 
 // setup func
 type SetupSettings = {

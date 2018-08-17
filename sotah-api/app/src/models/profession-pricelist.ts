@@ -3,11 +3,13 @@ import { Instance, Sequelize, STRING } from "sequelize";
 
 import { PricelistModel } from "./pricelist";
 import { ProfessionName } from "../lib/profession";
+import { ExpansionName } from "../lib/expansion";
 
 export type ProfessionPricelistAttributes = {
   id?: number
   pricelist_id: number
   name: ProfessionName
+  expansion: ExpansionName
 };
 
 export interface ProfessionPricelistInstance extends Instance<ProfessionPricelistAttributes> {
@@ -18,6 +20,7 @@ export type ProfessionPricelistModel = SequelizeStatic.Model<ProfessionPricelist
 
 export const createProfessionPricelistModel = (sequelize: Sequelize): ProfessionPricelistModel => {
   return sequelize.define<ProfessionPricelistInstance, ProfessionPricelistAttributes>("profession_pricelist", {
+    expansion: { type: STRING, allowNull: false },
     name: { type: STRING, allowNull: false }
   });
 };

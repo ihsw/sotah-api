@@ -12,6 +12,7 @@ import { realmSlug } from "../../lib/realm";
 import { auth } from "../../lib/session";
 import { ProfessionPricelistRequestBodyRules } from "../../lib/validator-rules";
 import { ProfessionName } from "../../lib/profession";
+import { ExpansionName } from "../../lib/expansion";
 
 type ProfessionPricelistRequestBody = {
   pricelist: {
@@ -25,6 +26,7 @@ type ProfessionPricelistRequestBody = {
     quantity_modifier: number
   }[]
   profession_name: ProfessionName
+  expansion_name: ExpansionName
 };
 
 export const getRouter = (models: Models) => {
@@ -48,8 +50,9 @@ export const getRouter = (models: Models) => {
       ...v
     })));
     const professionPricelist = await ProfessionPricelist.create({
-        name: result.profession_name,
-        pricelist_id: pricelist.id
+      expansion: result.expansion_name,
+      name: result.profession_name,
+      pricelist_id: pricelist.id
     });
 
     res.status(HTTPStatus.CREATED).json({

@@ -24,6 +24,7 @@ export const PricelistRequestBodyRules = yup.object().shape({
 
 export const ProfessionPricelistRequestBodyRules = yup.object().shape({
   entries: yup.array(PriceListEntryRules).required(),
+  expansion_name: yup.string().required(),
   pricelist: PricelistRules.required(),
   profession_name: yup.string().required()
 }).noUnknown();
