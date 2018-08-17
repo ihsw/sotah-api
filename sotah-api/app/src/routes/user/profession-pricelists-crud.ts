@@ -7,12 +7,10 @@ import { UserInstance } from "../../models/user";
 import { withoutEntries, PricelistInstance } from "../../models/pricelist";
 import { PricelistEntryInstance } from "../../models/pricelist-entry";
 import { withoutPricelist } from "../../models/profession-pricelist";
-import { ItemId } from "../../lib/auction";
 import { regionName } from "../../lib/region";
 import { realmSlug } from "../../lib/realm";
 import { auth } from "../../lib/session";
 import { ProfessionPricelistRequestBodyRules } from "../../lib/validator-rules";
-import { Messenger } from "../../lib/messenger";
 import { ProfessionName } from "../../lib/profession";
 
 type ProfessionPricelistRequestBody = {
@@ -29,7 +27,7 @@ type ProfessionPricelistRequestBody = {
   profession_name: ProfessionName
 };
 
-export const getRouter = (models: Models, messenger: Messenger) => {
+export const getRouter = (models: Models) => {
   const router = Router();
   const { Pricelist, PricelistEntry, ProfessionPricelist } = models;
 
@@ -59,37 +57,6 @@ export const getRouter = (models: Models, messenger: Messenger) => {
       pricelist: withoutEntries(pricelist),
       profession_pricelist: withoutPricelist(professionPricelist)
     });
-  }));
-
-  router.get("/region/:regionName/realm/:realmSlug/:profession_name", wrap(async (req: Request, res: Response) => {
-    // gathering pricelists associated with this user, region, and realm
-    const professionPricelists = await ProfessionPricelist.findAll({
-      include: [
-        {
-          include: [{ model: PricelistEntry, required: true }],
-          model: Pricelist,
-          required: true,
-          where: { region: req.params["regionName"], realm: req.params["realmSlug"] }
-        }
-      ],
-      where: { name: req.params["profession_name"] }
-    });
-
-    // gathering related items
-    const itemIds: ItemId[] = professionPricelists.reduce((itemIds: ItemId[], professionPricelist) => {
-      return professionPricelist.get("pricelist").get("pricelist_entries").reduce((itemIds: ItemId[], entry: PricelistEntryInstance) => {
-        const entryJson = entry.toJSON();
-        if (itemIds.indexOf(entryJson.item_id) === -1) {
-          itemIds.push(entryJson.item_id);
-        }
-
-        return itemIds;
-      }, itemIds);
-    }, []);
-    const items = (await messenger.getItems(itemIds)).data!.items;
-
-    // dumping out a response
-    res.json({ profession_pricelists: professionPricelists.map((v) => v.toJSON()), items });
   }));
 
   router.delete("/:id", auth, wrap(async (req: Request, res: Response) => {

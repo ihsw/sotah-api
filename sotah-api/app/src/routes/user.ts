@@ -23,7 +23,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
 
   router.use("/user/preferences", getPreferencesRouter(models));
   router.use("/user/pricelists", getPricelistsCrudRouter(models, messenger));
-  router.use("/user/profession-pricelists", getProfessionPricelistsCrudRouter(models, messenger));
+  router.use("/user/profession-pricelists", getProfessionPricelistsCrudRouter(models));
   router.use("/user", getBaseRouter(models));
 
   router.post("/users", wrap(async (req: Request, res: Response) => {
