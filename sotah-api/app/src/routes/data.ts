@@ -118,7 +118,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
 
     res.json({ price_list, items });
   }));
-  router.get("/region/:regionName/realm/:realmSlug/:profession_name", wrap(async (req: Request, res: Response) => {
+  router.get("/region/:regionName/realm/:realmSlug/profession-pricelists/:profession_name", wrap(async (req: Request, res: Response) => {
     // gathering pricelists associated with this user, region, and realm
     const professionPricelists = await ProfessionPricelist.findAll({
       include: [
