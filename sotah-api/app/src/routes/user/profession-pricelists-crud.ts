@@ -39,7 +39,7 @@ export const getRouter = (models: Models) => {
     try {
       result = await ProfessionPricelistRequestBodyRules.validate(req.body) as ProfessionPricelistRequestBody;
     } catch (err) {
-      res.status(HTTPStatus.BAD_REQUEST).json(err.errors);
+      res.status(HTTPStatus.BAD_REQUEST).json({ [err.path]: err.message });
 
       return;
     }
