@@ -68,9 +68,9 @@ export const getRouter = (models: Models) => {
     const professionPricelist = await ProfessionPricelist.findOne({
       include: [{
         include: [{ model: PricelistEntry }],
-        model: Pricelist
-      }],
-      where: { id: req.params["id"] }
+        model: Pricelist,
+        where: { id: req.params["id"] }
+      }]
     });
     if (professionPricelist === null) {
       res.status(HTTPStatus.NOT_FOUND).json({});
