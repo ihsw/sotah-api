@@ -35,6 +35,12 @@ export const getRouter = (models: Models) => {
 
   router.post("/", auth, wrap(async (req: Request, res: Response) => {
     const user = req.user as UserInstance;
+    if (user.id !== 1) {
+      res.status(HTTPStatus.UNAUTHORIZED).json({ unauthorized: "You are not authorized to do that." });
+
+      return;
+    }
+
     let result: ProfessionPricelistRequestBody | null = null;
     try {
       result = await ProfessionPricelistRequestBodyRules.validate(req.body) as ProfessionPricelistRequestBody;
@@ -63,8 +69,13 @@ export const getRouter = (models: Models) => {
   }));
 
   router.delete("/:id", auth, wrap(async (req: Request, res: Response) => {
-    // resolving the profession-pricelist
     const user = req.user as UserInstance;
+    if (user.id !== 1) {
+      res.status(HTTPStatus.UNAUTHORIZED).json({ unauthorized: "You are not authorized to do that." });
+
+      return;
+    }
+
     const professionPricelist = await ProfessionPricelist.findOne({
       include: [{
         include: [{ model: PricelistEntry }],
