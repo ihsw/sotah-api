@@ -30,14 +30,14 @@
         "tw": {}
     },
     "expansions": [
-        { "name": "bfa", "label": "Battle for Azeroth", "primary": true },
-        { "name": "legion", "label": "Legion" },
-        { "name": "warlords", "label": "Warlords of Draenor" },
-        { "name": "pandaria", "label": "Mists of Pandaria" },
-        { "name": "cataclysm", "label": "Cataclysm" },
-        { "name": "wotlk", "label": "Wrath of the Lich King" },
-        { "name": "tbc", "label": "The Burning Crusade" },
-        { "name": "vanilla", "label": "Vanilla" }
+        { "name": "bfa", "label": "Battle for Azeroth", "label_color": "#CED9E0", "primary": true },
+        { "name": "legion", "label": "Legion", "label_color": "#62D96B" },
+        { "name": "warlords", "label": "Warlords of Draenor", "label_color": "#FFB366" },
+        { "name": "pandaria", "label": "Mists of Pandaria", "label_color": "#2EE6D6" },
+        { "name": "cataclysm", "label": "Cataclysm", "label_color": "#FF6E4A" },
+        { "name": "wotlk", "label": "Wrath of the Lich King", "label_color": "#48AFF0" },
+        { "name": "tbc", "label": "The Burning Crusade", "label_color": "#43BF4D" },
+        { "name": "vanilla", "label": "Vanilla", "label_color": "#FFC940" }
     ],
     "professions": [
         { "name": "alchemy", "label": "Alchemy", "icon": "trade_alchemy" },
