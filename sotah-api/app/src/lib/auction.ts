@@ -125,6 +125,7 @@ export type Item = {
   weaponInfo: ItemWeaponInfo
   bonusStats: ItemBonusStat[]
   description: string
+  icon_url: string
 };
 
 export type Owner = {
