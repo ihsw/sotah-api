@@ -40,20 +40,14 @@
         { "name": "vanilla", "label": "Vanilla" }
     ],
     "professions": [
-        { "name": "alchemy", "label": "Alchemy" },
-        { "name": "archaeology", "label": "Archaeology" },
-        { "name": "blacksmithing", "label": "Blacksmithing" },
-        { "name": "cooking", "label": "Cooking" },
-        { "name": "enchanting", "label": "Enchanting" },
-        { "name": "engineering", "label": "Engineering" },
-        { "name": "fishing", "label": "Fishing" },
-        { "name": "herbalism", "label": "Herbalism" },
-        { "name": "inscription", "label": "Inscription" },
-        { "name": "jewelcrafting", "label": "Jewelcrafting" },
-        { "name": "leatherworking", "label": "Leatherworking" },
-        { "name": "mining", "label": "Mining" },
-        { "name": "skinning", "label": "Skinning" },
-        { "name": "tailoring", "label": "Tailoring" },
-        { "name": "first-aid", "label": "First Aid" }
+        { "name": "alchemy", "label": "Alchemy", "icon": "trade_alchemy" },
+        { "name": "blacksmithing", "label": "Blacksmithing", "icon": "trade_blacksmithing" },
+        { "name": "cooking", "label": "Cooking", "icon": "inv_misc_food_15" },
+        { "name": "enchanting", "label": "Enchanting", "icon": "trade_engraving" },
+        { "name": "engineering", "label": "Engineering", "icon": "trade_engineering" },
+        { "name": "inscription", "label": "Inscription", "icon": "inv_inscription_tradeskill01" },
+        { "name": "jewelcrafting", "label": "Jewelcrafting", "icon": "inv_misc_gem_01" },
+        { "name": "leatherworking", "label": "Leatherworking", "icon": "trade_leatherworking" },
+        { "name": "tailoring", "label": "Tailoring", "icon": "trade_tailoring" }
     ]
 }
