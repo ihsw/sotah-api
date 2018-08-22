@@ -7,7 +7,7 @@ import { Messenger, Message, code } from "../lib/messenger";
 import { IRealm } from "../lib/realm";
 import { AuctionsRequestBody, OwnersRequestBody, ItemsRequestBody, AuctionsQueryRequestBody, ItemId } from "../lib/auction";
 import { PricelistEntryInstance } from "../models/pricelist-entry";
-import { PriceListRequestBody } from "../lib/price-list";
+import { PriceListRequestBody, UnmetDemandRequestBody } from "../lib/price-list";
 
 interface StatusRealm extends IRealm {
   regionName: string;
@@ -117,6 +117,63 @@ export const getRouter = (models: Models, messenger: Messenger) => {
     const items = (await messenger.getItems(item_ids)).data!.items;
 
     res.json({ price_list, items });
+  }));
+  router.post("/region/:regionName/realm/:realmSlug/unmet-demand", wrap(async (req, res) => {
+    // gathering profession-pricelists
+    const { expansion } = <UnmetDemandRequestBody>req.body;
+    const professionPricelists = await ProfessionPricelist.findAll({
+      include: [
+        {
+          include: [{ model: PricelistEntry, required: true }],
+          model: Pricelist,
+          required: true,
+        }
+      ],
+      where: { expansion }
+    });
+
+    // gathering pricing data
+    const pricelistResponses = await Promise.all(professionPricelists.map((v) => {
+        const pricelistEntries: PricelistEntryInstance[] = v.get("pricelist").get("pricelist_entries");
+        const itemIds: ItemId[] = pricelistEntries.map(v => v.get("item_id"));
+        return messenger.getPriceList({
+          item_ids: itemIds,
+          realm_slug: req.params["realmSlug"],
+          region_name: req.params["regionName"],
+        });
+    }));
+
+    // validating the responses
+    const err: Error | null = pricelistResponses.reduce((result, v) => {
+      if (result !== null) {
+        return result;
+      }
+
+      return v.error;
+    }, null);
+    if  (err !== null) {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ err });
+
+      return;
+    }
+
+    const pricelistResponsesData = pricelistResponses.map(v => v.data!);
+
+    // resolving the items
+    const itemIds: ItemId[] = pricelistResponsesData.reduce((result: ItemId[], v) => {
+      for (const id of Object.keys(v)) {
+        const itemId = Number(id);
+        if (result.indexOf(itemId) === -1) {
+          result.push(itemId);
+        }
+      }
+
+      return result;
+    }, []);
+
+    const items = (await messenger.getItems(itemIds)).data!.items;
+
+    res.json({ items });
   }));
   router.get("/profession-pricelists/:profession_name", wrap(async (req: Request, res: Response) => {
     // gathering pricelists associated with this user, region, and realm
