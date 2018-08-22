@@ -17,6 +17,7 @@ services:
     - NGINX_PORT=80
     volumes:
     - ./reverse-proxy/conf.d/sotah.conf:/etc/nginx/conf.d/sotah.conf:ro
+    - ./reverse-proxy/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
     - sotah-client
     - sotah-api-production
