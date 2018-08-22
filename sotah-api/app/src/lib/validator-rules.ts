@@ -12,9 +12,7 @@ export const PriceListEntryRules = yup.object().shape({
 }).noUnknown();
 
 export const PricelistRules = yup.object().shape({
-  name: yup.string().required(),
-  realm: yup.string().required(),
-  region: yup.string().required()
+  name: yup.string().required()
 }).noUnknown();
 
 export const PricelistRequestBodyRules = yup.object().shape({

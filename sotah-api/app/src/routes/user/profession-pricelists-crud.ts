@@ -7,8 +7,6 @@ import { UserInstance } from "../../models/user";
 import { withoutEntries, PricelistInstance } from "../../models/pricelist";
 import { PricelistEntryInstance } from "../../models/pricelist-entry";
 import { withoutPricelist } from "../../models/profession-pricelist";
-import { regionName } from "../../lib/region";
-import { realmSlug } from "../../lib/realm";
 import { auth } from "../../lib/session";
 import { ProfessionPricelistRequestBodyRules } from "../../lib/validator-rules";
 import { ProfessionName } from "../../lib/profession";
@@ -17,8 +15,6 @@ import { ExpansionName } from "../../lib/expansion";
 type ProfessionPricelistRequestBody = {
   pricelist: {
     name: string
-    region: regionName
-    realm: realmSlug
   }
   entries: {
     id?: number

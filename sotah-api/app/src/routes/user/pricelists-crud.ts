@@ -7,8 +7,6 @@ import { UserInstance } from "../../models/user";
 import { withoutEntries } from "../../models/pricelist";
 import { PricelistEntryInstance } from "../../models/pricelist-entry";
 import { ItemId } from "../../lib/auction";
-import { regionName } from "../../lib/region";
-import { realmSlug } from "../../lib/realm";
 import { auth } from "../../lib/session";
 import { PricelistRequestBodyRules } from "../../lib/validator-rules";
 import { Messenger } from "../../lib/messenger";
@@ -16,8 +14,6 @@ import { Messenger } from "../../lib/messenger";
 type PricelistRequestBody = {
   pricelist: {
     name: string
-    region: regionName
-    realm: realmSlug
   }
   entries: {
     id?: number
@@ -54,20 +50,11 @@ export const getRouter = (models: Models, messenger: Messenger) => {
 
   router.get("/", auth, wrap(async (req: Request, res: Response) => {
     const user = req.user as UserInstance;
-    const pricelists = await Pricelist.findAll({
-      include: [PricelistEntry],
-      where: { user_id: user.id }
-    });
-    res.json({ pricelists: pricelists.map((v) => v.toJSON()) });
-  }));
 
-  router.get("/region/:regionName/realm/:realmSlug", auth, wrap(async (req: Request, res: Response) => {
-    const user = req.user as UserInstance;
-
-    // gathering pricelists associated with this user, region, and realm
+    // gathering pricelists associated with this user
     let pricelists = await Pricelist.findAll({
       include: [PricelistEntry, ProfessionPricelist],
-      where: { user_id: user.id, region: req.params["regionName"], realm: req.params["realmSlug"] }
+      where: { user_id: user.id }
     });
 
     // filtering out profession-pricelists
