@@ -1,7 +1,7 @@
 import { ExpansionName } from "./expansion";
 import { regionName } from "./region";
 import { realmSlug } from "./realm";
-import { ItemId } from "./auction";
+import { ItemId, ItemsMap } from "./auction";
 import { ProfessionPricelistAttributes } from "../models/profession-pricelist";
 
 export type PriceListRequestBody = {
@@ -12,13 +12,9 @@ export type UnmetDemandRequestBody = {
   expansion: ExpansionName;
 };
 
-export type UnmetDemandItem = {
-  professionPricelist: ProfessionPricelistAttributes;
-  pricelistMap: PriceListMap;
-};
-
 export type UnmetDemandResponseBody = {
-  items: UnmetDemandItem[];
+  items: ItemsMap;
+  professionPricelists: ProfessionPricelistAttributes[];
 };
 
 export type PriceListRequest = {
