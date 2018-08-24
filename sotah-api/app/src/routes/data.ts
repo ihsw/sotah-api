@@ -159,7 +159,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
     const msgData = msg.data!;
 
     // gathering unmet items
-    const unmetItemIds = itemIds.filter(v => !(v in msgData));
+    const unmetItemIds = itemIds.filter(v => !(v.toString() in msgData.price_list));
     const unmetItems = (await messenger.getItems(unmetItemIds)).data!.items;
 
     // filtering in unmet profession-pricelists
@@ -173,7 +173,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
 
     res.json({
       items: unmetItems,
-      professionPricelists: unmetProfessionPricelists.map(v => v.toJSON()).filter(() => false)
+      professionPricelists: unmetProfessionPricelists.map(v => v.toJSON())
     });
   }));
   router.get("/profession-pricelists/:profession_name", wrap(async (req: Request, res: Response) => {
