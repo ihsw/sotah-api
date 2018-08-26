@@ -15,7 +15,7 @@ const { request } = setup({
 });
 const { createUser, requestProfessionPricelist, createProfessionPricelist } = getTestHelper(request);
 
-test("Profession pricelists crud endpoint Should create a profession-pricelist", async (t) => {
+test.only("Profession pricelists crud endpoint Should create a profession-pricelist", async (t) => {
   const password = "testtest";
   const user = await createUser(t, {
     email: `create-profession-pricelist+${uuidv4()}@test.com`,
@@ -27,10 +27,11 @@ test("Profession pricelists crud endpoint Should create a profession-pricelist",
 
   res = await requestProfessionPricelist(token, {
     entries: [{item_id: -1, quantity_modifier: -1}],
-    pricelist: { name: "test", realm: "test", region: "test" },
+    pricelist: { name: "test" },
     profession_name: "jewelcrafting"
   });
   const { status, body } = res;
+  console.log(res.text);
   t.is(status, HTTPStatus.CREATED);
 
   t.true("profession_pricelist" in body);
@@ -57,7 +58,7 @@ test("Profession pricelists crud endpoint Should return profession-pricelists", 
   for (let i = 0; i < count; i++) {
     await createProfessionPricelist(t, token, {
       entries: [{item_id: -1, quantity_modifier: -1}],
-      pricelist: { name: "test", realm: "test-realm", region: "test-region" },
+      pricelist: { name: "test" },
       profession_name: "jewelcrafting"
     });
   }
@@ -87,7 +88,7 @@ test("Profession pricelists crud endpoint Should delete a profession-pricelist",
 
   const responseBody = await createProfessionPricelist(t, token, {
     entries: [{item_id: -1, quantity_modifier: -1}],
-    pricelist: { name: "test", realm: "test-realm", region: "test-region" },
+    pricelist: { name: "test" },
     profession_name: "jewelcrafting"
   });
 
@@ -108,7 +109,7 @@ test("Profession pricelists crud endpoint Should fail on deleting a non-owned pr
 
   const responseBody = await createProfessionPricelist(t, token, {
     entries: [{item_id: -1, quantity_modifier: -1}],
-    pricelist: { name: "test", realm: "test-realm", region: "test-region" },
+    pricelist: { name: "test" },
     profession_name: "jewelcrafting"
   });
 

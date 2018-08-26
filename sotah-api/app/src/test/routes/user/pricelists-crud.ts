@@ -16,7 +16,7 @@ const { request } = setup({
 const { createUser, requestPricelist, createPricelist } = getTestHelper(request);
 
 test("Pricelists crud endpoint Should create a pricelist", async (t) => {
-  const password = "test";
+  const password = "testtest";
   const user = await createUser(t, {
     email: `create-pricelist+${uuidv4()}@test.com`,
     password
@@ -27,7 +27,7 @@ test("Pricelists crud endpoint Should create a pricelist", async (t) => {
 
   res = await requestPricelist(token, {
     entries: [{item_id: -1, quantity_modifier: -1}],
-    pricelist: { name: "test", realm: "test", region: "test" }
+    pricelist: { name: "test" }
   });
   const { status, body } = res;
   t.is(status, HTTPStatus.CREATED);
@@ -37,7 +37,7 @@ test("Pricelists crud endpoint Should create a pricelist", async (t) => {
 });
 
 test("Pricelists crud endpoint Should return a pricelist", async (t) => {
-  const password = "test";
+  const password = "testtest";
   const user = await createUser(t, {
     email: `get-pricelist+${uuidv4()}@test.com`,
     password
@@ -48,7 +48,7 @@ test("Pricelists crud endpoint Should return a pricelist", async (t) => {
 
   const { pricelist } = await createPricelist(t, res.body.token, {
     entries: [{item_id: -1, quantity_modifier: -1}],
-    pricelist: { name: "test", realm: "test", region: "test" }
+    pricelist: { name: "test" }
   });
 
   res = await (request
@@ -60,7 +60,7 @@ test("Pricelists crud endpoint Should return a pricelist", async (t) => {
 });
 
 test("Pricelists crud endpoint Should return pricelists", async (t) => {
-  const password = "test";
+  const password = "testtest";
   const user = await createUser(t, {
     email: `get-pricelists+${uuidv4()}@test.com`,
     password
@@ -73,7 +73,7 @@ test("Pricelists crud endpoint Should return pricelists", async (t) => {
   for (let i = 0; i < count; i++) {
     await createPricelist(t, res.body.token, {
       entries: [{item_id: -1, quantity_modifier: -1}],
-      pricelist: { name: "test", realm: "test", region: "test" }
+      pricelist: { name: "test" }
     });
   }
 
@@ -90,8 +90,8 @@ test("Pricelists crud endpoint Should return pricelists", async (t) => {
   );
 });
 
-test("Pricelists crud endpoint Should return pricelists for a region/realm", async (t) => {
-  const password = "test";
+test("Pricelists crud endpoint Should return pricelists", async (t) => {
+  const password = "testtest";
   const user = await createUser(t, {
     email: `get-pricelists+${uuidv4()}@test.com`,
     password
@@ -104,12 +104,12 @@ test("Pricelists crud endpoint Should return pricelists for a region/realm", asy
   for (let i = 0; i < count; i++) {
     await createPricelist(t, res.body.token, {
       entries: [{item_id: -1, quantity_modifier: -1}],
-      pricelist: { name: "test", realm: "test-realm", region: "test-region" }
+      pricelist: { name: "test" }
     });
   }
 
   res = await (request
-    .get("/user/pricelists/region/test-region/realm/test-realm")
+    .get("/user/pricelists")
     .set("Authorization", `Bearer ${token}`)
   );
   const { body, status } = res;
@@ -121,35 +121,8 @@ test("Pricelists crud endpoint Should return pricelists for a region/realm", asy
   );
 });
 
-test("Pricelists crud endpoint Should return no pricelists for an invalid region/realm", async (t) => {
-  const password = "test";
-  const user = await createUser(t, {
-    email: `get-pricelists+${uuidv4()}@test.com`,
-    password
-  });
-  let res = await request.post("/login").send({ email: user.email, password });
-  t.is(res.status, HTTPStatus.OK);
-  const { token } = res.body;
-
-  const count = 5;
-  for (let i = 0; i < count; i++) {
-    await createPricelist(t, res.body.token, {
-      entries: [{item_id: -1, quantity_modifier: -1}],
-      pricelist: { name: "test", realm: "test-realm", region: "test-region" }
-    });
-  }
-
-  res = await (request
-    .get("/user/pricelists/region/wew/realm/lad")
-    .set("Authorization", `Bearer ${token}`)
-  );
-  const { body, status } = res;
-  t.is(status, HTTPStatus.OK);
-  t.is(body.pricelists.length, 0);
-});
-
 test("Pricelists crud endpoint Should update a pricelist", async (t) => {
-  const password = "test";
+  const password = "testtest";
   const user = await createUser(t, {
     email: `update-pricelist+${uuidv4()}@test.com`,
     password
@@ -160,7 +133,7 @@ test("Pricelists crud endpoint Should update a pricelist", async (t) => {
 
   const { pricelist, entries } = await createPricelist(t, res.body.token, {
     entries: [{item_id: -1, quantity_modifier: -1}],
-    pricelist: { name: "test", realm: "test", region: "test" }
+    pricelist: { name: "test" }
   });
 
   res = await (request
@@ -173,7 +146,7 @@ test("Pricelists crud endpoint Should update a pricelist", async (t) => {
           quantity_modifier: v.quantity_modifier + 1
         };
       }),
-      pricelist: { name: "test2", region: "test2", realm: "test2" }
+      pricelist: { name: "test2" }
     })
   );
   let { status, body } = res;
@@ -183,7 +156,7 @@ test("Pricelists crud endpoint Should update a pricelist", async (t) => {
 });
 
 test("Pricelists crud endpoint Should update all entries", async (t) => {
-  const password = "test";
+  const password = "testtest";
   const user = await createUser(t, {
     email: `update-pricelist+${uuidv4()}@test.com`,
     password
@@ -194,7 +167,7 @@ test("Pricelists crud endpoint Should update all entries", async (t) => {
 
   const { pricelist, entries } = await createPricelist(t, res.body.token, {
     entries: [{item_id: -1, quantity_modifier: -1}],
-    pricelist: { name: "test", realm: "test", region: "test" }
+    pricelist: { name: "test" }
   });
 
   res = await (request
@@ -207,7 +180,7 @@ test("Pricelists crud endpoint Should update all entries", async (t) => {
           quantity_modifier: v.quantity_modifier + 5
         };
       }),
-      pricelist: { name: "test2", region: "test2", realm: "test2" }
+      pricelist: { name: "test2" }
     })
   );
   let { status, body } = res;
@@ -219,7 +192,7 @@ test("Pricelists crud endpoint Should update all entries", async (t) => {
 
 test("Pricelists crud endpoint Should remove absent entries", async (t) => {
   // creating the user
-  const password = "test";
+  const password = "testtest";
   const user = await createUser(t, {
     email: `update-pricelist+${uuidv4()}@test.com`,
     password
@@ -231,7 +204,7 @@ test("Pricelists crud endpoint Should remove absent entries", async (t) => {
   // creating the pricelist
   const { pricelist, entries } = await createPricelist(t, res.body.token, {
     entries: [{item_id: -1, quantity_modifier: -1}, {item_id: -1, quantity_modifier: -1}],
-    pricelist: { name: "test", realm: "test", region: "test" }
+    pricelist: { name: "test" }
   });
 
   // updating the pricelist with missing entries
@@ -240,7 +213,7 @@ test("Pricelists crud endpoint Should remove absent entries", async (t) => {
     .set("Authorization", `Bearer ${token}`)
     .send({
       entries: entries.slice(0, 1),
-      pricelist: { name: "test2", region: "test2", realm: "test2" }
+      pricelist: { name: "test2" }
     })
   );
   t.is(res.status, HTTPStatus.OK);
@@ -257,7 +230,7 @@ test("Pricelists crud endpoint Should remove absent entries", async (t) => {
 
 test("Pricelists crud endpoint Should add new entries", async (t) => {
   // creating the user
-  const password = "test";
+  const password = "testtest";
   const user = await createUser(t, {
     email: `update-pricelist+${uuidv4()}@test.com`,
     password
@@ -269,7 +242,7 @@ test("Pricelists crud endpoint Should add new entries", async (t) => {
   // creating the pricelist
   const { pricelist, entries } = await createPricelist(t, res.body.token, {
     entries: [{item_id: -1, quantity_modifier: -1}, {item_id: -1, quantity_modifier: -1}],
-    pricelist: { name: "test", realm: "test", region: "test" }
+    pricelist: { name: "test" }
   });
 
   // updating the pricelist with missing entries
@@ -278,7 +251,7 @@ test("Pricelists crud endpoint Should add new entries", async (t) => {
     .set("Authorization", `Bearer ${token}`)
     .send({
       entries: [...entries.slice(0, 1), {item_id: -2, quantity_modifier: -2}],
-      pricelist: { name: "test2", region: "test2", realm: "test2" }
+      pricelist: { name: "test2" }
     })
   );
   t.is(res.status, HTTPStatus.OK);

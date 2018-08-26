@@ -4,6 +4,7 @@ import { SuperTest, Test } from "supertest";
 import * as nats from "nats";
 import { TestContext } from "ava";
 import * as HTTPStatus from "http-status";
+import * as Sequelize from "sequelize";
 
 import { Messenger } from "./messenger";
 import { getApp, Options } from "./app";
@@ -11,20 +12,30 @@ import { PricelistAttributes } from "../models/pricelist";
 import { PricelistEntryAttributes } from "../models/pricelist-entry";
 import { ProfessionPricelistAttributes } from "../models/profession-pricelist";
 import { ProfessionName } from "./profession";
+import { createModels, Models } from "../models";
 
 // setup func
 type SetupSettings = {
   app: Express
   messenger: Messenger
   request: SuperTest<Test>
+  models: Models
 };
 
 export const setup = (opts: Options): SetupSettings => {
   const app = getApp(opts);
   const request = supertest(app);
   const messenger = new Messenger(nats.connect({ url: `nats://${opts.natsHost}:${opts.natsPort}` }), opts.logger);
+  const sequelize = new Sequelize("postgres", "postgres", "", <Sequelize.Options>{
+    define: { timestamps: false },
+    dialect: "postgres",
+    host: opts.dbHost,
+    logging: false,
+    operatorsAliases: false
+  });
+  const models = createModels(sequelize);
 
-  return { app, messenger, request };
+  return { app, messenger, request, models };
 };
 
 // user test-helper
@@ -65,8 +76,6 @@ export interface IPricelistResponse {
 export interface IPricelistRequest {
   pricelist: {
     name: string
-    realm: string
-    region: string
   };
   entries: {
     item_id: number
