@@ -16,7 +16,7 @@ const { request } = setup({
 const { createUser } = getTestHelper(request);
 
 test("User creation endpoint Should return not found on existing user but no preferences", async (t) => {
-  const password = "test";
+  const password = "testtest";
   const user = await createUser(t, {
     email: `no-preferences+${uuidv4()}@test.com`,
     password
@@ -30,7 +30,7 @@ test("User creation endpoint Should return not found on existing user but no pre
 });
 
 test("User creation endpoint Should create preferences", async (t) => {
-  const password = "test";
+  const password = "testtest";
   const user = await createUser(t, {
     email: `create-preference+${uuidv4()}@test.com`,
     password
@@ -50,7 +50,7 @@ test("User creation endpoint Should create preferences", async (t) => {
 });
 
 test("User creation endpoint Should return preferences", async (t) => {
-  const password = "test";
+  const password = "testtest";
   const user = await createUser(t, {
     email: `create-preference+${uuidv4()}@test.com`,
     password
@@ -77,7 +77,7 @@ test("User creation endpoint Should return preferences", async (t) => {
 });
 
 test("User creation endpoint Should create blank preferences", async (t) => {
-  const password = "test";
+  const password = "testtest";
   const user = await createUser(t, {
     email: `create-blank-preference+${uuidv4()}@test.com`,
     password
@@ -97,7 +97,7 @@ test("User creation endpoint Should create blank preferences", async (t) => {
 });
 
 test("User creation endpoint Should update preferences", async (t) => {
-  const password = "test";
+  const password = "testtest";
   const user = await createUser(t, {
     email: `create-preference+${uuidv4()}@test.com`,
     password

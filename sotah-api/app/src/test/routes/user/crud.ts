@@ -18,7 +18,7 @@ const { createUser } = getTestHelper(request);
 test("User creation endpoint Should return a user", async (t) => {
   const user = await createUser(t, {
     email: `return-new-user+${uuidv4()}@test.com`,
-    password: "test"
+    password: "testtest"
   });
   const res = await request.get(`/user/${user.id}`);
   t.is(res.status, HTTPStatus.OK);

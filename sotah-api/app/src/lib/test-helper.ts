@@ -13,6 +13,7 @@ import { PricelistEntryAttributes } from "../models/pricelist-entry";
 import { ProfessionPricelistAttributes } from "../models/profession-pricelist";
 import { ProfessionName } from "./profession";
 import { createModels, Models } from "../models";
+import { ExpansionName } from "./expansion";
 
 // setup func
 type SetupSettings = {
@@ -120,6 +121,7 @@ export interface IProfessionPricelistResponse {
 
 export interface IProfessionPricelistRequest extends IPricelistRequest {
   profession_name: ProfessionName;
+  expansion_name: ExpansionName;
 }
 
 const getProfessionPricelistTestHelper = (request: SuperTest<Test>) => {

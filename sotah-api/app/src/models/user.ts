@@ -1,15 +1,21 @@
 import * as SequelizeStatic from "sequelize";
-import { Instance, Sequelize, STRING } from "sequelize";
+import { Instance, Sequelize, STRING, INTEGER } from "sequelize";
 import * as jwt from "jsonwebtoken";
 
 import { JwtPayload, jwtOptions } from "../lib/session";
 import { PreferenceModel } from "./preference";
 import { PricelistModel } from "./pricelist";
 
+export enum UserLevel {
+  Admin = 60,
+  Regular = 5
+}
+
 export type UserAttributes = {
   id?: number
   email: string
   hashed_password: string
+  level: UserLevel
 };
 
 export interface UserInstance extends Instance<UserAttributes> {
@@ -21,7 +27,8 @@ export type UserModel = SequelizeStatic.Model<UserInstance, UserAttributes>;
 export const createModel = (sequelize: Sequelize): UserModel => {
   return sequelize.define<UserInstance, UserAttributes>("user", {
     email: { type: STRING, allowNull: false },
-    hashed_password: { type: STRING, allowNull: false }
+    hashed_password: { type: STRING, allowNull: false },
+    level: { type: INTEGER, allowNull: false, defaultValue: UserLevel.Regular }
   });
 };
 

@@ -3,7 +3,7 @@ import * as HTTPStatus from "http-status";
 import { wrap } from "async-middleware";
 
 import { Models } from "../../models";
-import { UserInstance } from "../../models/user";
+import { UserInstance, UserLevel } from "../../models/user";
 import { withoutEntries, PricelistInstance } from "../../models/pricelist";
 import { PricelistEntryInstance } from "../../models/pricelist-entry";
 import { withoutPricelist } from "../../models/profession-pricelist";
@@ -31,7 +31,7 @@ export const getRouter = (models: Models) => {
 
   router.post("/", auth, wrap(async (req: Request, res: Response) => {
     const user = req.user as UserInstance;
-    if (user.id !== 1) {
+    if (user.get("level") !== UserLevel.Admin) {
       res.status(HTTPStatus.UNAUTHORIZED).json({ unauthorized: "You are not authorized to do that." });
 
       return;
@@ -66,7 +66,7 @@ export const getRouter = (models: Models) => {
 
   router.delete("/:id", auth, wrap(async (req: Request, res: Response) => {
     const user = req.user as UserInstance;
-    if (user.id !== 1) {
+    if (user.get("level") !== UserLevel.Admin) {
       res.status(HTTPStatus.UNAUTHORIZED).json({ unauthorized: "You are not authorized to do that." });
 
       return;

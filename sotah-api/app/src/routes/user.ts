@@ -5,7 +5,7 @@ import * as bcrypt from "bcrypt";
 
 import { Messenger } from "../lib/messenger";
 import { Models } from "../models";
-import { withoutPassword, generateJwtToken } from "../models/user";
+import { withoutPassword, generateJwtToken, UserLevel } from "../models/user";
 import { getRouter as getBaseRouter } from "./user/base";
 import { getRouter as getPreferencesRouter } from "./user/preferences";
 import { getRouter as getPricelistsCrudRouter } from "./user/pricelists-crud";
@@ -44,7 +44,8 @@ export const getRouter = (models: Models, messenger: Messenger) => {
 
     const user = await User.create({
       email: result.email,
-      hashed_password: await bcrypt.hash(result.password, 10)
+      hashed_password: await bcrypt.hash(result.password, 10),
+      level: UserLevel.Regular
     });
 
     res.status(HTTPStatus.CREATED).json({

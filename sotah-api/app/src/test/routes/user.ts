@@ -20,7 +20,7 @@ const { requestUser, createUser } = getTestHelper(request);
 test("User creation endpoint Should create a new user", async (t) => {
   const res = await requestUser({
     email: `create-new-user+${uuidv4()}@test.com`,
-    password: "test"
+    password: "testtest"
   });
   t.is(res.status, HTTPStatus.CREATED);
   t.not(String(res.header["content-type"]).match(/^application\/json/), null);
@@ -40,7 +40,7 @@ test("User creation endpoint Should fail on invalid username", async (t) => {
 test("User creation endpoint Should fail on invalid password", async (t) => {
   const user = await createUser(t, {
     email: `login-fail+${uuidv4()}@test.com`,
-    password: "test"
+    password: "testtest"
   });
 
   const res = await request.post("/login").send({ email: user.email, password: "test2" });
@@ -49,7 +49,7 @@ test("User creation endpoint Should fail on invalid password", async (t) => {
 });
 
 test("User creation endpoint Should succeed", async (t) => {
-  const password = "test";
+  const password = "testtest";
   const user = await createUser(t, {
     email: `login-succeed+${uuidv4()}@test.com`,
     password
@@ -63,16 +63,16 @@ test("User creation endpoint Should succeed", async (t) => {
 test("User creation endpoint Should fail on duplicate user", async (t) => {
   const user = await createUser(t, {
     email: `login-fail+${uuidv4()}@test.com`,
-    password: "test"
+    password: "testtest"
   });
 
-  const res = await request.post("/users").send({ email: user.email, password: "" });
+  const res = await request.post("/users").send({ email: user.email, password: "testtest" });
   t.is(res.status, HTTPStatus.BAD_REQUEST);
   t.deepEqual(res.body, { email: "Email is already in use!" });
 });
 
 test("User creation endpoint Should return jwt when providing valid credentials", async (t) => {
-  const password = "test";
+  const password = "testtest";
   const user = await createUser(t, {
     email: `valid-credentials+${uuidv4()}@test.com`,
     password
@@ -84,7 +84,7 @@ test("User creation endpoint Should return jwt when providing valid credentials"
 });
 
 test("User creation endpoint Should return logged in user", async (t) => {
-  const password = "test";
+  const password = "testtest";
   const user = await createUser(t, {
     email: `login-succeed+${uuidv4()}@test.com`,
     password
