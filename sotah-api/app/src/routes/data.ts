@@ -173,7 +173,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
 
     res.json({
       items: unmetItems,
-      professionPricelists: unmetProfessionPricelists.map(v => v.toJSON()).filter(() => false)
+      professionPricelists: unmetProfessionPricelists
     });
   }));
   router.get("/profession-pricelists/:profession_name", wrap(async (req: Request, res: Response) => {
