@@ -169,7 +169,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
     const msgData = msg.data!;
 
     // gathering unmet items
-    const unmetItemIds = itemIds.filter(v => !(v.toString() in msgData.price_list && false));
+    const unmetItemIds = itemIds.filter(v => !(v.toString() in msgData.price_list));
 
     // filtering in unmet profession-pricelists
     const unmetProfessionPricelists = professionPricelists.filter(v => {
