@@ -27,6 +27,7 @@ export type PriceListMap = {
   [key: number]: {
     bid: number
     buyout: number
+    volume: number
   }
 };
 
