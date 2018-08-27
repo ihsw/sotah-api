@@ -133,7 +133,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
       where: { expansion }
     });
 
-    // gathering included items
+    // gathering included item-ids
     const itemIds = professionPricelists.reduce((previousValue: ItemId[], v: ProfessionPricelistInstance) => {
       const pricelistEntries: PricelistEntryInstance[] = v.get("pricelist").get("pricelist_entries");
       const pricelistItemIds: ItemId[] = pricelistEntries.map(v => v.get("item_id"));
@@ -145,7 +145,15 @@ export const getRouter = (models: Models, messenger: Messenger) => {
 
       return previousValue;
     }, []);
-    const items = (await messenger.getItems(itemIds)).data!.items;
+
+    // gathering items
+    const itemsMsg = await messenger.getItems(itemIds);
+    if (itemsMsg.code !== code.ok) {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: itemsMsg.error });
+
+      return;
+    }
+    const items = itemsMsg.data!.items;
 
     // gathering pricing data
     const msg = await messenger.getPriceList({
