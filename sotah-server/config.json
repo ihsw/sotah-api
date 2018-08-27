@@ -23,7 +23,7 @@
     "use_cache_dir": true,
     "whitelist": {
         "us": {
-            "earthen-ring": true
+            "aegwynn": true
         },
         "eu": {},
         "kr": {},
