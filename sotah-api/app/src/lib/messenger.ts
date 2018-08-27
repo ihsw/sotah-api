@@ -183,8 +183,20 @@ export class Messenger {
     return this.request(subjects.itemClasses);
   }
 
-  getPriceList(request: PriceListRequest): Promise<Message<PriceListResponse>> {
-    return this.request(subjects.priceList, { body: JSON.stringify(request) });
+  async getPriceList(request: PriceListRequest): Promise<Message<PriceListResponse>> {
+    const message = await this.request<string>(
+      subjects.priceList,
+      { body: JSON.stringify(request), parseData: false }
+    );
+    if (message.code !== code.ok) {
+      return { code: message.code, error: message.error };
+    }
+
+    return {
+      code: code.ok,
+      data: JSON.parse((await gunzip(Buffer.from(message.rawData!, "base64"))).toString()),
+      error: null,
+    };
   }
 
   async getItems(itemIds: ItemId[]): Promise<Message<ItemsResponse>> {
