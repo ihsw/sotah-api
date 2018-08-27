@@ -187,8 +187,20 @@ export class Messenger {
     return this.request(subjects.priceList, { body: JSON.stringify(request) });
   }
 
-  getItems(itemIds: ItemId[]): Promise<Message<ItemsResponse>> {
-    return this.request(subjects.items, { body: JSON.stringify({ itemIds }) });
+  async getItems(itemIds: ItemId[]): Promise<Message<ItemsResponse>> {
+    const message = await this.request<string>(
+      subjects.items,
+      { body: JSON.stringify({ itemIds} ), parseData: false }
+    );
+    if (message.code !== code.ok) {
+      return { code: message.code, error: message.error };
+    }
+
+    return {
+      code: code.ok,
+      data: JSON.parse((await gunzip(Buffer.from(message.rawData!, "base64"))).toString()),
+      error: null,
+    };
   }
 
   getBoot(): Promise<Message<BootResponse>> {
