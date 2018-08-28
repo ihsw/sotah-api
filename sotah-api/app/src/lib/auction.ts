@@ -139,7 +139,7 @@ export type AuctionRealm = {
 };
 
 export type Auction = {
-  item: Item
+  itemId: ItemId
   owner: OwnerName
   ownerRealm: string
   bid: number
