@@ -87,8 +87,6 @@ services:
     depends_on:
     - nats
     command: -c /tmp/sotah-server/config.json --cache-dir /tmp/sotah-server/data -v debug api
-    volumes:
-    - ./sotah-server/data/item-icons:/tmp/item-icons
   sotah-server-api-test:
     extends: sotah-server-base
     depends_on:
