@@ -51,6 +51,14 @@ services:
     - sotah-api-production
     - chronograf
 
+  
+  sotah-server-live-auctions-production:
+    extends: sotah-server-base
+    depends_on:
+    - nats
+    - sotah-server-api-production
+    command: -c /tmp/sotah-server/config.json --cache-dir /tmp/sotah-server/data -v debug live-auctions
+
   sotah-server-api-production:
     extends:
       file: ./docker-compose.yml
@@ -64,6 +72,7 @@ services:
     volumes:
     - $GOOGLE_APPLICATION_CREDENTIALS:/tmp/gcloud-app-credentials.json
 
+
   sotah-api-production:
     extends:
       file: ./docker-compose.yml
@@ -73,6 +82,7 @@ services:
     - nats
     - db
   
+
   sotah-client-production:
     image: ihsw/sotah-client
     ports:
