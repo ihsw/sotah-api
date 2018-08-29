@@ -84,6 +84,14 @@ services:
     depends_on:
     - nats
     command: -c /tmp/sotah-server/config.json --cache-dir /tmp/sotah-server/data -v debug api-test -d /tmp/sotah-server/test-fixtures
+  sotah-server-sync-items:
+    extends: sotah-server-base
+    environment:
+    - GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcloud-app-credentials.json
+    - PROJECT_ID=$PROJECT_ID
+    volumes:
+    - $GOOGLE_APPLICATION_CREDENTIALS:/tmp/gcloud-app-credentials.json
+    command: -c /tmp/sotah-server/config.json --cache-dir /tmp/sotah-server/data -v debug sync-items
 
   sotah-api-base:
     build: ./sotah-api
