@@ -95,9 +95,7 @@ services:
     - nats
     command: -c /tmp/sotah-server/config.json --cache-dir /tmp/sotah-server/data -v debug api-test -d /tmp/sotah-server/test-fixtures
   sotah-server-api-production:
-    extends:
-      file: ./docker-compose.yml
-      service: sotah-server-base
+    extends: sotah-server-base
     depends_on:
     - nats
     command: -c /tmp/sotah-server/config.json --cache-dir /tmp/sotah-server/data -v debug api
@@ -141,9 +139,7 @@ services:
     - nats
     - db
   sotah-api-production:
-    extends:
-      file: ./docker-compose.yml
-      service: sotah-api-base
+    extends: sotah-api-base
     depends_on:
     - sotah-server-api-production
     - nats
