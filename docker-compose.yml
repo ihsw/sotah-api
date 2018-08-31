@@ -91,13 +91,13 @@ services:
     extends: sotah-server-base
     depends_on:
     - nats
-    - sotah-server-api
+    - sotah-server-live-auctions
     command: -c /tmp/sotah-server/config.json --cache-dir /tmp/sotah-server/data -v debug pricelist-histories
   sotah-server-pricelist-histories-production:
     extends: sotah-server-base
     depends_on:
     - nats
-    - sotah-server-api-production
+    - sotah-server-live-auctions-production
     command: -c /tmp/sotah-server/config.json --cache-dir /tmp/sotah-server/data -v debug pricelist-histories
     environment:
     - GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcloud-app-credentials.json
