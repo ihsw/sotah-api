@@ -7,7 +7,7 @@ import { Messenger, Message, code } from "../lib/messenger";
 import { IRealm } from "../lib/realm";
 import { AuctionsRequestBody, OwnersRequestBody, ItemsRequestBody, AuctionsQueryRequestBody, ItemId } from "../lib/auction";
 import { PricelistEntryInstance } from "../models/pricelist-entry";
-import { PriceListRequestBody, UnmetDemandRequestBody } from "../lib/price-list";
+import { PriceListRequestBody, PricelistHistoryRequest, UnmetDemandRequestBody } from "../lib/price-list";
 import { ProfessionPricelistInstance } from "../models/profession-pricelist";
 
 interface StatusRealm extends IRealm {
@@ -148,7 +148,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
     res.json({ price_list, items });
   }));
   router.post("/region/:regionName/realm/:realmSlug/price-list-history", wrap(async (req, res) => {
-    const { item_ids } = <PriceListRequestBody>req.body;
+    const { item_ids } = <PricelistHistoryRequest>req.body;
     const history = (await messenger.getPricelistHistories({
       item_ids,
       realm_slug: req.params["realmSlug"],
