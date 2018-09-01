@@ -23,12 +23,14 @@ export type PriceListRequest = {
   item_ids: ItemId[]
 };
 
+export type Prices = {
+  bid: number
+  buyout: number
+  volume: number
+};
+
 export type PriceListMap = {
-  [key: number]: {
-    bid: number
-    buyout: number
-    volume: number
-  }
+  [itemId: number]: Prices
 };
 
 export type PriceListResponse = {
@@ -42,9 +44,11 @@ export type PricelistHistoryRequest = {
 };
 
 export type PricelistHistoryMap = {
-  [key: number]: PriceListMap
+  [unixTimestamp: number]: Prices
 };
 
 export type PricelistHistoryResponse = {
-  history: PricelistHistoryMap
+  history: {
+    [itemId: number]: PricelistHistoryMap
+  }
 };
