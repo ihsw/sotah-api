@@ -12,7 +12,7 @@ import {
   ItemId,
   ItemsResponse
 } from "./auction";
-import { PriceListRequest, PriceListResponse } from "./price-list";
+import { PriceListRequest, PriceListResponse, PricelistHistoryRequest, PricelistHistoryResponse } from "./price-list";
 import { BootResponse } from "./boot";
 
 const DEFAULT_TIMEOUT = 5 * 1000;
@@ -41,6 +41,7 @@ export enum subjects {
   auctionsQuery = "auctionsQuery",
   itemClasses = "itemClasses",
   priceList = "priceList",
+  priceListHistory = "priceListHistory",
   items = "items",
   boot = "boot"
 }
@@ -217,5 +218,21 @@ export class Messenger {
 
   getBoot(): Promise<Message<BootResponse>> {
     return this.request(subjects.boot);
+  }
+
+  async getPricelistHistories(req: PricelistHistoryRequest): Promise<Message<PricelistHistoryResponse>> {
+    const message = await this.request<string>(
+      subjects.priceListHistory,
+      { body: JSON.stringify(req), parseData: false }
+    );
+    if (message.code !== code.ok) {
+      return { code: message.code, error: message.error };
+    }
+
+    return {
+      code: code.ok,
+      data: JSON.parse((await gunzip(Buffer.from(message.rawData!, "base64"))).toString()),
+      error: null,
+    };
   }
 }

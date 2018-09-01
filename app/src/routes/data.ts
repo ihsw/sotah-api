@@ -147,6 +147,17 @@ export const getRouter = (models: Models, messenger: Messenger) => {
 
     res.json({ price_list, items });
   }));
+  router.post("/region/:regionName/realm/:realmSlug/price-list-history", wrap(async (req, res) => {
+    const { item_ids } = <PriceListRequestBody>req.body;
+    const history = (await messenger.getPricelistHistories({
+      item_ids,
+      realm_slug: req.params["realmSlug"],
+      region_name: req.params["regionName"]
+    })).data!.history;
+    const items = (await messenger.getItems(item_ids)).data!.items;
+
+    res.json({ history, items });
+  }));
   router.post("/region/:regionName/realm/:realmSlug/unmet-demand", wrap(async (req, res) => {
     // gathering profession-pricelists
     const { expansion } = <UnmetDemandRequestBody>req.body;

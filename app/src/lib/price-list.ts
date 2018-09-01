@@ -34,3 +34,13 @@ export type PriceListMap = {
 export type PriceListResponse = {
   price_list: PriceListMap
 };
+
+export type PricelistHistoryRequest = {
+  region_name: regionName
+  realm_slug: realmSlug
+  item_ids: ItemId[]
+};
+
+export type PricelistHistoryResponse = {
+  history: PriceListMap
+};
