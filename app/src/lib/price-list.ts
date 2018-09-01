@@ -41,6 +41,10 @@ export type PricelistHistoryRequest = {
   item_ids: ItemId[]
 };
 
+export type PricelistHistoryMap = {
+  [key: number]: PriceListMap
+};
+
 export type PricelistHistoryResponse = {
-  history: PriceListMap
+  history: PricelistHistoryMap
 };
