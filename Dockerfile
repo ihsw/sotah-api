@@ -11,4 +11,4 @@ WORKDIR /srv/app
 RUN npm install -s \
   && npm run -s build
 
-CMD ["./bin/run-app"]
+CMD ["./bin/run-app-prod"]
