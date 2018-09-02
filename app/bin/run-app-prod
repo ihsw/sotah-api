@@ -1,4 +1,4 @@
 #! /bin/bash
 
 node ./dist/validate-environment.js \
-    && npm run -s run:prod
+    && npm run -s run
