@@ -254,3 +254,28 @@ export type ItemsMap = {
 export type ItemsResponse = {
   items: ItemsMap
 };
+
+export type OwnersQueryByItemsRequest = {
+  region_name: regionName
+  realm_slug: realmSlug
+  items: ItemId[]
+};
+
+export type OwnersQueryByItemsRequestBody = {
+  items: ItemId[]
+};
+
+export type OwnerItemsOwnership = {
+  owned_value: number;
+  owned_volume: number;
+};
+
+export type OwnerItemsOwnershipMap = {
+  [ownerName: string]: OwnerItemsOwnership
+};
+
+export type OwnersQueryByItemsResponse = {
+  total_value: number
+  total_volume: number
+  ownership: OwnerItemsOwnershipMap
+};

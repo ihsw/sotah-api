@@ -10,7 +10,9 @@ import {
   AuctionsQueryRequest, AuctionsQueryResponse,
   ItemClassesResponse,
   ItemId,
-  ItemsResponse
+  ItemsResponse,
+  OwnersQueryByItemsRequest,
+  OwnersQueryByItemsResponse
 } from "./auction";
 import { PriceListRequest, PriceListResponse, PricelistHistoryRequest, PricelistHistoryResponse } from "./price-list";
 import { BootResponse } from "./boot";
@@ -45,7 +47,8 @@ export enum subjects {
   priceListHistory = "priceListHistory",
   items = "items",
   boot = "boot",
-  sessionSecret = "sessionSecret"
+  sessionSecret = "sessionSecret",
+  ownersQueryByItems = "ownersQueryByItems"
 }
 
 export enum code {
@@ -240,5 +243,9 @@ export class Messenger {
 
   getSessionSecret(): Promise<Message<SessionSecretResponse>> {
     return this.request(subjects.sessionSecret);
+  }
+
+  queryOwnerItems(request: OwnersQueryByItemsRequest): Promise<Message<OwnersQueryByItemsResponse>> {
+    return this.request(subjects.ownersQueryByItems, { body: JSON.stringify(request) });
   }
 }
