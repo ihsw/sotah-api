@@ -14,6 +14,7 @@ import {
 } from "./auction";
 import { PriceListRequest, PriceListResponse, PricelistHistoryRequest, PricelistHistoryResponse } from "./price-list";
 import { BootResponse } from "./boot";
+import { SessionSecretResponse } from "./session";
 
 const DEFAULT_TIMEOUT = 5 * 1000;
 
@@ -43,7 +44,8 @@ export enum subjects {
   priceList = "priceList",
   priceListHistory = "priceListHistory",
   items = "items",
-  boot = "boot"
+  boot = "boot",
+  sessionSecret = "sessionSecret"
 }
 
 export enum code {
@@ -234,5 +236,9 @@ export class Messenger {
       data: JSON.parse((await gunzip(Buffer.from(message.rawData!, "base64"))).toString()),
       error: null,
     };
+  }
+
+  getSessionSecret(): Promise<Message<SessionSecretResponse>> {
+    return this.request(subjects.sessionSecret);
   }
 }

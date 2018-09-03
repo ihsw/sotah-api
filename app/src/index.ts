@@ -11,15 +11,17 @@ const logger = getLogger("debug");
 const natsHost = process.env["NATS_HOST"] || "";
 const natsPort = process.env["NATS_PORT"] || "";
 const dbHost = process.env["DB_HOST"] || "";
-const app = getApp({ logger, natsHost, natsPort, dbHost });
 
 const appPort = process.env["APP_PORT"];
-const server = http.createServer(app);
-server.listen(appPort, () => logger.info(`Listening on ${appPort}`));
-process.on("SIGTERM", () => {
-  logger.info("Caught SIGTERM, closing server");
-  server.close(() => {
-    logger.info("Server closed, exiting");
-    process.exit(0);
+(async () => {
+  const app = await getApp({ logger, natsHost, natsPort, dbHost });
+  const server = http.createServer(app);
+  server.listen(appPort, () => logger.info(`Listening on ${appPort}`));
+  process.on("SIGTERM", () => {
+    logger.info("Caught SIGTERM, closing server");
+    server.close(() => {
+      logger.info("Server closed, exiting");
+      process.exit(0);
+    });
   });
-});
+})();

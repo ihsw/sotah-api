@@ -7,17 +7,23 @@ import * as jwt from "jsonwebtoken";
 
 import { getLogger } from "../../lib/logger";
 import { setup, getTestHelper } from "../../lib/test-helper";
-import { JwtPayload, jwtOptions } from "../../lib/session";
+import { JwtPayload, getJwtOptions } from "../../lib/session";
 
-const { request } = setup({
-  dbHost: process.env["DB_HOST"] as string,
-  logger: getLogger(),
-  natsHost: process.env["NATS_HOST"] as string,
-  natsPort: process.env["NATS_PORT"] as string
-});
-const { requestUser, createUser } = getTestHelper(request);
+const helper = async () => {
+  const { request, messenger } = await setup({
+    dbHost: process.env["DB_HOST"] as string,
+    logger: getLogger(),
+    natsHost: process.env["NATS_HOST"] as string,
+    natsPort: process.env["NATS_PORT"] as string
+  });
+  const { requestUser, createUser} = getTestHelper(request);
+
+  return { request, messenger, requestUser, createUser };
+};
 
 test("User creation endpoint Should create a new user", async (t) => {
+  const { requestUser } = await helper();
+
   const res = await requestUser({
     email: `create-new-user+${uuidv4()}@test.com`,
     password: "testtest"
@@ -32,12 +38,16 @@ test("User creation endpoint Should create a new user", async (t) => {
 });
 
 test("User creation endpoint Should fail on invalid username", async (t) => {
+  const { request } = await helper();
+
   const res = await request.post("/login").send({ email: `login-fail+${uuidv4()}@test.com` });
   t.is(res.status, HTTPStatus.BAD_REQUEST);
   t.is(res.body.email, "Invalid email!");
 });
 
 test("User creation endpoint Should fail on invalid password", async (t) => {
+  const { createUser, request } = await helper();
+
   const user = await createUser(t, {
     email: `login-fail+${uuidv4()}@test.com`,
     password: "testtest"
@@ -49,6 +59,8 @@ test("User creation endpoint Should fail on invalid password", async (t) => {
 });
 
 test("User creation endpoint Should succeed", async (t) => {
+  const { createUser, request } = await helper();
+
   const password = "testtest";
   const user = await createUser(t, {
     email: `login-succeed+${uuidv4()}@test.com`,
@@ -61,6 +73,8 @@ test("User creation endpoint Should succeed", async (t) => {
 });
 
 test("User creation endpoint Should fail on duplicate user", async (t) => {
+  const { createUser, request } = await helper();
+
   const user = await createUser(t, {
     email: `login-fail+${uuidv4()}@test.com`,
     password: "testtest"
@@ -72,6 +86,8 @@ test("User creation endpoint Should fail on duplicate user", async (t) => {
 });
 
 test("User creation endpoint Should return jwt when providing valid credentials", async (t) => {
+  const { createUser, request } = await helper();
+
   const password = "testtest";
   const user = await createUser(t, {
     email: `valid-credentials+${uuidv4()}@test.com`,
@@ -84,6 +100,8 @@ test("User creation endpoint Should return jwt when providing valid credentials"
 });
 
 test("User creation endpoint Should return logged in user", async (t) => {
+  const { createUser, request } = await helper();
+
   const password = "testtest";
   const user = await createUser(t, {
     email: `login-succeed+${uuidv4()}@test.com`,
@@ -99,6 +117,10 @@ test("User creation endpoint Should return logged in user", async (t) => {
 });
 
 test("User creation endpoint Should fail on valid jwt token but invalid payload", async (t) => {
+  const { messenger, request } = await helper();
+
+  const jwtOptions = await getJwtOptions(messenger);
+
   const token = jwt.sign(
     <JwtPayload>{ data: "-1" },
     jwtOptions.secret,

@@ -7,15 +7,22 @@ import { v4 as uuidv4 } from "uuid";
 import { getLogger } from "../../../lib/logger";
 import { setup, getTestHelper } from "../../../lib/test-helper";
 
-const { request } = setup({
-  dbHost: process.env["DB_HOST"] as string,
-  logger: getLogger(),
-  natsHost: process.env["NATS_HOST"] as string,
-  natsPort: process.env["NATS_PORT"] as string
-});
-const { createUser } = getTestHelper(request);
+
+const helper = async () => {
+  const { request } = await setup({
+    dbHost: process.env["DB_HOST"] as string,
+    logger: getLogger(),
+    natsHost: process.env["NATS_HOST"] as string,
+    natsPort: process.env["NATS_PORT"] as string
+  });
+  const { createUser } = getTestHelper(request);
+
+  return { request, createUser };
+};
 
 test("User creation endpoint Should return not found on existing user but no preferences", async (t) => {
+  const { createUser, request } = await helper();
+
   const password = "testtest";
   const user = await createUser(t, {
     email: `no-preferences+${uuidv4()}@test.com`,
@@ -30,6 +37,8 @@ test("User creation endpoint Should return not found on existing user but no pre
 });
 
 test("User creation endpoint Should create preferences", async (t) => {
+  const { createUser, request } = await helper();
+
   const password = "testtest";
   const user = await createUser(t, {
     email: `create-preference+${uuidv4()}@test.com`,
@@ -50,6 +59,8 @@ test("User creation endpoint Should create preferences", async (t) => {
 });
 
 test("User creation endpoint Should return preferences", async (t) => {
+  const { createUser, request } = await helper();
+
   const password = "testtest";
   const user = await createUser(t, {
     email: `create-preference+${uuidv4()}@test.com`,
@@ -77,6 +88,8 @@ test("User creation endpoint Should return preferences", async (t) => {
 });
 
 test("User creation endpoint Should create blank preferences", async (t) => {
+  const { createUser, request } = await helper();
+
   const password = "testtest";
   const user = await createUser(t, {
     email: `create-blank-preference+${uuidv4()}@test.com`,
@@ -97,6 +110,8 @@ test("User creation endpoint Should create blank preferences", async (t) => {
 });
 
 test("User creation endpoint Should update preferences", async (t) => {
+  const { createUser, request } = await helper();
+
   const password = "testtest";
   const user = await createUser(t, {
     email: `create-preference+${uuidv4()}@test.com`,

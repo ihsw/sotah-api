@@ -7,15 +7,21 @@ import { v4 as uuidv4 } from "uuid";
 import { getLogger } from "../../../lib/logger";
 import { setup, getTestHelper } from "../../../lib/test-helper";
 
-const { request } = setup({
-  dbHost: process.env["DB_HOST"] as string,
-  logger: getLogger(),
-  natsHost: process.env["NATS_HOST"] as string,
-  natsPort: process.env["NATS_PORT"] as string
-});
-const { createUser, requestPricelist, createPricelist } = getTestHelper(request);
+const helper = async () => {
+  const { request } = await setup({
+    dbHost: process.env["DB_HOST"] as string,
+    logger: getLogger(),
+    natsHost: process.env["NATS_HOST"] as string,
+    natsPort: process.env["NATS_PORT"] as string
+  });
+  const { createUser, requestPricelist, createPricelist } = getTestHelper(request);
+
+  return { request, createUser, requestPricelist, createPricelist };
+};
 
 test("Pricelists crud endpoint Should create a pricelist", async (t) => {
+  const { createUser, request, requestPricelist } = await helper();
+
   const password = "testtest";
   const user = await createUser(t, {
     email: `create-pricelist+${uuidv4()}@test.com`,
@@ -37,6 +43,8 @@ test("Pricelists crud endpoint Should create a pricelist", async (t) => {
 });
 
 test("Pricelists crud endpoint Should return a pricelist", async (t) => {
+  const { createUser, request, createPricelist } = await helper();
+
   const password = "testtest";
   const user = await createUser(t, {
     email: `get-pricelist+${uuidv4()}@test.com`,
@@ -60,6 +68,8 @@ test("Pricelists crud endpoint Should return a pricelist", async (t) => {
 });
 
 test("Pricelists crud endpoint Should return pricelists", async (t) => {
+  const { createUser, request, createPricelist } = await helper();
+
   const password = "testtest";
   const user = await createUser(t, {
     email: `get-pricelists+${uuidv4()}@test.com`,
@@ -91,6 +101,8 @@ test("Pricelists crud endpoint Should return pricelists", async (t) => {
 });
 
 test("Pricelists crud endpoint Should return pricelists", async (t) => {
+  const { createUser, request, createPricelist } = await helper();
+
   const password = "testtest";
   const user = await createUser(t, {
     email: `get-pricelists+${uuidv4()}@test.com`,
@@ -122,6 +134,8 @@ test("Pricelists crud endpoint Should return pricelists", async (t) => {
 });
 
 test("Pricelists crud endpoint Should update a pricelist", async (t) => {
+  const { createUser, request, createPricelist } = await helper();
+
   const password = "testtest";
   const user = await createUser(t, {
     email: `update-pricelist+${uuidv4()}@test.com`,
@@ -156,6 +170,8 @@ test("Pricelists crud endpoint Should update a pricelist", async (t) => {
 });
 
 test("Pricelists crud endpoint Should update all entries", async (t) => {
+  const { createUser, request, createPricelist } = await helper();
+
   const password = "testtest";
   const user = await createUser(t, {
     email: `update-pricelist+${uuidv4()}@test.com`,
@@ -191,6 +207,8 @@ test("Pricelists crud endpoint Should update all entries", async (t) => {
 });
 
 test("Pricelists crud endpoint Should remove absent entries", async (t) => {
+  const { createUser, request, createPricelist } = await helper();
+
   // creating the user
   const password = "testtest";
   const user = await createUser(t, {
@@ -229,6 +247,8 @@ test("Pricelists crud endpoint Should remove absent entries", async (t) => {
 });
 
 test("Pricelists crud endpoint Should add new entries", async (t) => {
+  const { createUser, request, createPricelist } = await helper();
+
   // creating the user
   const password = "testtest";
   const user = await createUser(t, {

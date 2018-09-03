@@ -17,7 +17,7 @@ export type Options = {
   dbHost: string
 };
 
-export const getApp = (opts: Options): express.Express => {
+export const getApp = async (opts: Options): Promise<express.Express> => {
   const { logger, natsHost, natsPort, dbHost } = opts;
 
   // express init
@@ -39,7 +39,7 @@ export const getApp = (opts: Options): express.Express => {
   const models = createModels(sequelize);
 
   // session init
-  app = appendSessions(app, models.User);
+  app = await appendSessions(app, messenger, models.User);
 
   // request logging
   app.use((req, res, next) => {

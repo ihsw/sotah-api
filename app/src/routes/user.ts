@@ -49,7 +49,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
     });
 
     res.status(HTTPStatus.CREATED).json({
-      token: generateJwtToken(user),
+      token: await generateJwtToken(user, messenger),
       user: withoutPassword(user)
     });
   }));
@@ -75,7 +75,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
 
     // issuing a jwt token
     res.status(HTTPStatus.OK).json({
-      token: generateJwtToken(user),
+      token: await generateJwtToken(user, messenger),
       user: withoutPassword(user)
     });
   }));

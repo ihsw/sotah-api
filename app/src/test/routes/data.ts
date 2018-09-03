@@ -8,14 +8,20 @@ import { setup } from "../../lib/test-helper";
 import { IRegion } from "../../lib/region";
 import { AuctionsRequestBody, SortDirection, SortKind } from "../../lib/auction";
 
-const { request, messenger } = setup({
-  dbHost: process.env["DB_HOST"] as string,
-  logger: getLogger(),
-  natsHost: process.env["NATS_HOST"] as string,
-  natsPort: process.env["NATS_PORT"] as string
-});
+const helper = async () => {
+  const { request, messenger } = await setup({
+    dbHost: process.env["DB_HOST"] as string,
+    logger: getLogger(),
+    natsHost: process.env["NATS_HOST"] as string,
+    natsPort: process.env["NATS_PORT"] as string
+  });
+
+  return { request, messenger };
+};
 
 test("Regions Should return list of regions", async (t) => {
+  const { request } = await helper();
+
   const tId = setTimeout(() => { throw new Error("Timed out!"); }, 5 * 1000);
 
   const res = await request.get("/regions");
@@ -27,6 +33,8 @@ test("Regions Should return list of regions", async (t) => {
 });
 
 test("Status Should return status information", async (t) => {
+  const { request, messenger } = await helper();
+
   const tId = setTimeout(() => { throw new Error("Timed out!"); }, 5 * 1000);
 
   const regions = (await messenger.getRegions()).data!;
@@ -39,6 +47,8 @@ test("Status Should return status information", async (t) => {
 });
 
 test("Status Should return auction information", async (t) => {
+  const { request, messenger } = await helper();
+
   const tId = setTimeout(() => { throw new Error("Timed out!"); }, 5 * 1000);
 
   const [region] = (await messenger.getRegions()).data!;
@@ -55,6 +65,8 @@ test("Status Should return auction information", async (t) => {
 });
 
 test("Status Should return return 404 on invalid region name in auctions", async (t) => {
+  const { request } = await helper();
+
   const tId = setTimeout(() => { throw new Error("Timed out!"); }, 5 * 1000);
 
   const res = await request.post("/region/fdsfgs/realm/fdsfgs/auctions");
@@ -64,6 +76,8 @@ test("Status Should return return 404 on invalid region name in auctions", async
 });
 
 test("Status Should return 400 on invalid count", async (t) => {
+  const { request, messenger } = await helper();
+
   const tId = setTimeout(() => { throw new Error("Timed out!"); }, 5 * 1000);
 
   const [region] = (await messenger.getRegions()).data!;
@@ -76,6 +90,8 @@ test("Status Should return 400 on invalid count", async (t) => {
 });
 
 test("Status Should return 404 on invalid region name", async (t) => {
+  const { request } = await helper();
+
   const tId = setTimeout(() => { throw new Error("Timed out!"); }, 5 * 1000);
 
   const res = await request.get("/region/fdsfgs/realms");

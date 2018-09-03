@@ -7,15 +7,22 @@ import { v4 as uuidv4 } from "uuid";
 import { getLogger } from "../../../lib/logger";
 import { setup, getTestHelper } from "../../../lib/test-helper";
 
-const { request } = setup({
-  dbHost: process.env["DB_HOST"] as string,
-  logger: getLogger(),
-  natsHost: process.env["NATS_HOST"] as string,
-  natsPort: process.env["NATS_PORT"] as string
-});
-const { createUser } = getTestHelper(request);
+
+const helper = async () => {
+  const { request } = await setup({
+    dbHost: process.env["DB_HOST"] as string,
+    logger: getLogger(),
+    natsHost: process.env["NATS_HOST"] as string,
+    natsPort: process.env["NATS_PORT"] as string
+  });
+  const { createUser } = getTestHelper(request);
+
+  return { request, createUser };
+};
 
 test("User creation endpoint Should return a user", async (t) => {
+  const { createUser, request } = await helper();
+
   const user = await createUser(t, {
     email: `return-new-user+${uuidv4()}@test.com`,
     password: "testtest"
@@ -25,6 +32,8 @@ test("User creation endpoint Should return a user", async (t) => {
 });
 
 test("User creation endpoint Should error on fetching user by invalid id", async (t) => {
+  const { request } = await helper();
+
   const res = await request.get("/user/-1");
   t.is(res.status, HTTPStatus.NOT_FOUND);
 });

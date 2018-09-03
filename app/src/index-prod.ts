@@ -26,7 +26,9 @@ if (cluster.isMaster) {
     logger.info("Worker exited", { code, pid: worker.process.pid, signal });
   });
 } else {
-  const app = getApp({ logger, natsHost, natsPort, dbHost });
-  const server = http.createServer(app);
-  server.listen(appPort, () => logger.info("Listening", { port: appPort }));
+  (async () => {
+    const app = await getApp({ logger, natsHost, natsPort, dbHost });
+    const server = http.createServer(app);
+    server.listen(appPort, () => logger.info("Listening", { port: appPort }));
+  })();
 }

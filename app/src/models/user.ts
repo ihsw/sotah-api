@@ -2,7 +2,8 @@ import * as SequelizeStatic from "sequelize";
 import { Instance, Sequelize, STRING, INTEGER } from "sequelize";
 import * as jwt from "jsonwebtoken";
 
-import { JwtPayload, jwtOptions } from "../lib/session";
+import { JwtPayload, getJwtOptions } from "../lib/session";
+import { Messenger } from "../lib/messenger";
 import { PreferenceModel } from "./preference";
 import { PricelistModel } from "./pricelist";
 
@@ -50,7 +51,9 @@ export const withoutPassword = (user: UserInstance): UserAttributes => {
   return data;
 };
 
-export const generateJwtToken = (user: UserInstance): string => {
+export const generateJwtToken = async (user: UserInstance, messenger: Messenger): Promise<string> => {
+  const jwtOptions = await getJwtOptions(messenger);
+
   return jwt.sign(
     <JwtPayload>{ data: user.get("id") },
     jwtOptions.secret,

@@ -23,8 +23,8 @@ type SetupSettings = {
   models: Models
 };
 
-export const setup = (opts: Options): SetupSettings => {
-  const app = getApp(opts);
+export const setup = async (opts: Options): Promise<SetupSettings> => {
+  const app = await getApp(opts);
   const request = supertest(app);
   const messenger = new Messenger(nats.connect({ url: `nats://${opts.natsHost}:${opts.natsPort}` }), opts.logger);
   const sequelize = new Sequelize("postgres", "postgres", "", <Sequelize.Options>{

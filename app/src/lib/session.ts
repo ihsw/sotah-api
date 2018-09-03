@@ -1,21 +1,40 @@
 import { Express, Request, Response, NextFunction } from "express";
 import * as passport from "passport";
 import { Strategy, StrategyOptions, ExtractJwt } from "passport-jwt";
-import { v4 as uuidv4 } from "uuid";
 
 import { UserModel } from "../models/user";
+import { Messenger, code } from "./messenger";
 
-export const jwtOptions = {
-  audience: "sotah-client",
-  issuer: "sotah-api",
-  secret: uuidv4()
+export type SessionSecretResponse = {
+  session_secret: string
+};
+
+export type JwtOptions = {
+  audience: string
+  issuer: string
+  secret: string
+};
+
+export const getJwtOptions = async (messenger: Messenger): Promise<JwtOptions> => {
+  const msg = await messenger.getSessionSecret();
+  if (msg.code !== code.ok) {
+    throw new Error(msg.error!.message);
+  }
+
+  return {
+    audience: "sotah-client",
+    issuer: "sotah-api",
+    secret: msg.data!.session_secret
+  };
 };
 
 export type JwtPayload = {
   data: string
 };
 
-export const appendSessions = (app: Express, User: UserModel): Express => {
+export const appendSessions = async (app: Express, messenger: Messenger, User: UserModel): Promise<Express> => {
+  const jwtOptions = await getJwtOptions(messenger);
+
   const opts: StrategyOptions = {
     audience: jwtOptions.audience,
     issuer: jwtOptions.issuer,
