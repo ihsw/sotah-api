@@ -243,16 +243,10 @@ export type AuctionsQueryRequestBody = {
   query: string
 };
 
-export type AuctionsQueryRequest = {
-  query: string
-  region_name: regionName
-  realm_slug: realmSlug
-};
-
 export type AuctionsQueryItem = {
   target: string
-  item: Item
-  owner: Owner
+  item: Item | null
+  owner: Owner | null
   rank: number
 };
 

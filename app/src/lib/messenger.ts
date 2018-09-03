@@ -7,7 +7,7 @@ import {
   AuctionsRequest, AuctionsResponse,
   OwnersRequest, OwnersResponse,
   ItemsQueryResponse,
-  AuctionsQueryRequest, AuctionsQueryResponse,
+  AuctionsQueryResponse,
   ItemClassesResponse,
   ItemId,
   ItemsResponse,
@@ -181,10 +181,6 @@ export class Messenger {
 
   queryItems(query: string): Promise<Message<ItemsQueryResponse>> {
     return this.request(subjects.itemsQuery, { body: JSON.stringify({ query }) });
-  }
-
-  queryAuctions(request: AuctionsQueryRequest): Promise<Message<AuctionsQueryResponse>> {
-    return this.request(subjects.auctionsQuery, { body: JSON.stringify(request) });
   }
 
   queryOwners(request: OwnersQueryRequest): Promise<Message<AuctionsQueryResponse>> {

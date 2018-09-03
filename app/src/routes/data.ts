@@ -5,7 +5,7 @@ import * as HttpStatus from "http-status";
 import { Models } from "../models";
 import { Messenger, Message, code } from "../lib/messenger";
 import { IRealm } from "../lib/realm";
-import { AuctionsRequestBody, OwnersRequestBody, ItemsRequestBody, AuctionsQueryRequestBody, ItemId, OwnersQueryByItemsRequestBody } from "../lib/auction";
+import { AuctionsRequestBody, OwnersRequestBody, ItemsRequestBody, AuctionsQueryRequestBody, ItemId, OwnersQueryByItemsRequestBody, AuctionsQueryItem } from "../lib/auction";
 import { PricelistEntryInstance } from "../models/pricelist-entry";
 import { PriceListRequestBody, PricelistHistoryRequest, UnmetDemandRequestBody } from "../lib/price-list";
 import { ProfessionPricelistInstance } from "../models/profession-pricelist";
@@ -129,12 +129,51 @@ export const getRouter = (models: Models, messenger: Messenger) => {
   }));
   router.post("/region/:regionName/realm/:realmSlug/query-auctions", wrap(async (req, res) => {
     const { query } = <AuctionsQueryRequestBody>req.body;
-    const msg = await messenger.queryAuctions({
+
+    const itemsMessage = await messenger.queryItems(query);
+    if (itemsMessage.code !== code.ok) {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: itemsMessage.error });
+
+      return;
+    }
+
+    const ownersMessage = await messenger.queryOwners({
       query,
       realm_slug: req.params["realmSlug"],
-      region_name: req.params["regionName"]
+      region_name: req.params["regionName"],
     });
-    handleMessage(res, msg);
+    if (ownersMessage.code !== code.ok) {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: ownersMessage.error });
+
+      return;
+    }
+
+    let items: AuctionsQueryItem[] = [
+      ...itemsMessage.data!.items.map(v => {
+        const result: AuctionsQueryItem = { ...v, owner: null };
+
+        return result;
+      }),
+      ...ownersMessage.data!.items.map(v => {
+        const result: AuctionsQueryItem = { ...v, item: null };
+
+        return result;
+      })
+    ];
+    items = items.sort((a, b) => {
+      if (a.rank !== b.rank) {
+        return a.rank > b.rank ? 1 : -1;
+      }
+
+      if (a.target !== b.target) {
+        return a.target > b.target ? 1 : -1;
+      }
+
+      return 0;
+    });
+    items = items.slice(0, 10);
+
+    res.json({ items });
   }));
   router.post("/region/:regionName/realm/:realmSlug/query-owner-items", wrap(async (req, res) => {
     const { items } = <OwnersQueryByItemsRequestBody>req.body;
