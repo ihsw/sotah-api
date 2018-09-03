@@ -221,6 +221,23 @@ export type ItemsQueryResponse = {
   items: ItemsResponseItem[]
 };
 
+// owners-query
+export type OwnersQueryRequest = {
+  query: string
+  region_name: regionName
+  realm_slug: realmSlug
+};
+
+export type OwnersQueryItem = {
+  target: string
+  owner: Owner
+  rank: number
+};
+
+export type OwnersQueryResponse = {
+  items: OwnersQueryItem[]
+};
+
 // auctions-query
 export type AuctionsQueryRequestBody = {
   query: string

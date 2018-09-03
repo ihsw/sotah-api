@@ -12,7 +12,8 @@ import {
   ItemId,
   ItemsResponse,
   OwnersQueryByItemsRequest,
-  OwnersQueryByItemsResponse
+  OwnersQueryByItemsResponse,
+  OwnersQueryRequest
 } from "./auction";
 import { PriceListRequest, PriceListResponse, PricelistHistoryRequest, PricelistHistoryResponse } from "./price-list";
 import { BootResponse } from "./boot";
@@ -40,6 +41,7 @@ export enum subjects {
   genericTestErrors = "genericTestErrors",
   auctions = "auctions",
   owners = "owners",
+  ownersQuery = "ownersQuery",
   itemsQuery = "itemsQuery",
   auctionsQuery = "auctionsQuery",
   itemClasses = "itemClasses",
@@ -182,6 +184,10 @@ export class Messenger {
   }
 
   queryAuctions(request: AuctionsQueryRequest): Promise<Message<AuctionsQueryResponse>> {
+    return this.request(subjects.auctionsQuery, { body: JSON.stringify(request) });
+  }
+
+  queryOwners(request: OwnersQueryRequest): Promise<Message<AuctionsQueryResponse>> {
     return this.request(subjects.auctionsQuery, { body: JSON.stringify(request) });
   }
 
