@@ -1,7 +1,6 @@
 import { Request, Router, Response } from "express";
 import { wrap } from "async-middleware";
 import * as HttpStatus from "http-status";
-import { LoggerInstance } from "winston";
 
 import { Models } from "../models";
 import { Messenger, Message, code } from "../lib/messenger";
@@ -40,7 +39,7 @@ export const handleMessage = <T>(res: Response, msg: Message<T>) => {
   }
 };
 
-export const getRouter = (models: Models, messenger: Messenger, logger: LoggerInstance) => {
+export const getRouter = (models: Models, messenger: Messenger) => {
   const router = Router();
   const { Pricelist, PricelistEntry, ProfessionPricelist } = models;
 
