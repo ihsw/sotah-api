@@ -184,7 +184,7 @@ export class Messenger {
   }
 
   queryOwners(request: OwnersQueryRequest): Promise<Message<AuctionsQueryResponse>> {
-    return this.request(subjects.auctionsQuery, { body: JSON.stringify(request) });
+    return this.request(subjects.ownersQuery, { body: JSON.stringify(request) });
   }
 
   getItemClasses(): Promise<Message<ItemClassesResponse>> {
