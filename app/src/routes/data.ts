@@ -1,6 +1,7 @@
 import { Request, Router, Response } from "express";
 import { wrap } from "async-middleware";
 import * as HttpStatus from "http-status";
+import { LoggerInstance } from "winston";
 
 import { Models } from "../models";
 import { Messenger, Message, code } from "../lib/messenger";
@@ -39,7 +40,7 @@ export const handleMessage = <T>(res: Response, msg: Message<T>) => {
   }
 };
 
-export const getRouter = (models: Models, messenger: Messenger) => {
+export const getRouter = (models: Models, messenger: Messenger, logger: LoggerInstance) => {
   const router = Router();
   const { Pricelist, PricelistEntry, ProfessionPricelist } = models;
 
@@ -130,12 +131,16 @@ export const getRouter = (models: Models, messenger: Messenger) => {
   router.post("/region/:regionName/realm/:realmSlug/query-auctions", wrap(async (req, res) => {
     const { query } = <AuctionsQueryRequestBody>req.body;
 
+    logger.info("Querying items");
+
     const itemsMessage = await messenger.queryItems(query);
     if (itemsMessage.code !== code.ok) {
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: itemsMessage.error });
 
       return;
     }
+
+    logger.info("Querying owners");
 
     const ownersMessage = await messenger.queryOwners({
       query,
