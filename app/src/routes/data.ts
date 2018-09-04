@@ -131,16 +131,12 @@ export const getRouter = (models: Models, messenger: Messenger, logger: LoggerIn
   router.post("/region/:regionName/realm/:realmSlug/query-auctions", wrap(async (req, res) => {
     const { query } = <AuctionsQueryRequestBody>req.body;
 
-    logger.info("Querying items");
-
     const itemsMessage = await messenger.queryItems(query);
     if (itemsMessage.code !== code.ok) {
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: itemsMessage.error });
 
       return;
     }
-
-    logger.info("Querying owners");
 
     const ownersMessage = await messenger.queryOwners({
       query,
@@ -152,8 +148,6 @@ export const getRouter = (models: Models, messenger: Messenger, logger: LoggerIn
 
       return;
     }
-
-    logger.info("Received owners, consolidating items and owners");
 
     let items: AuctionsQueryItem[] = [
       ...itemsMessage.data!.items.map(v => {
