@@ -153,6 +153,8 @@ export const getRouter = (models: Models, messenger: Messenger, logger: LoggerIn
       return;
     }
 
+    logger.info("Received owners, consolidating items and owners");
+
     let items: AuctionsQueryItem[] = [
       ...itemsMessage.data!.items.map(v => {
         const result: AuctionsQueryItem = { ...v, owner: null };
