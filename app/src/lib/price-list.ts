@@ -24,8 +24,10 @@ export type PriceListRequest = {
 };
 
 export type Prices = {
-  bid: number
-  buyout: number
+  min_buyout_per: number
+  max_buyout_per: number
+  average_buyout_per: number
+  median_buyout_per: number
   volume: number
 };
 
