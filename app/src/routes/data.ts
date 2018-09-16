@@ -270,7 +270,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
 
           const offset = Math.pow(10, Math.floor(Math.log10(lowestMedianBuyout)));
 
-          return lowestMedianBuyout - (lowestMedianBuyout % offset) - offset;
+          return lowestMedianBuyout - (lowestMedianBuyout % offset) - offset * 0.5;
         })();
         out.upper = (() => {
           const highestMedianBuyout = itemPrices.reduce((previousHighestMedianBuyout, prices) => {
@@ -309,11 +309,18 @@ export const getRouter = (models: Models, messenger: Messenger) => {
 
     const overallPriceLimits: PriceLimits = { lower: 0, upper: 0 };
     overallPriceLimits.lower = item_ids.reduce((overallLower, itemId) => {
-      if (overallLower !== 0 && overallLower < itemPriceLimits[itemId].lower) {
+      if (itemPriceLimits[itemId].lower === 0) {
+        return overallLower;
+      }
+      if (overallLower === 0) {
         return overallLower;
       }
 
-      return itemPriceLimits[itemId].lower;
+      if (itemPriceLimits[itemId].lower < overallLower) {
+        return itemPriceLimits[itemId].lower;
+      }
+
+      return overallLower;
     }, 0);
     overallPriceLimits.upper = item_ids.reduce((overallUpper, itemId) => {
       if (overallUpper > itemPriceLimits[itemId].upper) {
