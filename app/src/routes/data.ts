@@ -288,7 +288,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
 
           const offset = Math.pow(10, Math.floor(Math.log10(targetUpper)));
 
-          return targetUpper - (targetUpper % offset) + offset;
+          return targetUpper - (targetUpper % offset) + offset * 2;
         })();
       }
 
