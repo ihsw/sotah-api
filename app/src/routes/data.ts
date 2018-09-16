@@ -261,7 +261,9 @@ export const getRouter = (models: Models, messenger: Messenger) => {
             return prices.median_buyout_per;
           }, 0);
 
-          return Math.pow(10, Math.floor(Math.log10(lowestMedianBuyout)));
+          const offset = Math.pow(10, Math.floor(Math.log10(lowestMedianBuyout)));
+
+          return lowestMedianBuyout - (lowestMedianBuyout % offset);
         })();
         out.upper = (() => {
           const highestMedianBuyout = itemPrices.reduce((previousHighestMedianBuyout, prices) => {
