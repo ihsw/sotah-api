@@ -252,53 +252,10 @@ export const getRouter = (models: Models, messenger: Messenger) => {
       const itemPriceHistory: PricelistHistoryMap = history[itemId];
       const itemPrices: Prices[] = Object.keys(itemPriceHistory).map(v => itemPriceHistory[v]);
       if (itemPrices.length > 0) {
-        out.lower = (() => {
-          const lowestMedianBuyout = itemPrices.reduce((previousLowestMedianBuyout, prices) => {
-            if (prices.median_buyout_per === 0) {
-              return previousLowestMedianBuyout;
-            }
-            if (previousLowestMedianBuyout === 0) {
-              return prices.median_buyout_per;
-            }
-
-            if (prices.median_buyout_per < previousLowestMedianBuyout) {
-              return prices.median_buyout_per;
-            }
-
-            return previousLowestMedianBuyout;
-          }, 0);
-
-          const offset = Math.pow(10, Math.floor(Math.log10(lowestMedianBuyout)));
-
-          return lowestMedianBuyout - (lowestMedianBuyout % offset) - offset * 0.5;
-        })();
-        out.upper = (() => {
-          const highestMedianBuyout = itemPrices.reduce((previousHighestMedianBuyout, prices) => {
-            if (previousHighestMedianBuyout > prices.median_buyout_per) {
-              return previousHighestMedianBuyout;
-            }
-
-            return prices.median_buyout_per;
-          }, 0);
-          const highestAverageBuyout = itemPrices.reduce((previousHighestAverageBuyout, prices) => {
-            if (previousHighestAverageBuyout > prices.average_buyout_per) {
-              return previousHighestAverageBuyout;
-            }
-
-            return prices.average_buyout_per;
-          }, 0);
-          const targetUpper = [highestMedianBuyout, highestAverageBuyout, itemMarketPrices[itemId]].reduce((previousTargetUpper, v) => {
-            if (previousTargetUpper === 0 || v > previousTargetUpper) {
-              return v;
-            }
-
-            return previousTargetUpper;
-          }, 0);
-
-          const offset = Math.pow(10, Math.floor(Math.log10(targetUpper)));
-
-          return targetUpper - (targetUpper % offset) + offset;
-        })();
+        const averageMinBuyout = itemPrices.map(v => v.min_buyout_per).reduce((total, v) => total + v, 0);
+        const log10LowerBound = Math.pow(10, Math.floor(Math.log10(averageMinBuyout)));
+        out.lower = averageMinBuyout - (averageMinBuyout % log10LowerBound) - log10LowerBound;
+        out.upper = averageMinBuyout - (averageMinBuyout % log10LowerBound) + log10LowerBound;
       }
 
       return {
