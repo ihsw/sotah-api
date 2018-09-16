@@ -229,26 +229,26 @@ export const getRouter = (models: Models, messenger: Messenger) => {
       const itemPriceHistory: PricelistHistoryMap = history[itemId];
       const itemPrices: Prices[] = Object.keys(itemPriceHistory).map(v => itemPriceHistory[v]);
       out.lower = (() => {
-        const lowestAverageBuyout = itemPrices.reduce((previousLowestAverageBuyout, prices) => {
-          if (previousLowestAverageBuyout !== 0 && previousLowestAverageBuyout < prices.average_buyout_per) {
-            return previousLowestAverageBuyout;
+        const lowestMedianBuyout = itemPrices.reduce((previousLowestMedianBuyout, prices) => {
+          if (previousLowestMedianBuyout !== 0 && previousLowestMedianBuyout < prices.median_buyout_per) {
+            return previousLowestMedianBuyout;
           }
 
-          return prices.average_buyout_per;
+          return prices.median_buyout_per;
         }, 0);
 
-        return Math.pow(10, Math.floor(Math.log10(lowestAverageBuyout)));
+        return Math.pow(10, Math.floor(Math.log10(lowestMedianBuyout)));
       })();
       out.upper = (() => {
-        const highestAverageBuyout = itemPrices.reduce((previousHighestAverageBuyout, prices) => {
-          if (previousHighestAverageBuyout > prices.average_buyout_per) {
-            return previousHighestAverageBuyout;
+        const highestMedianBuyout = itemPrices.reduce((previousHighestMedianBuyout, prices) => {
+          if (previousHighestMedianBuyout > prices.median_buyout_per) {
+            return previousHighestMedianBuyout;
           }
 
-          return prices.average_buyout_per;
+          return prices.median_buyout_per;
         }, 0);
 
-        return highestAverageBuyout - (highestAverageBuyout % out.lower) + out.lower;
+        return highestMedianBuyout - (highestMedianBuyout % out.lower) + out.lower;
       })();
 
       return {
