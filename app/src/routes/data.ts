@@ -248,7 +248,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
           return prices.average_buyout_per;
         }, 0);
 
-        return Math.pow(10, Math.ceil(Math.log10(highestAverageBuyout)));
+        return highestAverageBuyout - (highestAverageBuyout % out.lower) + out.lower;
       })();
 
       return {
