@@ -7,7 +7,7 @@ import { Messenger, Message, code } from "../lib/messenger";
 import { IRealm } from "../lib/realm";
 import { AuctionsRequestBody, OwnersRequestBody, ItemsRequestBody, AuctionsQueryRequestBody, ItemId, OwnersQueryByItemsRequestBody, AuctionsQueryItem } from "../lib/auction";
 import { PricelistEntryInstance } from "../models/pricelist-entry";
-import { PriceListRequestBody, PricelistHistoryRequest, UnmetDemandRequestBody } from "../lib/price-list";
+import { PriceListRequestBody, PricelistHistoryRequest, UnmetDemandRequestBody, PricelistHistoryMap, Prices } from "../lib/price-list";
 import { ProfessionPricelistInstance } from "../models/profession-pricelist";
 
 interface StatusRealm extends IRealm {
@@ -16,6 +16,15 @@ interface StatusRealm extends IRealm {
 
 type StatusResponse = {
   realms: StatusRealm[]
+};
+
+type PriceLimits = {
+  upper: number;
+  lower: number;
+};
+
+type ItemPriceLimits = {
+  [itemId: number]: PriceLimits;
 };
 
 export const handleMessage = <T>(res: Response, msg: Message<T>) => {
@@ -204,7 +213,67 @@ export const getRouter = (models: Models, messenger: Messenger) => {
     })).data!.history;
     const items = (await messenger.getItems(item_ids)).data!.items;
 
-    res.json({ history, items });
+    const itemPriceLimits: ItemPriceLimits = item_ids.reduce((previousItemPriceLimits, itemId) => {
+      const out: PriceLimits = {
+        lower: 0,
+        upper: 0
+      };
+
+      if (!(itemId in history)) {
+        return {
+          ...previousItemPriceLimits,
+          [itemId]: out
+        };
+      }
+
+      const itemPriceHistory: PricelistHistoryMap = history[itemId];
+      const itemPrices: Prices[] = Object.keys(itemPriceHistory).map(v => itemPriceHistory[v]);
+      out.lower = (() => {
+        const lowestAverageBuyout = itemPrices.reduce((previousLowestAverageBuyout, prices) => {
+          if (previousLowestAverageBuyout !== 0 && previousLowestAverageBuyout < prices.average_buyout_per) {
+            return previousLowestAverageBuyout;
+          }
+
+          return prices.average_buyout_per;
+        }, 0);
+
+        return Math.pow(10, Math.floor(Math.log10(lowestAverageBuyout)));
+      })();
+      out.upper = (() => {
+        const highestAverageBuyout = itemPrices.reduce((previousHighestAverageBuyout, prices) => {
+          if (previousHighestAverageBuyout > prices.average_buyout_per) {
+            return previousHighestAverageBuyout;
+          }
+
+          return prices.average_buyout_per;
+        }, 0);
+
+        return Math.pow(10, Math.ceil(Math.log10(highestAverageBuyout)));
+      })();
+
+      return {
+        ...previousItemPriceLimits,
+        [itemId]: out
+      };
+    }, {});
+
+    const overallPriceLimits: PriceLimits = { lower: 0, upper: 0 };
+    overallPriceLimits.lower = item_ids.reduce((overallLower, itemId) => {
+      if (overallLower !== 0 && overallLower < itemPriceLimits[itemId].lower) {
+        return overallLower;
+      }
+
+      return itemPriceLimits[itemId].lower;
+    }, 0);
+    overallPriceLimits.upper = item_ids.reduce((overallUpper, itemId) => {
+      if (overallUpper > itemPriceLimits[itemId].upper) {
+        return overallUpper;
+      }
+
+      return itemPriceLimits[itemId].upper;
+    }, 0);
+
+    res.json({ history, items, itemPriceLimits, overallPriceLimits });
   }));
   router.post("/region/:regionName/realm/:realmSlug/unmet-demand", wrap(async (req, res) => {
     // gathering profession-pricelists
