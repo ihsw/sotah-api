@@ -247,8 +247,16 @@ export const getRouter = (models: Models, messenger: Messenger) => {
 
           return prices.median_buyout_per;
         }, 0);
+        const highestAverageBuyout = itemPrices.reduce((previousHighestAverageBuyout, prices) => {
+          if (previousHighestAverageBuyout > prices.average_buyout_per) {
+            return previousHighestAverageBuyout;
+          }
 
-        return highestMedianBuyout - (highestMedianBuyout % out.lower) + out.lower;
+          return prices.average_buyout_per;
+        }, 0);
+        const targetUpper = highestMedianBuyout < highestAverageBuyout ? highestMedianBuyout : highestAverageBuyout;
+
+        return targetUpper - (targetUpper % out.lower) + out.lower;
       })();
 
       return {
