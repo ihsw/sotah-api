@@ -313,7 +313,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
         return overallLower;
       }
       if (overallLower === 0) {
-        return overallLower;
+        return itemPriceLimits[itemId].lower;
       }
 
       if (itemPriceLimits[itemId].lower < overallLower) {
