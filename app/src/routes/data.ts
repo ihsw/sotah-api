@@ -22,11 +22,14 @@ type StatusResponse = {
 type PriceLimits = {
   upper: number;
   lower: number;
-  averages: number[];
 };
 
 type ItemPriceLimits = {
   [itemId: number]: PriceLimits;
+};
+
+type ItemMarketPrices = {
+  [itemId: number]: number;
 };
 
 export const handleMessage = <T>(res: Response, msg: Message<T>) => {
@@ -215,9 +218,26 @@ export const getRouter = (models: Models, messenger: Messenger) => {
     })).data!.history;
     const items = (await messenger.getItems(item_ids)).data!.items;
 
+    const itemMarketPrices: ItemMarketPrices = item_ids.reduce((previousItemMarketPrices, itemId) => {
+      if (!(itemId in history)) {
+        return {
+          ...previousItemMarketPrices,
+          [itemId]: 0
+        };
+      }
+
+      const itemPriceHistory: PricelistHistoryMap = history[itemId];
+      const itemPrices: Prices[] = Object.keys(itemPriceHistory).map(v => itemPriceHistory[v]);
+      const marketPrice = ma(itemPrices.map(v => v.min_buyout_per), itemPrices.length)[itemPrices.length - 1];
+
+      return {
+        ...previousItemMarketPrices,
+        [itemId]: marketPrice
+      };
+    }, {});
+
     const itemPriceLimits: ItemPriceLimits = item_ids.reduce((previousItemPriceLimits, itemId) => {
       const out: PriceLimits = {
-        averages: [],
         lower: 0,
         upper: 0
       };
@@ -232,7 +252,6 @@ export const getRouter = (models: Models, messenger: Messenger) => {
       const itemPriceHistory: PricelistHistoryMap = history[itemId];
       const itemPrices: Prices[] = Object.keys(itemPriceHistory).map(v => itemPriceHistory[v]);
       if (itemPrices.length > 0) {
-        out.averages = ma(itemPrices.map(v => v.min_buyout_per), itemPrices.length);
         out.lower = (() => {
           const lowestMedianBuyout = itemPrices.reduce((previousLowestMedianBuyout, prices) => {
             if (previousLowestMedianBuyout !== 0 && previousLowestMedianBuyout < prices.median_buyout_per) {
@@ -271,7 +290,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
       };
     }, {});
 
-    const overallPriceLimits: PriceLimits = { lower: 0, upper: 0, averages: [] };
+    const overallPriceLimits: PriceLimits = { lower: 0, upper: 0 };
     overallPriceLimits.lower = item_ids.reduce((overallLower, itemId) => {
       if (overallLower !== 0 && overallLower < itemPriceLimits[itemId].lower) {
         return overallLower;
@@ -287,7 +306,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
       return itemPriceLimits[itemId].upper;
     }, 0);
 
-    res.json({ history, items, itemPriceLimits, overallPriceLimits });
+    res.json({ history, items, itemPriceLimits, overallPriceLimits, itemMarketPrices });
   }));
   router.post("/region/:regionName/realm/:realmSlug/unmet-demand", wrap(async (req, res) => {
     // gathering profession-pricelists
