@@ -288,7 +288,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
             return prices.average_buyout_per;
           }, 0);
           const targetUpper = [highestMedianBuyout, highestAverageBuyout, itemMarketPrices[itemId]].reduce((previousTargetUpper, v) => {
-            if (previousTargetUpper === 0 || v < previousTargetUpper) {
+            if (previousTargetUpper === 0 || v > previousTargetUpper) {
               return v;
             }
 
