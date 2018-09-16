@@ -254,11 +254,18 @@ export const getRouter = (models: Models, messenger: Messenger) => {
       if (itemPrices.length > 0) {
         out.lower = (() => {
           const lowestMedianBuyout = itemPrices.reduce((previousLowestMedianBuyout, prices) => {
-            if (previousLowestMedianBuyout !== 0 && previousLowestMedianBuyout < prices.median_buyout_per) {
+            if (prices.median_buyout_per === 0) {
               return previousLowestMedianBuyout;
             }
+            if (previousLowestMedianBuyout === 0) {
+              return prices.median_buyout_per;
+            }
 
-            return prices.median_buyout_per;
+            if (prices.median_buyout_per < previousLowestMedianBuyout) {
+              return prices.median_buyout_per;
+            }
+
+            return previousLowestMedianBuyout;
           }, 0);
 
           const offset = Math.pow(10, Math.floor(Math.log10(lowestMedianBuyout)));
