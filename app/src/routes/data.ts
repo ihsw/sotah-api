@@ -1,6 +1,7 @@
 import { Request, Router, Response } from "express";
 import { wrap } from "async-middleware";
 import * as HttpStatus from "http-status";
+import { ma } from "moving-averages";
 
 import { Models } from "../models";
 import { Messenger, Message, code } from "../lib/messenger";
@@ -21,6 +22,7 @@ type StatusResponse = {
 type PriceLimits = {
   upper: number;
   lower: number;
+  averages: number[];
 };
 
 type ItemPriceLimits = {
@@ -215,6 +217,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
 
     const itemPriceLimits: ItemPriceLimits = item_ids.reduce((previousItemPriceLimits, itemId) => {
       const out: PriceLimits = {
+        averages: [],
         lower: 0,
         upper: 0
       };
@@ -228,36 +231,39 @@ export const getRouter = (models: Models, messenger: Messenger) => {
 
       const itemPriceHistory: PricelistHistoryMap = history[itemId];
       const itemPrices: Prices[] = Object.keys(itemPriceHistory).map(v => itemPriceHistory[v]);
-      out.lower = (() => {
-        const lowestMedianBuyout = itemPrices.reduce((previousLowestMedianBuyout, prices) => {
-          if (previousLowestMedianBuyout !== 0 && previousLowestMedianBuyout < prices.median_buyout_per) {
-            return previousLowestMedianBuyout;
-          }
+      if (itemPrices.length > 0) {
+        out.averages = ma(itemPrices.map(v => v.min_buyout_per), itemPrices.length);
+        out.lower = (() => {
+          const lowestMedianBuyout = itemPrices.reduce((previousLowestMedianBuyout, prices) => {
+            if (previousLowestMedianBuyout !== 0 && previousLowestMedianBuyout < prices.median_buyout_per) {
+              return previousLowestMedianBuyout;
+            }
 
-          return prices.median_buyout_per;
-        }, 0);
+            return prices.median_buyout_per;
+          }, 0);
 
-        return Math.pow(10, Math.floor(Math.log10(lowestMedianBuyout)));
-      })();
-      out.upper = (() => {
-        const highestMedianBuyout = itemPrices.reduce((previousHighestMedianBuyout, prices) => {
-          if (previousHighestMedianBuyout > prices.median_buyout_per) {
-            return previousHighestMedianBuyout;
-          }
+          return Math.pow(10, Math.floor(Math.log10(lowestMedianBuyout)));
+        })();
+        out.upper = (() => {
+          const highestMedianBuyout = itemPrices.reduce((previousHighestMedianBuyout, prices) => {
+            if (previousHighestMedianBuyout > prices.median_buyout_per) {
+              return previousHighestMedianBuyout;
+            }
 
-          return prices.median_buyout_per;
-        }, 0);
-        const highestAverageBuyout = itemPrices.reduce((previousHighestAverageBuyout, prices) => {
-          if (previousHighestAverageBuyout > prices.average_buyout_per) {
-            return previousHighestAverageBuyout;
-          }
+            return prices.median_buyout_per;
+          }, 0);
+          const highestAverageBuyout = itemPrices.reduce((previousHighestAverageBuyout, prices) => {
+            if (previousHighestAverageBuyout > prices.average_buyout_per) {
+              return previousHighestAverageBuyout;
+            }
 
-          return prices.average_buyout_per;
-        }, 0);
-        const targetUpper = highestMedianBuyout < highestAverageBuyout ? highestMedianBuyout : highestAverageBuyout;
+            return prices.average_buyout_per;
+          }, 0);
+          const targetUpper = highestMedianBuyout < highestAverageBuyout ? highestMedianBuyout : highestAverageBuyout;
 
-        return targetUpper - (targetUpper % out.lower) + out.lower;
-      })();
+          return targetUpper - (targetUpper % out.lower) + out.lower;
+        })();
+      }
 
       return {
         ...previousItemPriceLimits,
@@ -265,7 +271,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
       };
     }, {});
 
-    const overallPriceLimits: PriceLimits = { lower: 0, upper: 0 };
+    const overallPriceLimits: PriceLimits = { lower: 0, upper: 0, averages: [] };
     overallPriceLimits.lower = item_ids.reduce((overallLower, itemId) => {
       if (overallLower !== 0 && overallLower < itemPriceLimits[itemId].lower) {
         return overallLower;
