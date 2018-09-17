@@ -252,10 +252,11 @@ export const getRouter = (models: Models, messenger: Messenger) => {
       const itemPriceHistory: PricelistHistoryMap = history[itemId];
       const itemPrices: Prices[] = Object.keys(itemPriceHistory).map(v => itemPriceHistory[v]);
       if (itemPrices.length > 0) {
-        const averageMinBuyout = itemPrices.map(v => v.min_buyout_per).reduce((total, v) => total + v, 0) / itemPrices.length;
-        const log10LowerBound = Math.pow(10, Math.floor(Math.log10(averageMinBuyout)));
-        out.lower = averageMinBuyout - (averageMinBuyout % log10LowerBound) - log10LowerBound;
-        out.upper = averageMinBuyout - (averageMinBuyout % log10LowerBound) + log10LowerBound;
+        // const targetValue = itemPrices.map(v => v.min_buyout_per).reduce((total, v) => total + v, 0) / itemPrices.length;
+        const targetValue = itemMarketPrices[itemId];
+        const log10LowerBound = Math.pow(10, Math.floor(Math.log10(targetValue)));
+        out.lower = targetValue - (targetValue % log10LowerBound) - log10LowerBound;
+        out.upper = targetValue - (targetValue % log10LowerBound) + log10LowerBound;
       }
 
       return {
