@@ -228,7 +228,13 @@ export const getRouter = (models: Models, messenger: Messenger) => {
 
       const itemPriceHistory: PricelistHistoryMap = history[itemId];
       const itemPrices: Prices[] = Object.keys(itemPriceHistory).map(v => itemPriceHistory[v]);
-      const marketPrice = ma(itemPrices.map(v => v.min_buyout_per), itemPrices.length)[itemPrices.length - 1];
+      const marketPrice = (() => {
+        if (itemPrices.length === 0) {
+          return 0;
+        }
+
+        return ma(itemPrices.map(v => v.min_buyout_per), itemPrices.length)[itemPrices.length - 1];
+      })();
 
       return {
         ...previousItemMarketPrices,
@@ -252,11 +258,39 @@ export const getRouter = (models: Models, messenger: Messenger) => {
       const itemPriceHistory: PricelistHistoryMap = history[itemId];
       const itemPrices: Prices[] = Object.keys(itemPriceHistory).map(v => itemPriceHistory[v]);
       if (itemPrices.length > 0) {
-        // const targetValue = itemPrices.map(v => v.min_buyout_per).reduce((total, v) => total + v, 0) / itemPrices.length;
-        const targetValue = itemMarketPrices[itemId];
-        const log10LowerBound = Math.pow(10, Math.floor(Math.log10(targetValue)));
-        out.lower = targetValue - (targetValue % log10LowerBound) - log10LowerBound;
-        out.upper = targetValue - (targetValue % log10LowerBound) + log10LowerBound;
+        const movingMinBuyouts: number[] = ma(itemPrices.map(v => v.min_buyout_per), 4).filter(v => !!v);
+        const minMovingMinBuyout = movingMinBuyouts.reduce((previousValue, v) => {
+          if (v === 0) {
+            return previousValue;
+          }
+
+          if (previousValue === 0) {
+            return v;
+          }
+
+          if (v < previousValue) {
+            return v;
+          }
+
+          return previousValue;
+        }, 0);
+        const maxMovingMinBuyout = movingMinBuyouts.reduce((previousValue, v) => {
+          if (v === 0) {
+            return previousValue;
+          }
+
+          if (previousValue === 0) {
+            return v;
+          }
+
+          if (v > previousValue) {
+            return v;
+          }
+
+          return previousValue;
+        }, 0);
+        out.lower = minMovingMinBuyout;
+        out.upper = maxMovingMinBuyout;
       }
 
       return {
