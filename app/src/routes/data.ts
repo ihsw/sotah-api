@@ -266,7 +266,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
       const itemPrices: Prices[] = Object.keys(itemPriceHistory).map(v => itemPriceHistory[v]);
       if (itemPrices.length > 0) {
         const bands: BollingerBands = boll(itemPrices.map(v => v.min_buyout_per), 4);
-        const minBandLower = bands.lower.filter(v => !!v).reduce((previousValue, v) => {
+        const minBandMid = bands.mid.filter(v => !!v).reduce((previousValue, v) => {
           if (v === 0) {
             return previousValue;
           }
@@ -296,7 +296,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
 
           return previousValue;
         }, 0);
-        out.lower = minBandLower;
+        out.lower = minBandMid;
         out.upper = maxBandUpper;
       }
 
