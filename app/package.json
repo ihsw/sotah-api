@@ -54,6 +54,7 @@
   "dependencies": {
     "async-middleware": "^1.2.1",
     "bcrypt": "^2.0.1",
+    "bollinger-bands": "^3.0.1",
     "compression": "^1.7.2",
     "express": "^4.16.3",
     "http-status": "^1.0.1",

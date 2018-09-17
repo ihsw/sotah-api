@@ -2,6 +2,7 @@ import { Request, Router, Response } from "express";
 import { wrap } from "async-middleware";
 import * as HttpStatus from "http-status";
 import { ma } from "moving-averages";
+import * as boll from "bollinger-bands";
 
 import { Models } from "../models";
 import { Messenger, Message, code } from "../lib/messenger";
@@ -30,6 +31,12 @@ type ItemPriceLimits = {
 
 type ItemMarketPrices = {
   [itemId: number]: number;
+};
+
+type BollingerBands = {
+  upper: number[];
+  mid: number[];
+  lower: number[];
 };
 
 export const handleMessage = <T>(res: Response, msg: Message<T>) => {
@@ -228,7 +235,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
 
       const itemPriceHistory: PricelistHistoryMap = history[itemId];
       const itemPrices: Prices[] = Object.keys(itemPriceHistory).map(v => itemPriceHistory[v]);
-      const marketPrice = (() => {
+      const marketPrice: number = (() => {
         if (itemPrices.length === 0) {
           return 0;
         }
@@ -258,8 +265,8 @@ export const getRouter = (models: Models, messenger: Messenger) => {
       const itemPriceHistory: PricelistHistoryMap = history[itemId];
       const itemPrices: Prices[] = Object.keys(itemPriceHistory).map(v => itemPriceHistory[v]);
       if (itemPrices.length > 0) {
-        const movingMinBuyouts: number[] = ma(itemPrices.map(v => v.min_buyout_per), 4).filter(v => !!v);
-        const minMovingMinBuyout = movingMinBuyouts.reduce((previousValue, v) => {
+        const bands: BollingerBands = boll(itemPrices.map(v => v.min_buyout_per), 4);
+        const minBandLower = bands.lower.filter(v => !!v).reduce((previousValue, v) => {
           if (v === 0) {
             return previousValue;
           }
@@ -274,7 +281,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
 
           return previousValue;
         }, 0);
-        const maxMovingMinBuyout = movingMinBuyouts.reduce((previousValue, v) => {
+        const maxBandUpper = bands.upper.filter(v => !!v).reduce((previousValue, v) => {
           if (v === 0) {
             return previousValue;
           }
@@ -289,8 +296,8 @@ export const getRouter = (models: Models, messenger: Messenger) => {
 
           return previousValue;
         }, 0);
-        out.lower = minMovingMinBuyout;
-        out.upper = maxMovingMinBuyout;
+        out.lower = minBandLower;
+        out.upper = maxBandUpper;
       }
 
       return {
