@@ -1,7 +1,6 @@
 import { Request, Router, Response } from "express";
 import { wrap } from "async-middleware";
 import * as HttpStatus from "http-status";
-import { ma } from "moving-averages";
 import * as boll from "bollinger-bands";
 
 import { Models } from "../models";
@@ -225,29 +224,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
     })).data!.history;
     const items = (await messenger.getItems(item_ids)).data!.items;
 
-    const itemMarketPrices: ItemMarketPrices = item_ids.reduce((previousItemMarketPrices, itemId) => {
-      if (!(itemId in history)) {
-        return {
-          ...previousItemMarketPrices,
-          [itemId]: 0
-        };
-      }
-
-      const itemPriceHistory: PricelistHistoryMap = history[itemId];
-      const itemPrices: Prices[] = Object.keys(itemPriceHistory).map(v => itemPriceHistory[v]);
-      const marketPrice: number = (() => {
-        if (itemPrices.length === 0) {
-          return 0;
-        }
-
-        return ma(itemPrices.map(v => v.min_buyout_per), itemPrices.length)[itemPrices.length - 1];
-      })();
-
-      return {
-        ...previousItemMarketPrices,
-        [itemId]: marketPrice
-      };
-    }, {});
+    const itemMarketPrices: ItemMarketPrices = [];
 
     const itemPriceLimits: ItemPriceLimits = item_ids.reduce((previousItemPriceLimits, itemId) => {
       const out: PriceLimits = {
@@ -265,7 +242,10 @@ export const getRouter = (models: Models, messenger: Messenger) => {
       const itemPriceHistory: PricelistHistoryMap = history[itemId];
       const itemPrices: Prices[] = Object.keys(itemPriceHistory).map(v => itemPriceHistory[v]);
       if (itemPrices.length > 0) {
-        const bands: BollingerBands = boll(itemPrices.map(v => v.min_buyout_per), 4);
+        const bands: BollingerBands = boll(
+          itemPrices.map(v => v.min_buyout_per),
+          itemPrices.length > 4 ? 4 : itemPrices.length
+        );
         const minBandMid = bands.mid.filter(v => !!v).reduce((previousValue, v) => {
           if (v === 0) {
             return previousValue;
