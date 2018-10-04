@@ -206,10 +206,14 @@ export const getRouter = (models: Models, messenger: Messenger) => {
   }));
   router.post("/region/:regionName/realm/:realmSlug/price-list", wrap(async (req, res) => {
     const { item_ids } = <PriceListRequestBody>req.body;
+    const currentUnixTimestamp = Date.now() / 1000;
+    const lowerBounds = currentUnixTimestamp - (60 * 60 * 24 * 14);
     const price_list = (await messenger.getPriceList({
       item_ids,
+      lower_bounds: lowerBounds,
       realm_slug: req.params["realmSlug"],
-      region_name: req.params["regionName"]
+      region_name: req.params["regionName"],
+      upper_bounds: currentUnixTimestamp
     })).data!.price_list;
     const items = (await messenger.getItems(item_ids)).data!.items;
 
@@ -348,10 +352,14 @@ export const getRouter = (models: Models, messenger: Messenger) => {
     const items = itemsMsg.data!.items;
 
     // gathering pricing data
+    const currentUnixTimestamp = Date.now() / 1000;
+    const lowerBounds = currentUnixTimestamp - (60 * 60 * 24 * 14);
     const msg = await messenger.getPriceList({
       item_ids: itemIds,
+      lower_bounds: lowerBounds,
       realm_slug: req.params["realmSlug"],
       region_name: req.params["regionName"],
+      upper_bounds: currentUnixTimestamp
     });
     if (msg.code !== code.ok) {
       res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: msg.error });
