@@ -21,8 +21,6 @@ export type PriceListRequest = {
   region_name: regionName
   realm_slug: realmSlug
   item_ids: ItemId[]
-  lower_bounds: number
-  upper_bounds: number
 };
 
 export type Prices = {
@@ -45,6 +43,8 @@ export type PricelistHistoryRequest = {
   region_name: regionName
   realm_slug: realmSlug
   item_ids: ItemId[]
+  lower_bounds: number
+  upper_bounds: number
 };
 
 export type PricelistHistoryMap = {
