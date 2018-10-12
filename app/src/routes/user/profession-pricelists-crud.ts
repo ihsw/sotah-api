@@ -4,7 +4,7 @@ import { wrap } from "async-middleware";
 
 import { Models } from "../../models";
 import { UserInstance, UserLevel } from "../../models/user";
-import { withoutEntries, PricelistInstance } from "../../models/pricelist";
+import { withoutEntries, PricelistInstance, PricelistAttributes } from "../../models/pricelist";
 import { PricelistEntryInstance } from "../../models/pricelist-entry";
 import { withoutPricelist } from "../../models/profession-pricelist";
 import { auth } from "../../lib/session";
@@ -92,7 +92,7 @@ export const getRouter = (models: Models) => {
       return;
     }
 
-    await Promise.all(pricelist.get("pricelist_entries").map((v: PricelistEntryInstance) => v.destroy()));
+    await Promise.all(pricelist.get(PricelistAttributes.name).map((v: PricelistEntryInstance) => v.destroy()));
     await professionPricelist.destroy();
     await pricelist.destroy();
     res.json({});

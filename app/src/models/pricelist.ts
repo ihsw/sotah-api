@@ -1,5 +1,5 @@
 import * as SequelizeStatic from "sequelize";
-import { Instance, Sequelize, STRING } from "sequelize";
+import { Instance, Sequelize, STRING, INTEGER } from "sequelize";
 
 import { UserModel } from "./user";
 import { PricelistEntryModel } from "./pricelist-entry";
@@ -19,7 +19,8 @@ export type PricelistModel = SequelizeStatic.Model<PricelistInstance, PricelistA
 
 export const createPricelistModel = (sequelize: Sequelize): PricelistModel => {
   return sequelize.define<PricelistInstance, PricelistAttributes>("pricelist", {
-    name: { type: STRING, allowNull: false }
+    name: { type: STRING, allowNull: false },
+    user_id: { type: INTEGER, allowNull: false }
   });
 };
 

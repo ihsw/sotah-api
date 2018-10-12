@@ -7,7 +7,7 @@ import * as HTTPStatus from "http-status";
 import * as Sequelize from "sequelize";
 
 import { Messenger } from "./messenger";
-import { getApp, Options } from "./app";
+import { getApp, IOptions } from "./app";
 import { PricelistAttributes } from "../models/pricelist";
 import { PricelistEntryAttributes } from "../models/pricelist-entry";
 import { ProfessionPricelistAttributes } from "../models/profession-pricelist";
@@ -23,7 +23,7 @@ type SetupSettings = {
   models: Models
 };
 
-export const setup = async (opts: Options): Promise<SetupSettings> => {
+export const setup = async (opts: IOptions): Promise<SetupSettings> => {
   const app = await getApp(opts);
   const request = supertest(app);
   const messenger = new Messenger(nats.connect({ url: `nats://${opts.natsHost}:${opts.natsPort}` }), opts.logger);
