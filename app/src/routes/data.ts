@@ -14,11 +14,11 @@ import {
 } from "../lib/auction";
 import { code, Message, Messenger } from "../lib/messenger";
 import {
-    PricelistHistoryMap,
-    PricelistHistoryRequest,
-    PriceListRequestBody,
-    Prices,
-    UnmetDemandRequestBody,
+    IPricelistHistoryMap,
+    IPricelistHistoryRequest,
+    IPriceListRequestBody,
+    IPrices,
+    IUnmetDemandRequestBody,
 } from "../lib/price-list";
 import { IRealm } from "../lib/realm";
 import { IModels } from "../models";
@@ -266,7 +266,7 @@ export const getRouter = (models: IModels, messenger: Messenger) => {
     router.post(
         "/region/:regionName/realm/:realmSlug/price-list",
         wrap(async (req, res) => {
-            const { item_ids } = req.body as PriceListRequestBody;
+            const { item_ids } = req.body as IPriceListRequestBody;
             const price_list = (await messenger.getPriceList({
                 item_ids,
                 realm_slug: req.params["realmSlug"],
@@ -280,7 +280,7 @@ export const getRouter = (models: IModels, messenger: Messenger) => {
     router.post(
         "/region/:regionName/realm/:realmSlug/price-list-history",
         wrap(async (req, res) => {
-            const { item_ids } = req.body as PricelistHistoryRequest;
+            const { item_ids } = req.body as IPricelistHistoryRequest;
             const currentUnixTimestamp = Math.floor(Date.now() / 1000);
             const lowerBounds = currentUnixTimestamp - 60 * 60 * 24 * 14;
             const history = (await messenger.getPricelistHistories({
@@ -307,8 +307,8 @@ export const getRouter = (models: IModels, messenger: Messenger) => {
                     };
                 }
 
-                const itemPriceHistory: PricelistHistoryMap = history[itemId];
-                const itemPrices: Prices[] = Object.keys(itemPriceHistory).map(v => itemPriceHistory[v]);
+                const itemPriceHistory: IPricelistHistoryMap = history[itemId];
+                const itemPrices: IPrices[] = Object.keys(itemPriceHistory).map(v => itemPriceHistory[v]);
                 if (itemPrices.length > 0) {
                     const bands: IBollingerBands = boll(
                         itemPrices.map(v => v.min_buyout_per),
@@ -384,7 +384,7 @@ export const getRouter = (models: IModels, messenger: Messenger) => {
         "/region/:regionName/realm/:realmSlug/unmet-demand",
         wrap(async (req, res) => {
             // gathering profession-pricelists
-            const { expansion } = req.body as UnmetDemandRequestBody;
+            const { expansion } = req.body as IUnmetDemandRequestBody;
             const professionPricelists = await ProfessionPricelist.findAll({
                 include: [
                     {

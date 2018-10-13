@@ -1,58 +1,58 @@
-import { ExpansionName } from "./expansion";
-import { regionName } from "./region";
-import { realmSlug } from "./realm";
-import { ItemId, IItemsMap } from "./auction";
 import { IProfessionPricelistAttributes } from "../models/profession-pricelist";
+import { IItemsMap, ItemId } from "./auction";
+import { ExpansionName } from "./expansion";
+import { realmSlug } from "./realm";
+import { regionName } from "./region";
 
-export type PriceListRequestBody = {
-  item_ids: ItemId[]
-};
+export interface IPriceListRequestBody {
+    item_ids: ItemId[];
+}
 
-export type UnmetDemandRequestBody = {
-  expansion: ExpansionName;
-};
+export interface IUnmetDemandRequestBody {
+    expansion: ExpansionName;
+}
 
-export type UnmetDemandResponseBody = {
-  items: IItemsMap;
-  professionPricelists: IProfessionPricelistAttributes[];
-};
+export interface IUnmetDemandResponseBody {
+    items: IItemsMap;
+    professionPricelists: IProfessionPricelistAttributes[];
+}
 
-export type PriceListRequest = {
-  region_name: regionName
-  realm_slug: realmSlug
-  item_ids: ItemId[]
-};
+export interface IPriceListRequest {
+    region_name: regionName;
+    realm_slug: realmSlug;
+    item_ids: ItemId[];
+}
 
-export type Prices = {
-  min_buyout_per: number
-  max_buyout_per: number
-  average_buyout_per: number
-  median_buyout_per: number
-  volume: number
-};
+export interface IPrices {
+    min_buyout_per: number;
+    max_buyout_per: number;
+    average_buyout_per: number;
+    median_buyout_per: number;
+    volume: number;
+}
 
-export type PriceListMap = {
-  [itemId: number]: Prices
-};
+export interface IPriceListMap {
+    [itemId: number]: IPrices;
+}
 
-export type PriceListResponse = {
-  price_list: PriceListMap
-};
+export interface IPriceListResponse {
+    price_list: IPriceListMap;
+}
 
-export type PricelistHistoryRequest = {
-  region_name: regionName
-  realm_slug: realmSlug
-  item_ids: ItemId[]
-  lower_bounds: number
-  upper_bounds: number
-};
+export interface IPricelistHistoryRequest {
+    region_name: regionName;
+    realm_slug: realmSlug;
+    item_ids: ItemId[];
+    lower_bounds: number;
+    upper_bounds: number;
+}
 
-export type PricelistHistoryMap = {
-  [unixTimestamp: number]: Prices
-};
+export interface IPricelistHistoryMap {
+    [unixTimestamp: number]: IPrices;
+}
 
-export type PricelistHistoryResponse = {
-  history: {
-    [itemId: number]: PricelistHistoryMap
-  }
-};
+export interface IPricelistHistoryResponse {
+    history: {
+        [itemId: number]: IPricelistHistoryMap;
+    };
+}
