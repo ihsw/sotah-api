@@ -4,19 +4,19 @@ import { LoggerInstance } from "winston";
 
 import { regionName, IRegion, IStatus } from "./region";
 import {
-  AuctionsRequest, AuctionsResponse,
-  OwnersRequest, OwnersResponse,
-  ItemsQueryResponse,
-  AuctionsQueryResponse,
-  ItemClassesResponse,
+  IAuctionsRequest, IAuctionsResponse,
+  IOwnersRequest, IOwnersResponse,
+  IItemsQueryResponse,
+  IAuctionsQueryResponse,
+  IItemClassesResponse,
   ItemId,
-  ItemsResponse,
-  OwnersQueryByItemsRequest,
-  OwnersQueryByItemsResponse,
-  OwnersQueryRequest
+  IItemsResponse,
+  IOwnersQueryByItemsRequest,
+  IOwnersQueryByItemsResponse,
+  IOwnersQueryRequest
 } from "./auction";
 import { PriceListRequest, PriceListResponse, PricelistHistoryRequest, PricelistHistoryResponse } from "./price-list";
-import { BootResponse } from "./boot";
+import { IBootResponse } from "./boot";
 import { SessionSecretResponse } from "./session";
 
 const DEFAULT_TIMEOUT = 5 * 1000;
@@ -159,7 +159,7 @@ export class Messenger {
     return this.request(subjects.regions);
   }
 
-  async getAuctions(request: AuctionsRequest): Promise<Message<AuctionsResponse>> {
+  async getAuctions(request: IAuctionsRequest): Promise<Message<IAuctionsResponse>> {
     const message = await this.request<string>(
       subjects.auctions,
       { body: JSON.stringify(request), parseData: false }
@@ -175,19 +175,19 @@ export class Messenger {
     };
   }
 
-  getOwners(request: OwnersRequest): Promise<Message<OwnersResponse>> {
+  getOwners(request: IOwnersRequest): Promise<Message<IOwnersResponse>> {
     return this.request(subjects.owners, { body: JSON.stringify(request) });
   }
 
-  queryItems(query: string): Promise<Message<ItemsQueryResponse>> {
+  queryItems(query: string): Promise<Message<IItemsQueryResponse>> {
     return this.request(subjects.itemsQuery, { body: JSON.stringify({ query }) });
   }
 
-  queryOwners(request: OwnersQueryRequest): Promise<Message<AuctionsQueryResponse>> {
+  queryOwners(request: IOwnersQueryRequest): Promise<Message<IAuctionsQueryResponse>> {
     return this.request(subjects.ownersQuery, { body: JSON.stringify(request) });
   }
 
-  getItemClasses(): Promise<Message<ItemClassesResponse>> {
+  getItemClasses(): Promise<Message<IItemClassesResponse>> {
     return this.request(subjects.itemClasses);
   }
 
@@ -207,7 +207,7 @@ export class Messenger {
     };
   }
 
-  async getItems(itemIds: ItemId[]): Promise<Message<ItemsResponse>> {
+  async getItems(itemIds: ItemId[]): Promise<Message<IItemsResponse>> {
     const message = await this.request<string>(
       subjects.items,
       { body: JSON.stringify({ itemIds} ), parseData: false }
@@ -223,7 +223,7 @@ export class Messenger {
     };
   }
 
-  getBoot(): Promise<Message<BootResponse>> {
+  getBoot(): Promise<Message<IBootResponse>> {
     return this.request(subjects.boot);
   }
 
@@ -247,7 +247,7 @@ export class Messenger {
     return this.request(subjects.sessionSecret);
   }
 
-  queryOwnerItems(request: OwnersQueryByItemsRequest): Promise<Message<OwnersQueryByItemsResponse>> {
+  queryOwnerItems(request: IOwnersQueryByItemsRequest): Promise<Message<IOwnersQueryByItemsResponse>> {
     return this.request(subjects.ownersQueryByItems, { body: JSON.stringify(request) });
   }
 }

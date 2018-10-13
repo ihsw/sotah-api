@@ -145,165 +145,165 @@ export interface IItem {
     icon_url: string;
 }
 
-export type Owner = {
-    name: OwnerName
-    normalized_name: string
-};
+export interface IOwner {
+    name: OwnerName;
+    normalized_name: string;
+}
 
-export type AuctionRealm = {
-    name: string
-    slug: realmSlug
-};
+export interface IAuctionRealm {
+    name: string;
+    slug: realmSlug;
+}
 
-export type Auction = {
-    itemId: ItemId
-    owner: OwnerName
-    ownerRealm: string
-    bid: number
-    buyout: number
-    buyoutPer: number
-    quantity: number
-    timeLeft: string
-    aucList: number[]
-};
+export interface IAuction {
+    itemId: ItemId;
+    owner: OwnerName;
+    ownerRealm: string;
+    bid: number;
+    buyout: number;
+    buyoutPer: number;
+    quantity: number;
+    timeLeft: string;
+    aucList: number[];
+}
 
-export type subItemClass = {
-    subclass: number
-    name: string
-};
+export interface ISubItemClass {
+    subclass: number;
+    name: string;
+}
 
-export type ItemClass = {
-    class: number
-    name: string
-    subclasses: subItemClass[]
-};
+export interface IItemClass {
+    class: number;
+    name: string;
+    subclasses: ISubItemClass[];
+}
 
 /**
  * request-body, request, and responses
  */
 // auctions
-export type AuctionsRequestBody = {
-    count: number
-    page: number
-    sortKind: SortKind
-    sortDirection: SortDirection
-    ownerFilters: OwnerName[]
-    itemFilters: ItemId[]
-};
+export interface IAuctionsRequestBody {
+    count: number;
+    page: number;
+    sortKind: SortKind;
+    sortDirection: SortDirection;
+    ownerFilters: OwnerName[];
+    itemFilters: ItemId[];
+}
 
-export type AuctionsRequest = {
-    region_name: regionName
-    realm_slug: realmSlug
-    page: number
-    count: number
-    sort_kind: SortKind
-    sort_direction: SortDirection
-    owner_filters: OwnerName[]
-    item_filters: ItemId[]
-};
+export interface IAuctionsRequest {
+    region_name: regionName;
+    realm_slug: realmSlug;
+    page: number;
+    count: number;
+    sort_kind: SortKind;
+    sort_direction: SortDirection;
+    owner_filters: OwnerName[];
+    item_filters: ItemId[];
+}
 
-export type AuctionsResponse = {
-    auctions: Auction[]
-    total: number
-    total_count: number
-};
+export interface IAuctionsResponse {
+    auctions: IAuction[];
+    total: number;
+    total_count: number;
+}
 
 // owners
-export type OwnersRequestBody = {
-    query: string
-};
+export interface IOwnersRequestBody {
+    query: string;
+}
 
-export type OwnersRequest = {
-    query: string
-    region_name: regionName
-    realm_slug: realmSlug
-};
+export interface IOwnersRequest {
+    query: string;
+    region_name: regionName;
+    realm_slug: realmSlug;
+}
 
-export type OwnersResponse = {
-    owners: OwnerName[]
-};
+export interface IOwnersResponse {
+    owners: OwnerName[];
+}
 
 // items
-export type ItemsRequestBody = {
-    query: string
-};
+export interface IItemsRequestBody {
+    query: string;
+}
 
-export type ItemsResponseItem = {
-    item: IItem
-    target: string
-    rank: number
-};
+export interface IItemsResponseItem {
+    item: IItem;
+    target: string;
+    rank: number;
+}
 
-export type ItemsQueryResponse = {
-    items: ItemsResponseItem[]
-};
+export interface IItemsQueryResponse {
+    items: IItemsResponseItem[];
+}
 
 // owners-query
-export type OwnersQueryRequest = {
-    query: string
-    region_name: regionName
-    realm_slug: realmSlug
-};
+export interface IOwnersQueryRequest {
+    query: string;
+    region_name: regionName;
+    realm_slug: realmSlug;
+}
 
-export type OwnersQueryItem = {
-    target: string
-    owner: Owner
-    rank: number
-};
+export interface IOwnersQueryItem {
+    target: string;
+    owner: IOwner;
+    rank: number;
+}
 
-export type OwnersQueryResponse = {
-    items: OwnersQueryItem[]
-};
+export interface IOwnersQueryResponse {
+    items: IOwnersQueryItem[];
+}
 
 // auctions-query
-export type AuctionsQueryRequestBody = {
-    query: string
-};
+export interface IAuctionsQueryRequestBody {
+    query: string;
+}
 
-export type AuctionsQueryItem = {
-    target: string
-    item: IItem | null
-    owner: Owner | null
-    rank: number
-};
+export interface IAuctionsQueryItem {
+    target: string;
+    item: IItem | null;
+    owner: IOwner | null;
+    rank: number;
+}
 
-export type AuctionsQueryResponse = {
-    items: AuctionsQueryItem[]
-};
+export interface IAuctionsQueryResponse {
+    items: IAuctionsQueryItem[];
+}
 
-export type ItemClassesResponse = {
-    classes: ItemClass[]
-};
+export interface IItemClassesResponse {
+    classes: IItemClass[];
+}
 
-export type ItemsMap = {
-    [key: number]: IItem
-};
+export interface IItemsMap {
+    [key: number]: IItem;
+}
 
-export type ItemsResponse = {
-    items: ItemsMap
-};
+export interface IItemsResponse {
+    items: IItemsMap;
+}
 
-export type OwnersQueryByItemsRequest = {
-    region_name: regionName
-    realm_slug: realmSlug
-    items: ItemId[]
-};
+export interface IOwnersQueryByItemsRequest {
+    region_name: regionName;
+    realm_slug: realmSlug;
+    items: ItemId[];
+}
 
-export type OwnersQueryByItemsRequestBody = {
-    items: ItemId[]
-};
+export interface IOwnersQueryByItemsRequestBody {
+    items: ItemId[];
+}
 
-export type OwnerItemsOwnership = {
+export interface IOwnerItemsOwnership {
     owned_value: number;
     owned_volume: number;
-};
+}
 
-export type OwnerItemsOwnershipMap = {
-    [ownerName: string]: OwnerItemsOwnership
-};
+export interface IOwnerItemsOwnershipMap {
+    [ownerName: string]: IOwnerItemsOwnership;
+}
 
-export type OwnersQueryByItemsResponse = {
-    total_value: number
-    total_volume: number
-    ownership: OwnerItemsOwnershipMap
-};
+export interface IOwnersQueryByItemsResponse {
+    total_value: number;
+    total_volume: number;
+    ownership: IOwnerItemsOwnershipMap;
+}

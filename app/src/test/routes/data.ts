@@ -6,7 +6,7 @@ import * as HttpStatus from "http-status";
 import { getLogger } from "../../lib/logger";
 import { setup } from "../../lib/test-helper";
 import { IRegion } from "../../lib/region";
-import { AuctionsRequestBody, SortDirection, SortKind } from "../../lib/auction";
+import { IAuctionsRequestBody, SortDirection, SortKind } from "../../lib/auction";
 
 const helper = async () => {
   const { request, messenger } = await setup({
@@ -53,7 +53,7 @@ test("Status Should return auction information", async (t) => {
 
   const [region] = (await messenger.getRegions()).data!;
   const [realm] = (await messenger.getStatus(region.name)).data!.realms;
-  const res = await request.post(`/region/${region.name}/realm/${realm.slug}/auctions`).send(<AuctionsRequestBody>{
+  const res = await request.post(`/region/${region.name}/realm/${realm.slug}/auctions`).send(<IAuctionsRequestBody>{
     count: 10,
     page: 0,
     sortDirection: SortDirection.none,

@@ -1,11 +1,11 @@
-import { IRegion } from "./region";
-import { ItemClass } from "./auction";
+import { IItemClass } from "./auction";
 import { IExpansion } from "./expansion";
 import { IProfession } from "./profession";
+import { IRegion } from "./region";
 
-export type BootResponse = {
-  regions: IRegion[]
-  item_classes: ItemClass[]
-  expansions: IExpansion[]
-  professions: IProfession[]
-};
+export interface IBootResponse {
+    regions: IRegion[];
+    item_classes: IItemClass[];
+    expansions: IExpansion[];
+    professions: IProfession[];
+}

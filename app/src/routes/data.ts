@@ -6,7 +6,7 @@ import * as boll from "bollinger-bands";
 import { Models } from "../models";
 import { Messenger, Message, code } from "../lib/messenger";
 import { IRealm } from "../lib/realm";
-import { AuctionsRequestBody, OwnersRequestBody, ItemsRequestBody, AuctionsQueryRequestBody, ItemId, OwnersQueryByItemsRequestBody, AuctionsQueryItem } from "../lib/auction";
+import { IAuctionsRequestBody, IOwnersRequestBody, IItemsRequestBody, IAuctionsQueryRequestBody, ItemId, IOwnersQueryByItemsRequestBody, IAuctionsQueryItem } from "../lib/auction";
 import { PricelistEntryInstance } from "../models/pricelist-entry";
 import { PriceListRequestBody, PricelistHistoryRequest, UnmetDemandRequestBody, PricelistHistoryMap, Prices } from "../lib/price-list";
 import { ProfessionPricelistInstance } from "../models/profession-pricelist";
@@ -92,7 +92,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
     res.send(response).end();
   }));
   router.post("/region/:regionName/realm/:realmSlug/auctions", wrap(async (req, res) => {
-    const { count, page, sortDirection, sortKind, ownerFilters, itemFilters } = <AuctionsRequestBody>req.body;
+    const { count, page, sortDirection, sortKind, ownerFilters, itemFilters } = <IAuctionsRequestBody>req.body;
     const msg = await messenger.getAuctions({
       count,
       item_filters: itemFilters,
@@ -134,7 +134,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
     }
   }));
   router.post("/region/:regionName/realm/:realmSlug/owners", wrap(async (req, res) => {
-    const { query } = <OwnersRequestBody>req.body;
+    const { query } = <IOwnersRequestBody>req.body;
     const msg = await messenger.getOwners({
       query,
       realm_slug: req.params["realmSlug"],
@@ -143,12 +143,12 @@ export const getRouter = (models: Models, messenger: Messenger) => {
     handleMessage(res, msg);
   }));
   router.post("/items", wrap(async (req, res) => {
-    const { query } = <ItemsRequestBody>req.body;
+    const { query } = <IItemsRequestBody>req.body;
     const msg = await messenger.queryItems(query);
     handleMessage(res, msg);
   }));
   router.post("/region/:regionName/realm/:realmSlug/query-auctions", wrap(async (req, res) => {
-    const { query } = <AuctionsQueryRequestBody>req.body;
+    const { query } = <IAuctionsQueryRequestBody>req.body;
 
     const itemsMessage = await messenger.queryItems(query);
     if (itemsMessage.code !== code.ok) {
@@ -168,14 +168,14 @@ export const getRouter = (models: Models, messenger: Messenger) => {
       return;
     }
 
-    let items: AuctionsQueryItem[] = [
+    let items: IAuctionsQueryItem[] = [
       ...itemsMessage.data!.items.map(v => {
-        const result: AuctionsQueryItem = { ...v, owner: null };
+        const result: IAuctionsQueryItem = { ...v, owner: null };
 
         return result;
       }),
       ...ownersMessage.data!.items.map(v => {
-        const result: AuctionsQueryItem = { ...v, item: null };
+        const result: IAuctionsQueryItem = { ...v, item: null };
 
         return result;
       })
@@ -196,7 +196,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
     res.json({ items });
   }));
   router.post("/region/:regionName/realm/:realmSlug/query-owner-items", wrap(async (req, res) => {
-    const { items } = <OwnersQueryByItemsRequestBody>req.body;
+    const { items } = <IOwnersQueryByItemsRequestBody>req.body;
     const msg = await messenger.queryOwnerItems({
       items,
       realm_slug: req.params["realmSlug"],
