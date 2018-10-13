@@ -7,7 +7,7 @@ import * as jwt from "jsonwebtoken";
 
 import { getLogger } from "../../lib/logger";
 import { setup, getTestHelper } from "../../lib/test-helper";
-import { JwtPayload, getJwtOptions } from "../../lib/session";
+import { IJwtPayload, getJwtOptions } from "../../lib/session";
 
 const helper = async () => {
   const { request, messenger } = await setup({
@@ -122,7 +122,7 @@ test("User creation endpoint Should fail on valid jwt token but invalid payload"
   const jwtOptions = await getJwtOptions(messenger);
 
   const token = jwt.sign(
-    <JwtPayload>{ data: "-1" },
+    <IJwtPayload>{ data: "-1" },
     jwtOptions.secret,
     { issuer: jwtOptions.issuer, audience: jwtOptions.audience }
   );

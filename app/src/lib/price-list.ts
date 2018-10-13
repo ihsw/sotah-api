@@ -2,7 +2,7 @@ import { ExpansionName } from "./expansion";
 import { regionName } from "./region";
 import { realmSlug } from "./realm";
 import { ItemId, IItemsMap } from "./auction";
-import { ProfessionPricelistAttributes } from "../models/profession-pricelist";
+import { IProfessionPricelistAttributes } from "../models/profession-pricelist";
 
 export type PriceListRequestBody = {
   item_ids: ItemId[]
@@ -14,7 +14,7 @@ export type UnmetDemandRequestBody = {
 
 export type UnmetDemandResponseBody = {
   items: IItemsMap;
-  professionPricelists: ProfessionPricelistAttributes[];
+  professionPricelists: IProfessionPricelistAttributes[];
 };
 
 export type PriceListRequest = {

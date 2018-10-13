@@ -2,16 +2,16 @@ import { Request, Response, Router } from "express";
 import * as HTTPStatus from "http-status";
 import { wrap } from "async-middleware";
 
-import { Models } from "../../models";
+import { IModels } from "../../models";
 import { auth } from "../../lib/session";
-import { withoutPassword, UserInstance } from "../../models/user";
+import { withoutPassword, IUserInstance } from "../../models/user";
 
-export const getRouter = (models: Models) => {
+export const getRouter = (models: IModels) => {
   const router = Router();
   const { User } = models;
 
   router.get("/", auth, wrap(async (req: Request, res: Response) => {
-    res.json(withoutPassword(req.user as UserInstance));
+    res.json(withoutPassword(req.user as IUserInstance));
   }));
 
   router.get("/:id", wrap(async (req: Request, res: Response) => {

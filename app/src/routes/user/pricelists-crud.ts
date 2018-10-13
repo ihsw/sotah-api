@@ -2,10 +2,10 @@ import { Request, Response, Router } from "express";
 import * as HTTPStatus from "http-status";
 import { wrap } from "async-middleware";
 
-import { Models } from "../../models";
-import { UserInstance } from "../../models/user";
+import { IModels } from "../../models";
+import { IUserInstance } from "../../models/user";
 import { withoutEntries } from "../../models/pricelist";
-import { PricelistEntryInstance } from "../../models/pricelist-entry";
+import { IPricelistEntryInstance } from "../../models/pricelist-entry";
 import { ItemId } from "../../lib/auction";
 import { auth } from "../../lib/session";
 import { PricelistRequestBodyRules } from "../../lib/validator-rules";
@@ -22,12 +22,12 @@ type PricelistRequestBody = {
   }[]
 };
 
-export const getRouter = (models: Models, messenger: Messenger) => {
+export const getRouter = (models: IModels, messenger: Messenger) => {
   const router = Router();
   const { Pricelist, PricelistEntry, ProfessionPricelist } = models;
 
   router.post("/", auth, wrap(async (req: Request, res: Response) => {
-    const user = req.user as UserInstance;
+    const user = req.user as IUserInstance;
     let result: PricelistRequestBody | null = null;
     try {
       result = await PricelistRequestBodyRules.validate(req.body) as PricelistRequestBody;
@@ -49,7 +49,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
   }));
 
   router.get("/", auth, wrap(async (req: Request, res: Response) => {
-    const user = req.user as UserInstance;
+    const user = req.user as IUserInstance;
 
     // gathering pricelists associated with this user
     let pricelists = await Pricelist.findAll({
@@ -62,7 +62,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
 
     // gathering related items
     const itemIds: ItemId[] = pricelists.reduce((itemIds: ItemId[], pricelist) => {
-      return pricelist.get("pricelist_entries").reduce((itemIds: ItemId[], entry: PricelistEntryInstance) => {
+      return pricelist.get("pricelist_entries").reduce((itemIds: ItemId[], entry: IPricelistEntryInstance) => {
         const entryJson = entry.toJSON();
         if (itemIds.indexOf(entryJson.item_id) === -1) {
           itemIds.push(entryJson.item_id);
@@ -78,7 +78,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
   }));
 
   router.get("/:id", auth, wrap(async (req: Request, res: Response) => {
-    const user = req.user as UserInstance;
+    const user = req.user as IUserInstance;
     const pricelist = await Pricelist.findOne({
       include: [PricelistEntry],
       where: { id: req.params["id"], user_id: user.id }
@@ -94,7 +94,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
 
   router.put("/:id", auth, wrap(async (req: Request, res: Response) => {
     // resolving the pricelist
-    const user = req.user as UserInstance;
+    const user = req.user as IUserInstance;
     const pricelist = await Pricelist.findOne({
       include: [PricelistEntry],
       where: { id: req.params["id"], user_id: user.id }
@@ -120,7 +120,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
     pricelist.save();
 
     // misc
-    const entries = pricelist.get("pricelist_entries") as PricelistEntryInstance[];
+    const entries = pricelist.get("pricelist_entries") as IPricelistEntryInstance[];
 
     // creating new entries
     const newRequestEntries = result.entries.filter((v) => !!v.id === false);
@@ -150,7 +150,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
 
   router.delete("/:id", auth, wrap(async (req: Request, res: Response) => {
     // resolving the pricelist
-    const user = req.user as UserInstance;
+    const user = req.user as IUserInstance;
     const pricelist = await Pricelist.findOne({
       include: [PricelistEntry],
       where: { id: req.params["id"], user_id: user.id }
@@ -161,7 +161,7 @@ export const getRouter = (models: Models, messenger: Messenger) => {
       return;
     }
 
-    await Promise.all(pricelist.get("pricelist_entries").map((v: PricelistEntryInstance) => v.destroy()));
+    await Promise.all(pricelist.get("pricelist_entries").map((v: IPricelistEntryInstance) => v.destroy()));
     await pricelist.destroy();
     res.json({});
   }));

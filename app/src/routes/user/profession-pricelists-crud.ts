@@ -2,10 +2,10 @@ import { Request, Response, Router } from "express";
 import * as HTTPStatus from "http-status";
 import { wrap } from "async-middleware";
 
-import { Models } from "../../models";
-import { UserInstance, UserLevel } from "../../models/user";
-import { withoutEntries, PricelistInstance, PricelistAttributes } from "../../models/pricelist";
-import { PricelistEntryInstance } from "../../models/pricelist-entry";
+import { IModels } from "../../models";
+import { IUserInstance, UserLevel } from "../../models/user";
+import { withoutEntries, IPricelistInstance, IPricelistAttributes } from "../../models/pricelist";
+import { IPricelistEntryInstance } from "../../models/pricelist-entry";
 import { withoutPricelist } from "../../models/profession-pricelist";
 import { auth } from "../../lib/session";
 import { ProfessionPricelistRequestBodyRules } from "../../lib/validator-rules";
@@ -25,12 +25,12 @@ type ProfessionPricelistRequestBody = {
   expansion_name: ExpansionName
 };
 
-export const getRouter = (models: Models) => {
+export const getRouter = (models: IModels) => {
   const router = Router();
   const { Pricelist, PricelistEntry, ProfessionPricelist } = models;
 
   router.post("/", auth, wrap(async (req: Request, res: Response) => {
-    const user = req.user as UserInstance;
+    const user = req.user as IUserInstance;
     if (user.get("level") !== UserLevel.Admin) {
       res.status(HTTPStatus.UNAUTHORIZED).json({ unauthorized: "You are not authorized to do that." });
 
@@ -65,7 +65,7 @@ export const getRouter = (models: Models) => {
   }));
 
   router.delete("/:id", auth, wrap(async (req: Request, res: Response) => {
-    const user = req.user as UserInstance;
+    const user = req.user as IUserInstance;
     if (user.get("level") !== UserLevel.Admin) {
       res.status(HTTPStatus.UNAUTHORIZED).json({ unauthorized: "You are not authorized to do that." });
 
@@ -85,14 +85,14 @@ export const getRouter = (models: Models) => {
       return;
     }
 
-    const pricelist: PricelistInstance = professionPricelist.get("pricelist");
+    const pricelist: IPricelistInstance = professionPricelist.get("pricelist");
     if (pricelist.get("user_id") !== user.id) {
       res.status(HTTPStatus.UNAUTHORIZED).json({});
 
       return;
     }
 
-    await Promise.all(pricelist.get(PricelistAttributes.name).map((v: PricelistEntryInstance) => v.destroy()));
+    await Promise.all(pricelist.get(PricelistAttributes.name).map((v: IPricelistEntryInstance) => v.destroy()));
     await professionPricelist.destroy();
     await pricelist.destroy();
     res.json({});

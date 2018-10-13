@@ -17,7 +17,7 @@ import {
 } from "./auction";
 import { PriceListRequest, PriceListResponse, PricelistHistoryRequest, PricelistHistoryResponse } from "./price-list";
 import { IBootResponse } from "./boot";
-import { SessionSecretResponse } from "./session";
+import { ISessionSecretResponse } from "./session";
 
 const DEFAULT_TIMEOUT = 5 * 1000;
 
@@ -243,7 +243,7 @@ export class Messenger {
     };
   }
 
-  getSessionSecret(): Promise<Message<SessionSecretResponse>> {
+  getSessionSecret(): Promise<Message<ISessionSecretResponse>> {
     return this.request(subjects.sessionSecret);
   }
 

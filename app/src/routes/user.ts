@@ -5,7 +5,7 @@ import * as HTTPStatus from "http-status";
 
 import { Messenger } from "../lib/messenger";
 import { UserRequestBodyRules } from "../lib/validator-rules";
-import { Models } from "../models";
+import { IModels } from "../models";
 import { generateJwtToken, UserLevel, withoutPassword } from "../models/user";
 import { getRouter as getBaseRouter } from "./user/base";
 import { getRouter as getPreferencesRouter } from "./user/preferences";
@@ -17,7 +17,7 @@ interface IUserCreateBody {
     password: string;
 }
 
-export const getRouter = (models: Models, messenger: Messenger) => {
+export const getRouter = (models: IModels, messenger: Messenger) => {
     const router = Router();
     const { User } = models;
 

@@ -1,416 +1,490 @@
-import { Request, Router, Response } from "express";
 import { wrap } from "async-middleware";
-import * as HttpStatus from "http-status";
 import * as boll from "bollinger-bands";
+import { Request, Response, Router } from "express";
+import * as HttpStatus from "http-status";
 
-import { Models } from "../models";
-import { Messenger, Message, code } from "../lib/messenger";
+import {
+    IAuctionsQueryItem,
+    IAuctionsQueryRequestBody,
+    IAuctionsRequestBody,
+    IItemsRequestBody,
+    IOwnersQueryByItemsRequestBody,
+    IOwnersRequestBody,
+    ItemId,
+} from "../lib/auction";
+import { code, Message, Messenger } from "../lib/messenger";
+import {
+    PricelistHistoryMap,
+    PricelistHistoryRequest,
+    PriceListRequestBody,
+    Prices,
+    UnmetDemandRequestBody,
+} from "../lib/price-list";
 import { IRealm } from "../lib/realm";
-import { IAuctionsRequestBody, IOwnersRequestBody, IItemsRequestBody, IAuctionsQueryRequestBody, ItemId, IOwnersQueryByItemsRequestBody, IAuctionsQueryItem } from "../lib/auction";
-import { PricelistEntryInstance } from "../models/pricelist-entry";
-import { PriceListRequestBody, PricelistHistoryRequest, UnmetDemandRequestBody, PricelistHistoryMap, Prices } from "../lib/price-list";
-import { ProfessionPricelistInstance } from "../models/profession-pricelist";
+import { IModels } from "../models";
+import { IPricelistEntryInstance } from "../models/pricelist-entry";
+import { IProfessionPricelistInstance } from "../models/profession-pricelist";
 
-interface StatusRealm extends IRealm {
-  regionName: string;
+interface IStatusRealm extends IRealm {
+    regionName: string;
 }
 
-type StatusResponse = {
-  realms: StatusRealm[]
-};
+interface IStatusResponse {
+    realms: IStatusRealm[];
+}
 
-type PriceLimits = {
-  upper: number;
-  lower: number;
-};
+interface IPriceLimits {
+    upper: number;
+    lower: number;
+}
 
-type ItemPriceLimits = {
-  [itemId: number]: PriceLimits;
-};
+interface IItemPriceLimits {
+    [itemId: number]: IPriceLimits;
+}
 
-type ItemMarketPrices = {
-  [itemId: number]: number;
-};
+interface IItemMarketPrices {
+    [itemId: number]: number;
+}
 
-type BollingerBands = {
-  upper: number[];
-  mid: number[];
-  lower: number[];
-};
+interface IBollingerBands {
+    upper: number[];
+    mid: number[];
+    lower: number[];
+}
 
 export const handleMessage = <T>(res: Response, msg: Message<T>) => {
-  switch (msg.code) {
-    case code.ok:
-      res.send(msg.data).end();
+    switch (msg.code) {
+        case code.ok:
+            res.send(msg.data).end();
 
-      return;
-    case code.notFound:
-      res.status(HttpStatus.NOT_FOUND).send(msg.error!.message).end();
+            return;
+        case code.notFound:
+            res.status(HttpStatus.NOT_FOUND)
+                .send(msg.error!.message)
+                .end();
 
-      return;
-    case code.userError:
-      res.status(HttpStatus.BAD_REQUEST).send(msg.error!.message).end();
+            return;
+        case code.userError:
+            res.status(HttpStatus.BAD_REQUEST)
+                .send(msg.error!.message)
+                .end();
 
-      return;
-    default:
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(msg.error!.message).end();
+            return;
+        default:
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .send(msg.error!.message)
+                .end();
 
-      return;
-  }
+            return;
+    }
 };
 
-export const getRouter = (models: Models, messenger: Messenger) => {
-  const router = Router();
-  const { Pricelist, PricelistEntry, ProfessionPricelist } = models;
+export const getRouter = (models: IModels, messenger: Messenger) => {
+    const router = Router();
+    const { Pricelist, PricelistEntry, ProfessionPricelist } = models;
 
-  router.get("/regions", wrap(async (_, res) => {
-    const msg = await messenger.getRegions();
-    res.send(msg.data).end();
-  }));
-  router.get("/item-classes", wrap(async (_, res) => {
-    const msg = await messenger.getItemClasses();
-    res.send(msg.data).end();
-  }));
-  router.get("/boot", wrap(async (_, res) => {
-    const msg = await messenger.getBoot();
-    res.send(msg.data).end();
-  }));
-  router.get("/region/:regionName/realms", wrap(async (req, res) => {
-    const msg = await messenger.getStatus(req.params["regionName"]);
-    if (msg.code === code.notFound) {
-      res.status(HttpStatus.NOT_FOUND).end();
+    router.get(
+        "/regions",
+        wrap(async (_, res) => {
+            const msg = await messenger.getRegions();
+            res.send(msg.data).end();
+        }),
+    );
+    router.get(
+        "/item-classes",
+        wrap(async (_, res) => {
+            const msg = await messenger.getItemClasses();
+            res.send(msg.data).end();
+        }),
+    );
+    router.get(
+        "/boot",
+        wrap(async (_, res) => {
+            const msg = await messenger.getBoot();
+            res.send(msg.data).end();
+        }),
+    );
+    router.get(
+        "/region/:regionName/realms",
+        wrap(async (req, res) => {
+            const msg = await messenger.getStatus(req.params["regionName"]);
+            if (msg.code === code.notFound) {
+                res.status(HttpStatus.NOT_FOUND).end();
 
-      return;
-    }
+                return;
+            }
 
-    const response: StatusResponse = {
-      realms: msg.data!.realms.map((realm) => {
-        return { ...realm, regionName: req.params["regionName"] };
-      })
-    };
+            const response: IStatusResponse = {
+                realms: msg.data!.realms.map(realm => {
+                    return { ...realm, regionName: req.params["regionName"] };
+                }),
+            };
 
-    res.send(response).end();
-  }));
-  router.post("/region/:regionName/realm/:realmSlug/auctions", wrap(async (req, res) => {
-    const { count, page, sortDirection, sortKind, ownerFilters, itemFilters } = <IAuctionsRequestBody>req.body;
-    const msg = await messenger.getAuctions({
-      count,
-      item_filters: itemFilters,
-      owner_filters: ownerFilters,
-      page,
-      realm_slug: req.params["realmSlug"],
-      region_name: req.params["regionName"],
-      sort_direction: sortDirection,
-      sort_kind: sortKind
-    });
-    switch (msg.code) {
-      case code.ok:
-        const itemIds = msg.data!.auctions.map(v => v.itemId);
-        const itemsMsg = await messenger.getItems(itemIds);
-        if (itemsMsg.code !== code.ok) {
-          res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(msg.error!.message).end();
+            res.send(response).end();
+        }),
+    );
+    router.post(
+        "/region/:regionName/realm/:realmSlug/auctions",
+        wrap(async (req, res) => {
+            const {
+                count,
+                page,
+                sortDirection,
+                sortKind,
+                ownerFilters,
+                itemFilters,
+            } = req.body as IAuctionsRequestBody;
+            const msg = await messenger.getAuctions({
+                count,
+                item_filters: itemFilters,
+                owner_filters: ownerFilters,
+                page,
+                realm_slug: req.params["realmSlug"],
+                region_name: req.params["regionName"],
+                sort_direction: sortDirection,
+                sort_kind: sortKind,
+            });
+            switch (msg.code) {
+                case code.ok:
+                    const itemIds = msg.data!.auctions.map(v => v.itemId);
+                    const itemsMsg = await messenger.getItems(itemIds);
+                    if (itemsMsg.code !== code.ok) {
+                        res.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .send(msg.error!.message)
+                            .end();
 
-          return;
-        }
+                        return;
+                    }
 
-        res.send({
-          ...msg.data!,
-          items: itemsMsg.data!.items
-        }).end();
+                    res.send({ ...msg.data!, items: itemsMsg.data!.items }).end();
 
-        return;
-      case code.notFound:
-        res.status(HttpStatus.NOT_FOUND).send(msg.error!.message).end();
+                    return;
+                case code.notFound:
+                    res.status(HttpStatus.NOT_FOUND)
+                        .send(msg.error!.message)
+                        .end();
 
-        return;
-      case code.userError:
-        res.status(HttpStatus.BAD_REQUEST).send(msg.error!.message).end();
+                    return;
+                case code.userError:
+                    res.status(HttpStatus.BAD_REQUEST)
+                        .send(msg.error!.message)
+                        .end();
 
-        return;
-      default:
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(msg.error!.message).end();
+                    return;
+                default:
+                    res.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .send(msg.error!.message)
+                        .end();
 
-        return;
-    }
-  }));
-  router.post("/region/:regionName/realm/:realmSlug/owners", wrap(async (req, res) => {
-    const { query } = <IOwnersRequestBody>req.body;
-    const msg = await messenger.getOwners({
-      query,
-      realm_slug: req.params["realmSlug"],
-      region_name: req.params["regionName"]
-    });
-    handleMessage(res, msg);
-  }));
-  router.post("/items", wrap(async (req, res) => {
-    const { query } = <IItemsRequestBody>req.body;
-    const msg = await messenger.queryItems(query);
-    handleMessage(res, msg);
-  }));
-  router.post("/region/:regionName/realm/:realmSlug/query-auctions", wrap(async (req, res) => {
-    const { query } = <IAuctionsQueryRequestBody>req.body;
+                    return;
+            }
+        }),
+    );
+    router.post(
+        "/region/:regionName/realm/:realmSlug/owners",
+        wrap(async (req, res) => {
+            const { query } = req.body as IOwnersRequestBody;
+            const msg = await messenger.getOwners({
+                query,
+                realm_slug: req.params["realmSlug"],
+                region_name: req.params["regionName"],
+            });
+            handleMessage(res, msg);
+        }),
+    );
+    router.post(
+        "/items",
+        wrap(async (req, res) => {
+            const { query } = req.body as IItemsRequestBody;
+            const msg = await messenger.queryItems(query);
+            handleMessage(res, msg);
+        }),
+    );
+    router.post(
+        "/region/:regionName/realm/:realmSlug/query-auctions",
+        wrap(async (req, res) => {
+            const { query } = req.body as IAuctionsQueryRequestBody;
 
-    const itemsMessage = await messenger.queryItems(query);
-    if (itemsMessage.code !== code.ok) {
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: itemsMessage.error });
+            const itemsMessage = await messenger.queryItems(query);
+            if (itemsMessage.code !== code.ok) {
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: itemsMessage.error });
 
-      return;
-    }
+                return;
+            }
 
-    const ownersMessage = await messenger.queryOwners({
-      query,
-      realm_slug: req.params["realmSlug"],
-      region_name: req.params["regionName"],
-    });
-    if (ownersMessage.code !== code.ok) {
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: ownersMessage.error });
+            const ownersMessage = await messenger.queryOwners({
+                query,
+                realm_slug: req.params["realmSlug"],
+                region_name: req.params["regionName"],
+            });
+            if (ownersMessage.code !== code.ok) {
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: ownersMessage.error });
 
-      return;
-    }
+                return;
+            }
 
-    let items: IAuctionsQueryItem[] = [
-      ...itemsMessage.data!.items.map(v => {
-        const result: IAuctionsQueryItem = { ...v, owner: null };
+            let items: IAuctionsQueryItem[] = [
+                ...itemsMessage.data!.items.map(v => {
+                    const result: IAuctionsQueryItem = { ...v, owner: null };
 
-        return result;
-      }),
-      ...ownersMessage.data!.items.map(v => {
-        const result: IAuctionsQueryItem = { ...v, item: null };
+                    return result;
+                }),
+                ...ownersMessage.data!.items.map(v => {
+                    const result: IAuctionsQueryItem = { ...v, item: null };
 
-        return result;
-      })
-    ];
-    items = items.sort((a, b) => {
-      if (a.rank !== b.rank) {
-        return a.rank > b.rank ? 1 : -1;
-      }
+                    return result;
+                }),
+            ];
+            items = items.sort((a, b) => {
+                if (a.rank !== b.rank) {
+                    return a.rank > b.rank ? 1 : -1;
+                }
 
-      if (a.target !== b.target) {
-        return a.target > b.target ? 1 : -1;
-      }
+                if (a.target !== b.target) {
+                    return a.target > b.target ? 1 : -1;
+                }
 
-      return 0;
-    });
-    items = items.slice(0, 10);
+                return 0;
+            });
+            items = items.slice(0, 10);
 
-    res.json({ items });
-  }));
-  router.post("/region/:regionName/realm/:realmSlug/query-owner-items", wrap(async (req, res) => {
-    const { items } = <IOwnersQueryByItemsRequestBody>req.body;
-    const msg = await messenger.queryOwnerItems({
-      items,
-      realm_slug: req.params["realmSlug"],
-      region_name: req.params["regionName"]
-    });
-    handleMessage(res, msg);
-  }));
-  router.post("/region/:regionName/realm/:realmSlug/price-list", wrap(async (req, res) => {
-    const { item_ids } = <PriceListRequestBody>req.body;
-    const price_list = (await messenger.getPriceList({
-      item_ids,
-      realm_slug: req.params["realmSlug"],
-      region_name: req.params["regionName"],
-    })).data!.price_list;
-    const items = (await messenger.getItems(item_ids)).data!.items;
+            res.json({ items });
+        }),
+    );
+    router.post(
+        "/region/:regionName/realm/:realmSlug/query-owner-items",
+        wrap(async (req, res) => {
+            const { items } = req.body as IOwnersQueryByItemsRequestBody;
+            const msg = await messenger.queryOwnerItems({
+                items,
+                realm_slug: req.params["realmSlug"],
+                region_name: req.params["regionName"],
+            });
+            handleMessage(res, msg);
+        }),
+    );
+    router.post(
+        "/region/:regionName/realm/:realmSlug/price-list",
+        wrap(async (req, res) => {
+            const { item_ids } = req.body as PriceListRequestBody;
+            const price_list = (await messenger.getPriceList({
+                item_ids,
+                realm_slug: req.params["realmSlug"],
+                region_name: req.params["regionName"],
+            })).data!.price_list;
+            const items = (await messenger.getItems(item_ids)).data!.items;
 
-    res.json({ price_list, items });
-  }));
-  router.post("/region/:regionName/realm/:realmSlug/price-list-history", wrap(async (req, res) => {
-    const { item_ids } = <PricelistHistoryRequest>req.body;
-    const currentUnixTimestamp = Math.floor(Date.now() / 1000);
-    const lowerBounds = currentUnixTimestamp - (60 * 60 * 24 * 14);
-    const history = (await messenger.getPricelistHistories({
-      item_ids,
-      lower_bounds: lowerBounds,
-      realm_slug: req.params["realmSlug"],
-      region_name: req.params["regionName"],
-      upper_bounds: currentUnixTimestamp
-    })).data!.history;
-    const items = (await messenger.getItems(item_ids)).data!.items;
+            res.json({ price_list, items });
+        }),
+    );
+    router.post(
+        "/region/:regionName/realm/:realmSlug/price-list-history",
+        wrap(async (req, res) => {
+            const { item_ids } = req.body as PricelistHistoryRequest;
+            const currentUnixTimestamp = Math.floor(Date.now() / 1000);
+            const lowerBounds = currentUnixTimestamp - 60 * 60 * 24 * 14;
+            const history = (await messenger.getPricelistHistories({
+                item_ids,
+                lower_bounds: lowerBounds,
+                realm_slug: req.params["realmSlug"],
+                region_name: req.params["regionName"],
+                upper_bounds: currentUnixTimestamp,
+            })).data!.history;
+            const items = (await messenger.getItems(item_ids)).data!.items;
 
-    const itemMarketPrices: ItemMarketPrices = [];
+            const itemMarketPrices: IItemMarketPrices = [];
 
-    const itemPriceLimits: ItemPriceLimits = item_ids.reduce((previousItemPriceLimits, itemId) => {
-      const out: PriceLimits = {
-        lower: 0,
-        upper: 0
-      };
+            const itemPriceLimits: IItemPriceLimits = item_ids.reduce((previousItemPriceLimits, itemId) => {
+                const out: IPriceLimits = {
+                    lower: 0,
+                    upper: 0,
+                };
 
-      if (!(itemId in history)) {
-        return {
-          ...previousItemPriceLimits,
-          [itemId]: out
-        };
-      }
+                if (!(itemId in history)) {
+                    return {
+                        ...previousItemPriceLimits,
+                        [itemId]: out,
+                    };
+                }
 
-      const itemPriceHistory: PricelistHistoryMap = history[itemId];
-      const itemPrices: Prices[] = Object.keys(itemPriceHistory).map(v => itemPriceHistory[v]);
-      if (itemPrices.length > 0) {
-        const bands: BollingerBands = boll(
-          itemPrices.map(v => v.min_buyout_per),
-          itemPrices.length > 4 ? 4 : itemPrices.length
-        );
-        const minBandMid = bands.mid.filter(v => !!v).reduce((previousValue, v) => {
-          if (v === 0) {
-            return previousValue;
-          }
+                const itemPriceHistory: PricelistHistoryMap = history[itemId];
+                const itemPrices: Prices[] = Object.keys(itemPriceHistory).map(v => itemPriceHistory[v]);
+                if (itemPrices.length > 0) {
+                    const bands: IBollingerBands = boll(
+                        itemPrices.map(v => v.min_buyout_per),
+                        itemPrices.length > 4 ? 4 : itemPrices.length,
+                    );
+                    const minBandMid = bands.mid.filter(v => !!v).reduce((previousValue, v) => {
+                        if (v === 0) {
+                            return previousValue;
+                        }
 
-          if (previousValue === 0) {
-            return v;
-          }
+                        if (previousValue === 0) {
+                            return v;
+                        }
 
-          if (v < previousValue) {
-            return v;
-          }
+                        if (v < previousValue) {
+                            return v;
+                        }
 
-          return previousValue;
-        }, 0);
-        const maxBandUpper = bands.upper.filter(v => !!v).reduce((previousValue, v) => {
-          if (v === 0) {
-            return previousValue;
-          }
+                        return previousValue;
+                    }, 0);
+                    const maxBandUpper = bands.upper.filter(v => !!v).reduce((previousValue, v) => {
+                        if (v === 0) {
+                            return previousValue;
+                        }
 
-          if (previousValue === 0) {
-            return v;
-          }
+                        if (previousValue === 0) {
+                            return v;
+                        }
 
-          if (v > previousValue) {
-            return v;
-          }
+                        if (v > previousValue) {
+                            return v;
+                        }
 
-          return previousValue;
-        }, 0);
-        out.lower = minBandMid;
-        out.upper = maxBandUpper;
-      }
+                        return previousValue;
+                    }, 0);
+                    out.lower = minBandMid;
+                    out.upper = maxBandUpper;
+                }
 
-      return {
-        ...previousItemPriceLimits,
-        [itemId]: out
-      };
-    }, {});
+                return {
+                    ...previousItemPriceLimits,
+                    [itemId]: out,
+                };
+            }, {});
 
-    const overallPriceLimits: PriceLimits = { lower: 0, upper: 0 };
-    overallPriceLimits.lower = item_ids.reduce((overallLower, itemId) => {
-      if (itemPriceLimits[itemId].lower === 0) {
-        return overallLower;
-      }
-      if (overallLower === 0) {
-        return itemPriceLimits[itemId].lower;
-      }
+            const overallPriceLimits: IPriceLimits = { lower: 0, upper: 0 };
+            overallPriceLimits.lower = item_ids.reduce((overallLower, itemId) => {
+                if (itemPriceLimits[itemId].lower === 0) {
+                    return overallLower;
+                }
+                if (overallLower === 0) {
+                    return itemPriceLimits[itemId].lower;
+                }
 
-      if (itemPriceLimits[itemId].lower < overallLower) {
-        return itemPriceLimits[itemId].lower;
-      }
+                if (itemPriceLimits[itemId].lower < overallLower) {
+                    return itemPriceLimits[itemId].lower;
+                }
 
-      return overallLower;
-    }, 0);
-    overallPriceLimits.upper = item_ids.reduce((overallUpper, itemId) => {
-      if (overallUpper > itemPriceLimits[itemId].upper) {
-        return overallUpper;
-      }
+                return overallLower;
+            }, 0);
+            overallPriceLimits.upper = item_ids.reduce((overallUpper, itemId) => {
+                if (overallUpper > itemPriceLimits[itemId].upper) {
+                    return overallUpper;
+                }
 
-      return itemPriceLimits[itemId].upper;
-    }, 0);
+                return itemPriceLimits[itemId].upper;
+            }, 0);
 
-    res.json({ history, items, itemPriceLimits, overallPriceLimits, itemMarketPrices });
-  }));
-  router.post("/region/:regionName/realm/:realmSlug/unmet-demand", wrap(async (req, res) => {
-    // gathering profession-pricelists
-    const { expansion } = <UnmetDemandRequestBody>req.body;
-    const professionPricelists = await ProfessionPricelist.findAll({
-      include: [
-        {
-          include: [{ model: PricelistEntry, required: true }],
-          model: Pricelist,
-          required: true,
-        }
-      ],
-      where: { expansion }
-    });
+            res.json({ history, items, itemPriceLimits, overallPriceLimits, itemMarketPrices });
+        }),
+    );
+    router.post(
+        "/region/:regionName/realm/:realmSlug/unmet-demand",
+        wrap(async (req, res) => {
+            // gathering profession-pricelists
+            const { expansion } = req.body as UnmetDemandRequestBody;
+            const professionPricelists = await ProfessionPricelist.findAll({
+                include: [
+                    {
+                        include: [{ model: PricelistEntry, required: true }],
+                        model: Pricelist,
+                        required: true,
+                    },
+                ],
+                where: { expansion },
+            });
 
-    // gathering included item-ids
-    const itemIds = professionPricelists.reduce((previousValue: ItemId[], v: ProfessionPricelistInstance) => {
-      const pricelistEntries: PricelistEntryInstance[] = v.get("pricelist").get("pricelist_entries");
-      const pricelistItemIds: ItemId[] = pricelistEntries.map(v => v.get("item_id"));
-      for (const itemId of pricelistItemIds) {
-        if (previousValue.indexOf(itemId) === -1) {
-          previousValue.push(itemId);
-        }
-      }
+            // gathering included item-ids
+            const itemIds = professionPricelists.reduce((previousValue: ItemId[], v: IProfessionPricelistInstance) => {
+                const pricelistEntries: IPricelistEntryInstance[] = v.get("pricelist").get("pricelist_entries");
+                const pricelistItemIds: ItemId[] = pricelistEntries.map(entry => entry.get("item_id"));
+                for (const itemId of pricelistItemIds) {
+                    if (previousValue.indexOf(itemId) === -1) {
+                        previousValue.push(itemId);
+                    }
+                }
 
-      return previousValue;
-    }, []);
+                return previousValue;
+            }, []);
 
-    // gathering items
-    const itemsMsg = await messenger.getItems(itemIds);
-    if (itemsMsg.code !== code.ok) {
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: itemsMsg.error });
+            // gathering items
+            const itemsMsg = await messenger.getItems(itemIds);
+            if (itemsMsg.code !== code.ok) {
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: itemsMsg.error });
 
-      return;
-    }
-    const items = itemsMsg.data!.items;
+                return;
+            }
+            const items = itemsMsg.data!.items;
 
-    // gathering pricing data
-    const msg = await messenger.getPriceList({
-      item_ids: itemIds,
-      realm_slug: req.params["realmSlug"],
-      region_name: req.params["regionName"]
-    });
-    if (msg.code !== code.ok) {
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: msg.error });
+            // gathering pricing data
+            const msg = await messenger.getPriceList({
+                item_ids: itemIds,
+                realm_slug: req.params["realmSlug"],
+                region_name: req.params["regionName"],
+            });
+            if (msg.code !== code.ok) {
+                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: msg.error });
 
-      return;
-    }
-    const msgData = msg.data!;
+                return;
+            }
+            const msgData = msg.data!;
 
-    // gathering unmet items
-    const unmetItemIds = itemIds.filter(v => !(v.toString() in msgData.price_list));
+            // gathering unmet items
+            const unmetItemIds = itemIds.filter(v => !(v.toString() in msgData.price_list));
 
-    // filtering in unmet profession-pricelists
-    const unmetProfessionPricelists = professionPricelists.filter(v => {
-      const pricelistEntries: PricelistEntryInstance[] = v.get("pricelist").get("pricelist_entries");
-      const pricelistItemIds: ItemId[] = pricelistEntries.map(v => v.get("item_id"));
-      const unmetPricelistItemIds = pricelistItemIds.filter(v => unmetItemIds.indexOf(v) > -1);
+            // filtering in unmet profession-pricelists
+            const unmetProfessionPricelists = professionPricelists.filter(v => {
+                const pricelistEntries: IPricelistEntryInstance[] = v.get("pricelist").get("pricelist_entries");
+                const pricelistItemIds: ItemId[] = pricelistEntries.map(entry => entry.get("item_id"));
+                const unmetPricelistItemIds = pricelistItemIds.filter(itemId => unmetItemIds.indexOf(itemId) > -1);
 
-      return unmetPricelistItemIds.length > 0;
-    });
+                return unmetPricelistItemIds.length > 0;
+            });
 
-    res.json({
-      items,
-      professionPricelists: unmetProfessionPricelists,
-      unmetItemIds
-    });
-  }));
-  router.get("/profession-pricelists/:profession_name", wrap(async (req: Request, res: Response) => {
-    // gathering pricelists associated with this user, region, and realm
-    const professionPricelists = await ProfessionPricelist.findAll({
-      include: [
-        {
-          include: [{ model: PricelistEntry, required: true }],
-          model: Pricelist,
-          required: true,
-        }
-      ],
-      where: { name: req.params["profession_name"] }
-    });
+            res.json({
+                items,
+                professionPricelists: unmetProfessionPricelists,
+                unmetItemIds,
+            });
+        }),
+    );
+    router.get(
+        "/profession-pricelists/:profession_name",
+        wrap(async (req: Request, res: Response) => {
+            // gathering pricelists associated with this user, region, and realm
+            const professionPricelists = await ProfessionPricelist.findAll({
+                include: [
+                    {
+                        include: [{ model: PricelistEntry, required: true }],
+                        model: Pricelist,
+                        required: true,
+                    },
+                ],
+                where: { name: req.params["profession_name"] },
+            });
 
-    // gathering related items
-    const itemIds: ItemId[] = professionPricelists.reduce((itemIds: ItemId[], professionPricelist) => {
-      return professionPricelist.get("pricelist").get("pricelist_entries").reduce((itemIds: ItemId[], entry: PricelistEntryInstance) => {
-        const entryJson = entry.toJSON();
-        if (itemIds.indexOf(entryJson.item_id) === -1) {
-          itemIds.push(entryJson.item_id);
-        }
+            // gathering related items
+            const itemIds: ItemId[] = professionPricelists.reduce((pricelistItemIds: ItemId[], professionPricelist) => {
+                return professionPricelist
+                    .get("pricelist")
+                    .get("pricelist_entries")
+                    .reduce((entryItemIds: ItemId[], entry: IPricelistEntryInstance) => {
+                        const entryJson = entry.toJSON();
+                        if (entryItemIds.indexOf(entryJson.item_id) === -1) {
+                            entryItemIds.push(entryJson.item_id);
+                        }
 
-        return itemIds;
-      }, itemIds);
-    }, []);
-    const items = (await messenger.getItems(itemIds)).data!.items;
+                        return entryItemIds;
+                    }, pricelistItemIds);
+            }, []);
+            const items = (await messenger.getItems(itemIds)).data!.items;
 
-    // dumping out a response
-    res.json({ profession_pricelists: professionPricelists.map((v) => v.toJSON()), items });
-  }));
+            // dumping out a response
+            res.json({ profession_pricelists: professionPricelists.map(v => v.toJSON()), items });
+        }),
+    );
 
-  return router;
+    return router;
 };
