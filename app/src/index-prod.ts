@@ -1,7 +1,7 @@
 import * as cluster from "cluster";
-import * as process from "process";
 import * as http from "http";
 import * as os from "os";
+import * as process from "process";
 
 import { getApp } from "./lib/app";
 import { getLogger } from "./lib/logger";
@@ -16,19 +16,19 @@ const appPort = process.env["APP_PORT"];
 const logger = getLogger("debug");
 
 if (cluster.isMaster) {
-  const numCpus = os.cpus().length;
+    const numCpus = os.cpus().length;
 
-  for (let i = 0; i < numCpus; i++) {
-    cluster.fork();
-  }
+    for (let i = 0; i < numCpus; i++) {
+        cluster.fork();
+    }
 
-  cluster.on("exit", (worker, code, signal) => {
-    logger.info("Worker exited", { code, pid: worker.process.pid, signal });
-  });
+    cluster.on("exit", (worker, code, signal) => {
+        logger.info("Worker exited", { code, pid: worker.process.pid, signal });
+    });
 } else {
-  (async () => {
-    const app = await getApp({ logger, natsHost, natsPort, dbHost });
-    const server = http.createServer(app);
-    server.listen(appPort, () => logger.info("Listening", { port: appPort }));
-  })();
+    (async () => {
+        const app = await getApp({ logger, natsHost, natsPort, dbHost });
+        const server = http.createServer(app);
+        server.listen(appPort, () => logger.info("Listening", { port: appPort }));
+    })();
 }
