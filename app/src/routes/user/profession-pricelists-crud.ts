@@ -7,7 +7,7 @@ import { ProfessionName } from "../../lib/profession";
 import { auth } from "../../lib/session";
 import { ProfessionPricelistRequestBodyRules } from "../../lib/validator-rules";
 import { IModels } from "../../models";
-import { IPricelistInstance, withoutEntries } from "../../models/pricelist";
+import { withoutEntries } from "../../models/pricelist";
 import { IPricelistEntryInstance } from "../../models/pricelist-entry";
 import { withoutPricelist } from "../../models/profession-pricelist";
 import { IUserInstance, UserLevel } from "../../models/user";
@@ -100,14 +100,25 @@ export const getRouter = (models: IModels) => {
                 return;
             }
 
-            const pricelist: IPricelistInstance = professionPricelist.get("pricelist");
+            const pricelist = await Pricelist.findById(professionPricelist.get("pricelist_id"));
+            if (pricelist === null) {
+                res.status(HTTPStatus.INTERNAL_SERVER_ERROR).json({
+                    error: "Pricelist could not be found",
+                    pricelistId: professionPricelist.get("pricelist_id"),
+                    professionPricelistId: professionPricelist.id,
+                });
+
+                return;
+            }
+
             if (pricelist.get("user_id") !== user.id) {
                 res.status(HTTPStatus.UNAUTHORIZED).json({});
 
                 return;
             }
 
-            await Promise.all(pricelist.get("pricelist_attributes").map((v: IPricelistEntryInstance) => v.destroy()));
+            const pricelistAttributes = await PricelistEntry.findAll({ where: { pricelist_id: pricelist.id } });
+            await Promise.all(pricelistAttributes.map((v: IPricelistEntryInstance) => v.destroy()));
             await professionPricelist.destroy();
             await pricelist.destroy();
             res.json({});
