@@ -7,35 +7,35 @@ import { getLogger } from "../../lib/logger";
 import { setup } from "../../lib/test-helper";
 
 const helper = async () => {
-  const { request } = await setup({
-    dbHost: process.env["DB_HOST"] as string,
-    logger: getLogger(),
-    natsHost: process.env["NATS_HOST"] as string,
-    natsPort: process.env["NATS_PORT"] as string
-  });
+    const { request } = await setup({
+        dbHost: process.env["DB_HOST"] as string,
+        logger: getLogger(),
+        natsHost: process.env["NATS_HOST"] as string,
+        natsPort: process.env["NATS_PORT"] as string,
+    });
 
-  return { request };
+    return { request };
 };
 
-test("Homepage Should return standard greeting", async (t) => {
-  const { request } = await helper();
+test("Homepage Should return standard greeting", async t => {
+    const { request } = await helper();
 
-  const res = await request.get("/");
-  t.is(res.status, HttpStatus.OK);
-  t.is(res.text, "Hello, world!");
+    const res = await request.get("/");
+    t.is(res.status, HttpStatus.OK);
+    t.is(res.text, "Hello, world!");
 });
 
-test("Ping Should return pong", async (t) => {
-  const { request } = await helper();
+test("Ping Should return pong", async t => {
+    const { request } = await helper();
 
-  const res = await request.get("/ping");
-  t.is(res.status, HttpStatus.OK);
-  t.is(res.text, "Pong");
+    const res = await request.get("/ping");
+    t.is(res.status, HttpStatus.OK);
+    t.is(res.text, "Pong");
 });
 
-test("Internal-error Should return 500", async (t) => {
-  const { request } = await helper();
+test("Internal-error Should return 500", async t => {
+    const { request } = await helper();
 
-  const res = await request.get("/internal-error");
-  t.is(res.status, HttpStatus.INTERNAL_SERVER_ERROR, "Http status is NOT_FOUND");
+    const res = await request.get("/internal-error");
+    t.is(res.status, HttpStatus.INTERNAL_SERVER_ERROR, "Http status is NOT_FOUND");
 });
