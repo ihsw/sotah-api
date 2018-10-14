@@ -88,7 +88,6 @@ export const getRouter = (models: IModels) => {
             const professionPricelist = await ProfessionPricelist.findOne({
                 include: [
                     {
-                        include: [{ model: PricelistEntry }],
                         model: Pricelist,
                         where: { id: req.params["id"] },
                     },
@@ -117,8 +116,8 @@ export const getRouter = (models: IModels) => {
                 return;
             }
 
-            const pricelistAttributes = await PricelistEntry.findAll({ where: { pricelist_id: pricelist.id } });
-            await Promise.all(pricelistAttributes.map((v: IPricelistEntryInstance) => v.destroy()));
+            const pricelistEntries = await PricelistEntry.findAll({ where: { pricelist_id: pricelist.id } });
+            await Promise.all(pricelistEntries.map((v: IPricelistEntryInstance) => v.destroy()));
             await professionPricelist.destroy();
             await pricelist.destroy();
             res.json({});
