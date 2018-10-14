@@ -25,6 +25,7 @@ import {
 import { IRegion, IStatus, regionName } from "../region";
 import { ISessionSecretResponse } from "../session";
 import { Message } from "./message";
+import { MessageError } from "./message-error";
 
 const DEFAULT_TIMEOUT = 5 * 1000;
 
@@ -66,11 +67,6 @@ export enum code {
     msgJsonParseError = -2,
     notFound = -3,
     userError = -4,
-}
-
-export interface IMessageError {
-    message: string;
-    code: code;
 }
 
 export interface IMessage {
@@ -196,7 +192,7 @@ export class Messenger {
         return this.request(subjects.ownersQueryByItems, { body: JSON.stringify(request) });
     }
 
-    private request<T>(subject: string, opts?: IRequestOptions): Promise<Message<T>> {
+    public request<T>(subject: string, opts?: IRequestOptions): Promise<Message<T>> {
         return new Promise<Message<T>>((resolve, reject) => {
             const tId = setTimeout(() => reject(new Error("Timed out!")), DEFAULT_TIMEOUT);
 
@@ -219,7 +215,7 @@ export class Messenger {
                     const parsedMsg: IMessage = JSON.parse(natsMsg.toString());
                     const msg = new Message<T>(parsedMsg, parseData);
                     if (msg.error !== null && msg.code === code.genericError) {
-                        const reason: IMessageError = {
+                        const reason: MessageError = {
                             code: msg.code,
                             message: msg.error.message,
                         };
