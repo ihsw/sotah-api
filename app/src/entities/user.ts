@@ -25,6 +25,6 @@ export class User {
     @Column({ name: "hashed_password", nullable: false })
     public hashedPassword: string;
 
-    @Column({ nullable: false })
+    @Column("int", { nullable: false })
     public level: UserLevel;
 }
