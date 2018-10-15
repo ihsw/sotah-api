@@ -1,6 +1,7 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 import { Preference } from "./preference";
+import { Pricelist } from "./pricelist";
 
 export enum UserLevel {
     Admin = 60,
@@ -14,6 +15,9 @@ export class User {
 
     @OneToOne(() => Preference, preference => preference.user)
     public preference: Preference;
+
+    @ManyToOne(() => Pricelist, pricelist => pricelist.user)
+    public pricelists: Pricelist[];
 
     @Column({ nullable: false })
     public email: string;
