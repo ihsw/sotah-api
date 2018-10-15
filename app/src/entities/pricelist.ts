@@ -1,5 +1,6 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
+import { PricelistEntry } from "./pricelist-entry";
 import { ProfessionPricelist } from "./profession-pricelist";
 import { User } from "./user";
 
@@ -14,6 +15,9 @@ export class Pricelist {
 
     @OneToOne(() => ProfessionPricelist, professionPricelist => professionPricelist.pricelist)
     public professionPricelist: ProfessionPricelist;
+
+    @OneToMany(() => PricelistEntry, entry => entry.pricelist)
+    public entries: PricelistEntry[];
 
     @Column()
     public name: string;
