@@ -14,7 +14,7 @@ export class Pricelist {
     public user: User;
 
     @OneToOne(() => ProfessionPricelist, professionPricelist => professionPricelist.pricelist)
-    public professionPricelist: ProfessionPricelist;
+    public professionPricelist: ProfessionPricelist | undefined;
 
     @OneToMany(() => PricelistEntry, entry => entry.pricelist, {
         eager: true,
