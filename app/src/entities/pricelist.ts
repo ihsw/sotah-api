@@ -9,7 +9,7 @@ export class Pricelist {
     @PrimaryGeneratedColumn()
     public id: number;
 
-    @ManyToOne(() => User, user => user.pricelists)
+    @ManyToOne(() => User, user => user.pricelists, { eager: true })
     @JoinColumn({ name: "user_id" })
     public user: User;
 
