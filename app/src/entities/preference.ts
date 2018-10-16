@@ -12,8 +12,8 @@ export class Preference {
     public user: User;
 
     @Column({ name: "current_region", nullable: true })
-    public currentRegion: string;
+    public currentRegion: string | null;
 
     @Column({ name: "current_realm", nullable: true })
-    public currentRealm: string;
+    public currentRealm: string | null;
 }
