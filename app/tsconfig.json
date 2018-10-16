@@ -2,15 +2,14 @@
     "compilerOptions": {
         "module": "commonjs",
         "target": "es2017",
-        "noImplicitAny": false,
         "noUnusedParameters": true,
         "noUnusedLocals": true,
-        "strictNullChecks": true,
         "removeComments": true,
         "sourceMap": true,
         "rootDir": "./src",
         "outDir": "./dist",
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "strict": true
     },
     "filesGlob": [
         "./src/**/*.ts"
