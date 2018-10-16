@@ -9,7 +9,8 @@
         "rootDir": "./src",
         "outDir": "./dist",
         "experimentalDecorators": true,
-        "strict": true
+        "strict": true,
+        "noImplicitReturns": true
     },
     "filesGlob": [
         "./src/**/*.ts"
