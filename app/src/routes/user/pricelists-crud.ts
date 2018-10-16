@@ -1,15 +1,13 @@
 import { wrap } from "async-middleware";
 import { Request, Response, Router } from "express";
 import * as HTTPStatus from "http-status";
+import { Connection } from "typeorm";
 
+import { Pricelist, PricelistEntry, User } from "../../entities";
 import { ItemId } from "../../lib/auction";
 import { Messenger } from "../../lib/messenger";
 import { auth } from "../../lib/session";
 import { PricelistRequestBodyRules } from "../../lib/validator-rules";
-import { IModels } from "../../models";
-import { withoutEntries } from "../../models/pricelist";
-import { IPricelistEntryInstance } from "../../models/pricelist-entry";
-import { IUserInstance } from "../../models/user";
 
 interface IPricelistRequestBody {
     pricelist: {
@@ -22,15 +20,14 @@ interface IPricelistRequestBody {
     }>;
 }
 
-export const getRouter = (models: IModels, messenger: Messenger) => {
+export const getRouter = (dbConn: Connection, messenger: Messenger) => {
     const router = Router();
-    const { Pricelist, PricelistEntry, ProfessionPricelist } = models;
 
     router.post(
         "/",
         auth,
         wrap(async (req: Request, res: Response) => {
-            const user = req.user as IUserInstance;
+            const user = req.user as User;
             let result: IPricelistRequestBody | null = null;
             try {
                 result = (await PricelistRequestBodyRules.validate(req.body)) as IPricelistRequestBody;
@@ -40,18 +37,23 @@ export const getRouter = (models: IModels, messenger: Messenger) => {
                 return;
             }
 
-            const pricelist = await Pricelist.create({ ...result!.pricelist, user_id: user.id });
+            const pricelist = new Pricelist();
+            pricelist.user = user;
+            pricelist.name = result.pricelist.name;
+            await dbConn.manager.save(pricelist);
             const entries = await Promise.all(
-                result.entries.map(v =>
-                    PricelistEntry.create({
-                        pricelist_id: pricelist.id,
-                        ...v,
-                    }),
-                ),
+                result.entries.map(v => {
+                    const entry = new PricelistEntry();
+                    entry.pricelist = pricelist;
+                    entry.itemId = v.item_id;
+                    entry.quantityModifier = v.quantity_modifier;
+
+                    return dbConn.manager.save(entry);
+                }),
             );
             res.status(HTTPStatus.CREATED).json({
-                entries: entries.map(v => v.toJSON()),
-                pricelist: withoutEntries(pricelist),
+                entries,
+                pricelist,
             });
         }),
     );
@@ -60,34 +62,30 @@ export const getRouter = (models: IModels, messenger: Messenger) => {
         "/",
         auth,
         wrap(async (req: Request, res: Response) => {
-            const user = req.user as IUserInstance;
+            const user = req.user as User;
 
             // gathering pricelists associated with this user
-            let pricelists = await Pricelist.findAll({
-                include: [PricelistEntry, ProfessionPricelist],
+            let pricelists = await dbConn.getRepository(Pricelist).find({
                 where: { user_id: user.id },
             });
 
             // filtering out profession-pricelists
-            pricelists = pricelists.filter(v => !!v.get("profession_pricelist") === false);
+            pricelists = pricelists.filter(v => typeof v.professionPricelist === "undefined");
 
             // gathering related items
             const itemIds: ItemId[] = pricelists.reduce((pricelistsItemIds: ItemId[], pricelist) => {
-                return pricelist
-                    .get("pricelist_entries")
-                    .reduce((entriesItemIds: ItemId[], entry: IPricelistEntryInstance) => {
-                        const entryJson = entry.toJSON();
-                        if (entriesItemIds.indexOf(entryJson.item_id) === -1) {
-                            entriesItemIds.push(entryJson.item_id);
-                        }
+                return pricelist.entries.reduce((entriesItemIds: ItemId[], entry) => {
+                    if (entriesItemIds.indexOf(entry.itemId) === -1) {
+                        entriesItemIds.push(entry.itemId);
+                    }
 
-                        return entriesItemIds;
-                    }, pricelistsItemIds);
+                    return entriesItemIds;
+                }, pricelistsItemIds);
             }, []);
             const items = (await messenger.getItems(itemIds)).data!.items;
 
             // dumping out a response
-            res.json({ pricelists: pricelists.map(v => v.toJSON()), items });
+            res.json({ pricelists, items });
         }),
     );
 
@@ -95,18 +93,17 @@ export const getRouter = (models: IModels, messenger: Messenger) => {
         "/:id",
         auth,
         wrap(async (req: Request, res: Response) => {
-            const user = req.user as IUserInstance;
-            const pricelist = await Pricelist.findOne({
-                include: [PricelistEntry],
+            const user = req.user as User;
+            const pricelist = await dbConn.manager.getRepository(Pricelist).findOne({
                 where: { id: req.params["id"], user_id: user.id },
             });
-            if (pricelist === null) {
+            if (typeof pricelist === "undefined") {
                 res.status(HTTPStatus.NOT_FOUND);
 
                 return;
             }
 
-            res.json({ pricelist: pricelist.toJSON() });
+            res.json({ pricelist });
         }),
     );
 
@@ -115,12 +112,11 @@ export const getRouter = (models: IModels, messenger: Messenger) => {
         auth,
         wrap(async (req: Request, res: Response) => {
             // resolving the pricelist
-            const user = req.user as IUserInstance;
-            const pricelist = await Pricelist.findOne({
-                include: [PricelistEntry],
+            const user = req.user as User;
+            const pricelist = await dbConn.getRepository(Pricelist).findOne({
                 where: { id: req.params["id"], user_id: user.id },
             });
-            if (pricelist === null) {
+            if (typeof pricelist === "undefined") {
                 res.status(HTTPStatus.NOT_FOUND);
 
                 return;
@@ -137,35 +133,48 @@ export const getRouter = (models: IModels, messenger: Messenger) => {
             }
 
             // saving the pricelist
-            pricelist.setAttributes({ ...result.pricelist });
-            pricelist.save();
+            pricelist.name = result.pricelist.name;
+            await dbConn.manager.save(pricelist);
 
             // misc
-            const entries = pricelist.get("pricelist_entries") as IPricelistEntryInstance[];
+            const entries = pricelist.entries;
 
             // creating new entries
             const newRequestEntries = result.entries.filter(v => !!v.id === false);
             const newEntries = await Promise.all(
-                newRequestEntries.map(v => PricelistEntry.create({ ...v, pricelist_id: pricelist.id })),
+                newRequestEntries.map(v => {
+                    const entry = new PricelistEntry();
+                    entry.pricelist = pricelist;
+                    entry.itemId = v.item_id;
+                    entry.quantityModifier = v.quantity_modifier;
+
+                    return dbConn.manager.save(entry);
+                }),
             );
 
             // updating existing entries
-            const receivedRequestEntries = result.entries.filter(v => !!v.id);
-            const receivedEntries = await PricelistEntry.findAll({
-                where: { id: receivedRequestEntries.map(v => v.id!) },
+            const receivedRequestEntries = result.entries.filter(v => typeof v.id !== "undefined");
+            let receivedEntries = await dbConn.getRepository(PricelistEntry).find({
+                where: { id: receivedRequestEntries.map(v => v.id) },
             });
-            receivedEntries.map((v, i) => v.setAttributes({ ...receivedRequestEntries[i] }));
-            await Promise.all(receivedEntries.map(v => v.save()));
+            receivedEntries = await Promise.all(
+                receivedEntries.map((v, i) => {
+                    v.itemId = receivedRequestEntries[i].id!;
+                    v.quantityModifier = receivedEntries[i].quantityModifier;
+
+                    return dbConn.manager.save(v);
+                }),
+            );
 
             // gathering removed entries and deleting them
             const receivedEntryIds = receivedEntries.map(v => v.id);
             const removedEntries = entries.filter(v => receivedEntryIds.indexOf(v.id) === -1);
-            await Promise.all(removedEntries.map(v => v.destroy()));
+            await Promise.all(removedEntries.map(v => dbConn.manager.remove(v)));
 
             // dumping out a response
             res.json({
-                entries: [...receivedEntries, ...newEntries].map(v => v.toJSON()),
-                pricelist: withoutEntries(pricelist),
+                entries: [...receivedEntries, ...newEntries],
+                pricelist,
             });
         }),
     );
@@ -175,19 +184,18 @@ export const getRouter = (models: IModels, messenger: Messenger) => {
         auth,
         wrap(async (req: Request, res: Response) => {
             // resolving the pricelist
-            const user = req.user as IUserInstance;
-            const pricelist = await Pricelist.findOne({
-                include: [PricelistEntry],
+            const user = req.user as User;
+            const pricelist = await dbConn.getRepository(Pricelist).findOne({
                 where: { id: req.params["id"], user_id: user.id },
             });
-            if (pricelist === null) {
+            if (typeof pricelist === "undefined") {
                 res.status(HTTPStatus.NOT_FOUND);
 
                 return;
             }
 
-            await Promise.all(pricelist.get("pricelist_entries").map((v: IPricelistEntryInstance) => v.destroy()));
-            await pricelist.destroy();
+            await Promise.all(pricelist.entries.map(v => dbConn.manager.remove(v)));
+            await dbConn.manager.remove(pricelist);
             res.json({});
         }),
     );
