@@ -2,10 +2,10 @@ import * as compression from "compression";
 import * as express from "express";
 import * as HttpStatus from "http-status";
 import * as nats from "nats";
-import * as Sequelize from "sequelize";
+import { createConnection } from "typeorm";
 import { LoggerInstance } from "winston";
 
-import { createModels } from "../models";
+import { Preference, Pricelist, PricelistEntry, ProfessionPricelist, User } from "../entities";
 import { defaultRouter, getDataRouter, getUserRouter } from "../routes";
 import { Messenger } from "./messenger";
 import { appendSessions } from "./session";
@@ -26,20 +26,23 @@ export const getApp = async (opts: IOptions): Promise<express.Express> => {
     app.use(compression());
 
     // messenger init
-    const messenger = new Messenger(nats.connect({ url: `nats://${natsHost}:${natsPort}` }), logger);
+    const messenger = new Messenger(nats.connect({ url: `nats://${natsHost}:${natsPort}` }));
 
     // db init
-    const sequelize = new Sequelize("postgres", "postgres", "", {
-        define: { timestamps: false },
-        dialect: "postgres",
+    const dbConn = await createConnection({
+        database: "postgres",
+        entities: [Preference, Pricelist, PricelistEntry, ProfessionPricelist, User],
         host: dbHost,
         logging: false,
-        operatorsAliases: false,
+        password: "",
+        port: 5432,
+        synchronize: false,
+        type: "postgres",
+        username: "postgres",
     });
-    const models = createModels(sequelize);
 
     // session init
-    app = await appendSessions(app, messenger, models.User);
+    app = await appendSessions(app, messenger, dbConn);
 
     // request logging
     app.use((req, res, next) => {

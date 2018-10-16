@@ -1,5 +1,8 @@
+import * as jwt from "jsonwebtoken";
 import { Column, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
+import { Messenger } from "../lib/messenger";
+import { getJwtOptions } from "../lib/session";
 import { Preference } from "./preference";
 import { Pricelist } from "./pricelist";
 
@@ -27,4 +30,13 @@ export class User {
 
     @Column("int", { nullable: false })
     public level: UserLevel;
+
+    public async generateJwtToken(messenger: Messenger): Promise<string> {
+        const jwtOptions = await getJwtOptions(messenger);
+
+        return jwt.sign({ data: this.id }, jwtOptions.secret, {
+            audience: jwtOptions.audience,
+            issuer: jwtOptions.issuer,
+        });
+    }
 }

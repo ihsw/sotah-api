@@ -1,8 +1,9 @@
 import { Express, NextFunction, Request, Response } from "express";
 import * as passport from "passport";
 import { ExtractJwt, Strategy, StrategyOptions } from "passport-jwt";
+import { Connection } from "typeorm";
 
-import { UserModel } from "../models/user";
+import { User } from "../entities";
 import { code, Messenger } from "./messenger";
 
 export interface ISessionSecretResponse {
@@ -32,7 +33,7 @@ export interface IJwtPayload {
     data: string;
 }
 
-export const appendSessions = async (app: Express, messenger: Messenger, User: UserModel): Promise<Express> => {
+export const appendSessions = async (app: Express, messenger: Messenger, conn: Connection): Promise<Express> => {
     const jwtOptions = await getJwtOptions(messenger);
 
     const opts: StrategyOptions = {
@@ -44,7 +45,7 @@ export const appendSessions = async (app: Express, messenger: Messenger, User: U
     passport.use(
         new Strategy(opts, (jwtPayload: IJwtPayload, done) => {
             (async () => {
-                const user = await User.findById(jwtPayload.data);
+                const user = await conn.getRepository(User).findOne(jwtPayload.data);
                 if (user === null) {
                     done(null, false);
                 }

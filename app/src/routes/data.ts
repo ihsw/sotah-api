@@ -2,7 +2,9 @@ import { wrap } from "async-middleware";
 import * as boll from "bollinger-bands";
 import { Request, Response, Router } from "express";
 import * as HttpStatus from "http-status";
+import { Connection } from "typeorm";
 
+import { ProfessionPricelist } from "../entities";
 import {
     IAuctionsQueryItem,
     IAuctionsQueryRequestBody,
@@ -12,7 +14,8 @@ import {
     IOwnersRequestBody,
     ItemId,
 } from "../lib/auction";
-import { code, Message, Messenger } from "../lib/messenger";
+import { code, Messenger } from "../lib/messenger";
+import { Message } from "../lib/messenger/message";
 import {
     IPricelistHistoryMap,
     IPricelistHistoryRequest,
@@ -21,9 +24,6 @@ import {
     IUnmetDemandRequestBody,
 } from "../lib/price-list";
 import { IRealm } from "../lib/realm";
-import { IModels } from "../models";
-import { IPricelistEntryInstance } from "../models/pricelist-entry";
-import { IProfessionPricelistInstance } from "../models/profession-pricelist";
 
 interface IStatusRealm extends IRealm {
     regionName: string;
@@ -79,9 +79,8 @@ export const handleMessage = <T>(res: Response, msg: Message<T>) => {
     }
 };
 
-export const getRouter = (models: IModels, messenger: Messenger) => {
+export const getRouter = (conn: Connection, messenger: Messenger) => {
     const router = Router();
-    const { Pricelist, PricelistEntry, ProfessionPricelist } = models;
 
     router.get(
         "/regions",
@@ -385,21 +384,13 @@ export const getRouter = (models: IModels, messenger: Messenger) => {
         wrap(async (req, res) => {
             // gathering profession-pricelists
             const { expansion } = req.body as IUnmetDemandRequestBody;
-            const professionPricelists = await ProfessionPricelist.findAll({
-                include: [
-                    {
-                        include: [{ model: PricelistEntry, required: true }],
-                        model: Pricelist,
-                        required: true,
-                    },
-                ],
+            const professionPricelists = await conn.getRepository(ProfessionPricelist).find({
                 where: { expansion },
             });
 
             // gathering included item-ids
-            const itemIds = professionPricelists.reduce((previousValue: ItemId[], v: IProfessionPricelistInstance) => {
-                const pricelistEntries: IPricelistEntryInstance[] = v.get("pricelist").get("pricelist_entries");
-                const pricelistItemIds: ItemId[] = pricelistEntries.map(entry => entry.get("item_id"));
+            const itemIds = professionPricelists.reduce((previousValue: ItemId[], v: ProfessionPricelist) => {
+                const pricelistItemIds = v.pricelist.entries.map(entry => entry.itemId);
                 for (const itemId of pricelistItemIds) {
                     if (previousValue.indexOf(itemId) === -1) {
                         previousValue.push(itemId);
@@ -436,9 +427,9 @@ export const getRouter = (models: IModels, messenger: Messenger) => {
 
             // filtering in unmet profession-pricelists
             const unmetProfessionPricelists = professionPricelists.filter(v => {
-                const pricelistEntries: IPricelistEntryInstance[] = v.get("pricelist").get("pricelist_entries");
-                const pricelistItemIds: ItemId[] = pricelistEntries.map(entry => entry.get("item_id"));
-                const unmetPricelistItemIds = pricelistItemIds.filter(itemId => unmetItemIds.indexOf(itemId) > -1);
+                const unmetPricelistItemIds = v.pricelist.entries
+                    .map(entry => entry.itemId)
+                    .filter(itemId => unmetItemIds.indexOf(itemId) > -1);
 
                 return unmetPricelistItemIds.length > 0;
             });
@@ -454,35 +445,24 @@ export const getRouter = (models: IModels, messenger: Messenger) => {
         "/profession-pricelists/:profession_name",
         wrap(async (req: Request, res: Response) => {
             // gathering pricelists associated with this user, region, and realm
-            const professionPricelists = await ProfessionPricelist.findAll({
-                include: [
-                    {
-                        include: [{ model: PricelistEntry, required: true }],
-                        model: Pricelist,
-                        required: true,
-                    },
-                ],
-                where: { name: req.params["profession_name"] },
+            const professionPricelists = await conn.getRepository(ProfessionPricelist).find({
+                where: { name: req.param["profession_name"] },
             });
 
             // gathering related items
             const itemIds: ItemId[] = professionPricelists.reduce((pricelistItemIds: ItemId[], professionPricelist) => {
-                return professionPricelist
-                    .get("pricelist")
-                    .get("pricelist_entries")
-                    .reduce((entryItemIds: ItemId[], entry: IPricelistEntryInstance) => {
-                        const entryJson = entry.toJSON();
-                        if (entryItemIds.indexOf(entryJson.item_id) === -1) {
-                            entryItemIds.push(entryJson.item_id);
-                        }
+                return professionPricelist.pricelist.entries.reduce((entryItemIds: ItemId[], entry) => {
+                    if (entryItemIds.indexOf(entry.itemId) === -1) {
+                        entryItemIds.push(entry.itemId);
+                    }
 
-                        return entryItemIds;
-                    }, pricelistItemIds);
+                    return entryItemIds;
+                }, pricelistItemIds);
             }, []);
             const items = (await messenger.getItems(itemIds)).data!.items;
 
             // dumping out a response
-            res.json({ profession_pricelists: professionPricelists.map(v => v.toJSON()), items });
+            res.json({ profession_pricelists: professionPricelists, items });
         }),
     );
 
