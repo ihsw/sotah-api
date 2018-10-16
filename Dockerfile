@@ -33,6 +33,7 @@ ENV DB_HOST 0.0.0.0
 ENV NATS_HOST 0.0.0.0
 ENV NATS_PORT 0
 ENV APP_PORT 8080
+ENV NODE_ENV=production
 
 # copying in source
 COPY ./app /srv/app

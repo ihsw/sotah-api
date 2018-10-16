@@ -4,3 +4,4 @@
 
 ## Features
 - [ ] Use [TypeStrict](https://github.com/krzkaczor/TypeStrict)
+- [ ] Use [routing-controllers](https://github.com/typestack/routing-controllers)
