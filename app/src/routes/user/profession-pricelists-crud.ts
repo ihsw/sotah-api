@@ -1,16 +1,14 @@
 import { wrap } from "async-middleware";
 import { Request, Response, Router } from "express";
 import * as HTTPStatus from "http-status";
+import { Connection } from "typeorm";
 
+import { Pricelist, PricelistEntry, ProfessionPricelist, User } from "../../entities";
+import { UserLevel } from "../../entities/user";
 import { ExpansionName } from "../../lib/expansion";
 import { ProfessionName } from "../../lib/profession";
 import { auth } from "../../lib/session";
 import { ProfessionPricelistRequestBodyRules } from "../../lib/validator-rules";
-import { IModels } from "../../models";
-import { withoutEntries } from "../../models/pricelist";
-import { IPricelistEntryInstance } from "../../models/pricelist-entry";
-import { withoutPricelist } from "../../models/profession-pricelist";
-import { IUserInstance, UserLevel } from "../../models/user";
 
 interface IProfessionPricelistRequestBody {
     pricelist: {
@@ -25,16 +23,15 @@ interface IProfessionPricelistRequestBody {
     expansion_name: ExpansionName;
 }
 
-export const getRouter = (models: IModels) => {
+export const getRouter = (dbConn: Connection) => {
     const router = Router();
-    const { Pricelist, PricelistEntry, ProfessionPricelist } = models;
 
     router.post(
         "/",
         auth,
         wrap(async (req: Request, res: Response) => {
-            const user = req.user as IUserInstance;
-            if (user.get("level") !== UserLevel.Admin) {
+            const user = req.user as User;
+            if (user.level !== UserLevel.Admin) {
                 res.status(HTTPStatus.UNAUTHORIZED).json({ unauthorized: "You are not authorized to do that." });
 
                 return;
@@ -51,25 +48,31 @@ export const getRouter = (models: IModels) => {
                 return;
             }
 
-            const pricelist = await Pricelist.create({ ...result!.pricelist, user_id: user.id });
+            const pricelist = new Pricelist();
+            pricelist.user = user;
+            pricelist.name = result.pricelist.name;
+            await dbConn.manager.save(pricelist);
+
             const entries = await Promise.all(
-                result.entries.map(v =>
-                    PricelistEntry.create({
-                        pricelist_id: pricelist.id,
-                        ...v,
-                    }),
-                ),
+                result.entries.map(v => {
+                    const entry = new PricelistEntry();
+                    entry.pricelist = pricelist;
+                    entry.itemId = v.item_id;
+                    entry.quantityModifier = v.quantity_modifier;
+
+                    return dbConn.manager.save(entry);
+                }),
             );
-            const professionPricelist = await ProfessionPricelist.create({
-                expansion: result.expansion_name,
-                name: result.profession_name,
-                pricelist_id: pricelist.id,
-            });
+            const professionPricelist = new ProfessionPricelist();
+            professionPricelist.pricelist = pricelist;
+            professionPricelist.name = result.profession_name;
+            professionPricelist.expansion = result.expansion_name;
+            await dbConn.manager.save(professionPricelist);
 
             res.status(HTTPStatus.CREATED).json({
-                entries: entries.map(v => v.toJSON()),
-                pricelist: withoutEntries(pricelist),
-                profession_pricelist: withoutPricelist(professionPricelist),
+                entries,
+                pricelist,
+                profession_pricelist: professionPricelist,
             });
         }),
     );
@@ -78,48 +81,31 @@ export const getRouter = (models: IModels) => {
         "/:id",
         auth,
         wrap(async (req: Request, res: Response) => {
-            const user = req.user as IUserInstance;
-            if (user.get("level") !== UserLevel.Admin) {
+            const user = req.user as User;
+            if (user.level !== UserLevel.Admin) {
                 res.status(HTTPStatus.UNAUTHORIZED).json({ unauthorized: "You are not authorized to do that." });
 
                 return;
             }
 
-            const professionPricelist = await ProfessionPricelist.findOne({
-                include: [
-                    {
-                        model: Pricelist,
-                        where: { id: req.params["id"] },
-                    },
-                ],
+            const professionPricelist = await dbConn.getRepository(ProfessionPricelist).findOne({
+                where: { id: req.params["id"] },
             });
-            if (professionPricelist === null) {
+            if (typeof professionPricelist === "undefined") {
                 res.status(HTTPStatus.NOT_FOUND).json({});
 
                 return;
             }
 
-            const pricelist = await Pricelist.findById(professionPricelist.get("pricelist_id"));
-            if (pricelist === null) {
-                res.status(HTTPStatus.INTERNAL_SERVER_ERROR).json({
-                    error: "Pricelist could not be found",
-                    pricelistId: professionPricelist.get("pricelist_id"),
-                    professionPricelistId: professionPricelist.id,
-                });
-
-                return;
-            }
-
-            if (pricelist.get("user_id") !== user.id) {
+            if (professionPricelist.pricelist.user.id !== user.id) {
                 res.status(HTTPStatus.UNAUTHORIZED).json({});
 
                 return;
             }
 
-            const pricelistEntries = await PricelistEntry.findAll({ where: { pricelist_id: pricelist.id } });
-            await Promise.all(pricelistEntries.map((v: IPricelistEntryInstance) => v.destroy()));
-            await professionPricelist.destroy();
-            await pricelist.destroy();
+            await Promise.all(professionPricelist.pricelist.entries.map(v => dbConn.manager.remove(v)));
+            await dbConn.manager.remove(professionPricelist);
+            await dbConn.manager.remove(professionPricelist.pricelist);
             res.json({});
         }),
     );
