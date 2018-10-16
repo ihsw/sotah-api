@@ -2,7 +2,6 @@ import { TestContext } from "ava";
 import { Express } from "express";
 import * as HTTPStatus from "http-status";
 import * as nats from "nats";
-import * as Sequelize from "sequelize";
 import * as supertest from "supertest";
 
 import { createModels, IModels } from "../models";
@@ -25,7 +24,7 @@ interface ISetupSettings {
 export const setup = async (opts: IOptions): Promise<ISetupSettings> => {
     const app = await getApp(opts);
     const request = supertest(app);
-    const messenger = new Messenger(nats.connect({ url: `nats://${opts.natsHost}:${opts.natsPort}` }), opts.logger);
+    const messenger = new Messenger(nats.connect({ url: `nats://${opts.natsHost}:${opts.natsPort}` }));
     const sequelize = new Sequelize("postgres", "postgres", "", {
         define: { timestamps: false },
         dialect: "postgres",

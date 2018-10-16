@@ -79,7 +79,7 @@ export const handleMessage = <T>(res: Response, msg: Message<T>) => {
     }
 };
 
-export const getRouter = (conn: Connection, messenger: Messenger) => {
+export const getRouter = (dbConn: Connection, messenger: Messenger) => {
     const router = Router();
 
     router.get(
@@ -384,7 +384,7 @@ export const getRouter = (conn: Connection, messenger: Messenger) => {
         wrap(async (req, res) => {
             // gathering profession-pricelists
             const { expansion } = req.body as IUnmetDemandRequestBody;
-            const professionPricelists = await conn.getRepository(ProfessionPricelist).find({
+            const professionPricelists = await dbConn.getRepository(ProfessionPricelist).find({
                 where: { expansion },
             });
 
@@ -445,7 +445,7 @@ export const getRouter = (conn: Connection, messenger: Messenger) => {
         "/profession-pricelists/:profession_name",
         wrap(async (req: Request, res: Response) => {
             // gathering pricelists associated with this user, region, and realm
-            const professionPricelists = await conn.getRepository(ProfessionPricelist).find({
+            const professionPricelists = await dbConn.getRepository(ProfessionPricelist).find({
                 where: { name: req.param["profession_name"] },
             });
 
