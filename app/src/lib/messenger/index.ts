@@ -1,29 +1,27 @@
 import * as nats from "nats";
 import * as zlib from "zlib";
 
+import { ItemId } from "../../types/item";
+import { IRegion, IStatus, regionName } from "../../types/region";
 import {
-    IAuctionsQueryResponse,
-    IAuctionsRequest,
-    IAuctionsResponse,
-    IItemClassesResponse,
-    IItemsQueryResponse,
-    IItemsResponse,
-    IOwnersQueryByItemsRequest,
-    IOwnersQueryByItemsResponse,
-    IOwnersQueryRequest,
-    IOwnersRequest,
-    IOwnersResponse,
-    ItemId,
-} from "../auction";
-import { IBootResponse } from "../boot";
-import {
-    IPricelistHistoryRequest,
-    IPricelistHistoryResponse,
-    IPriceListRequest,
-    IPriceListResponse,
-} from "../price-list";
-import { IRegion, IStatus, regionName } from "../region";
-import { ISessionSecretResponse } from "../session";
+    IGetAuctionsRequest,
+    IGetAuctionsResponse,
+    IGetBootResponse,
+    IGetItemsClassesResponse,
+    IGetItemsResponse,
+    IGetOwnersRequest,
+    IGetOwnersResponse,
+    IGetPricelistHistoriesRequest,
+    IGetPricelistHistoriesResponse,
+    IGetPricelistRequest,
+    IGetPricelistResponse,
+    IGetSessionSecretResponse,
+    IQueryItemsResponse,
+    IQueryOwnerItemsRequest,
+    IQueryOwnerItemsResponse,
+    IQueryOwnersRequest,
+    IQueryOwnersResponse,
+} from "./contracts";
 import { Message } from "./message";
 import { MessageError } from "./message-error";
 
@@ -100,7 +98,7 @@ export class Messenger {
         return this.request(subjects.regions);
     }
 
-    public async getAuctions(request: IAuctionsRequest): Promise<Message<IAuctionsResponse>> {
+    public async getAuctions(request: IGetAuctionsRequest): Promise<Message<IGetAuctionsResponse>> {
         const message = await this.request<string>(subjects.auctions, {
             body: JSON.stringify(request),
             parseData: false,
@@ -116,23 +114,23 @@ export class Messenger {
         };
     }
 
-    public getOwners(request: IOwnersRequest): Promise<Message<IOwnersResponse>> {
+    public getOwners(request: IGetOwnersRequest): Promise<Message<IGetOwnersResponse>> {
         return this.request(subjects.owners, { body: JSON.stringify(request) });
     }
 
-    public queryItems(query: string): Promise<Message<IItemsQueryResponse>> {
+    public queryItems(query: string): Promise<Message<IQueryItemsResponse>> {
         return this.request(subjects.itemsQuery, { body: JSON.stringify({ query }) });
     }
 
-    public queryOwners(request: IOwnersQueryRequest): Promise<Message<IAuctionsQueryResponse>> {
+    public queryOwners(request: IQueryOwnersRequest): Promise<Message<IQueryOwnersResponse>> {
         return this.request(subjects.ownersQuery, { body: JSON.stringify(request) });
     }
 
-    public getItemClasses(): Promise<Message<IItemClassesResponse>> {
+    public getItemClasses(): Promise<Message<IGetItemsClassesResponse>> {
         return this.request(subjects.itemClasses);
     }
 
-    public async getPriceList(request: IPriceListRequest): Promise<Message<IPriceListResponse>> {
+    public async getPriceList(request: IGetPricelistRequest): Promise<Message<IGetPricelistResponse>> {
         const message = await this.request<string>(subjects.priceList, {
             body: JSON.stringify(request),
             parseData: false,
@@ -148,7 +146,7 @@ export class Messenger {
         };
     }
 
-    public async getItems(itemIds: ItemId[]): Promise<Message<IItemsResponse>> {
+    public async getItems(itemIds: ItemId[]): Promise<Message<IGetItemsResponse>> {
         const message = await this.request<string>(subjects.items, {
             body: JSON.stringify({ itemIds }),
             parseData: false,
@@ -164,11 +162,13 @@ export class Messenger {
         };
     }
 
-    public getBoot(): Promise<Message<IBootResponse>> {
+    public getBoot(): Promise<Message<IGetBootResponse>> {
         return this.request(subjects.boot);
     }
 
-    public async getPricelistHistories(req: IPricelistHistoryRequest): Promise<Message<IPricelistHistoryResponse>> {
+    public async getPricelistHistories(
+        req: IGetPricelistHistoriesRequest,
+    ): Promise<Message<IGetPricelistHistoriesResponse>> {
         const message = await this.request<string>(subjects.priceListHistory, {
             body: JSON.stringify(req),
             parseData: false,
@@ -184,11 +184,11 @@ export class Messenger {
         };
     }
 
-    public getSessionSecret(): Promise<Message<ISessionSecretResponse>> {
+    public getSessionSecret(): Promise<Message<IGetSessionSecretResponse>> {
         return this.request(subjects.sessionSecret);
     }
 
-    public queryOwnerItems(request: IOwnersQueryByItemsRequest): Promise<Message<IOwnersQueryByItemsResponse>> {
+    public queryOwnerItems(request: IQueryOwnerItemsRequest): Promise<Message<IQueryOwnerItemsResponse>> {
         return this.request(subjects.ownersQueryByItems, { body: JSON.stringify(request) });
     }
 

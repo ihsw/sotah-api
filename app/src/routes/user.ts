@@ -22,9 +22,9 @@ export const getRouter = (dbConn: Connection, messenger: Messenger) => {
     const router = Router();
 
     router.use("/user/preferences", getPreferencesRouter(dbConn));
-    router.use("/user/pricelists", getPricelistsCrudRouter(models, messenger));
-    router.use("/user/profession-pricelists", getProfessionPricelistsCrudRouter(models));
-    router.use("/user", getBaseRouter(models));
+    router.use("/user/pricelists", getPricelistsCrudRouter(dbConn, messenger));
+    router.use("/user/profession-pricelists", getProfessionPricelistsCrudRouter(dbConn));
+    router.use("/user", getBaseRouter());
 
     router.post(
         "/users",

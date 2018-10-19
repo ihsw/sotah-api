@@ -4,14 +4,13 @@ import { Request, Response, Router } from "express";
 import * as HttpStatus from "http-status";
 import { Connection } from "typeorm";
 
+import { DataController, handle } from "../controllers";
 import { ProfessionPricelist } from "../entities";
 import {
     IAuctionsQueryItem,
     IAuctionsQueryRequestBody,
-    IAuctionsRequestBody,
     IItemsRequestBody,
     IOwnersQueryByItemsRequestBody,
-    IOwnersRequestBody,
     ItemId,
 } from "../lib/auction";
 import { code, Messenger } from "../lib/messenger";
@@ -23,15 +22,6 @@ import {
     IPrices,
     IUnmetDemandRequestBody,
 } from "../lib/price-list";
-import { IRealm } from "../lib/realm";
-
-interface IStatusRealm extends IRealm {
-    regionName: string;
-}
-
-interface IStatusResponse {
-    realms: IStatusRealm[];
-}
 
 interface IPriceLimits {
     upper: number;
@@ -81,114 +71,42 @@ export const handleMessage = <T>(res: Response, msg: Message<T>) => {
 
 export const getRouter = (dbConn: Connection, messenger: Messenger) => {
     const router = Router();
+    const controller = new DataController(messenger);
 
     router.get(
         "/regions",
-        wrap(async (_, res) => {
-            const msg = await messenger.getRegions();
-            res.send(msg.data).end();
+        wrap(async (req, res) => {
+            await handle(controller.getRegions, req, res);
         }),
     );
     router.get(
         "/item-classes",
-        wrap(async (_, res) => {
-            const msg = await messenger.getItemClasses();
-            res.send(msg.data).end();
+        wrap(async (req, res) => {
+            await handle(controller.getItemClasses, req, res);
         }),
     );
     router.get(
         "/boot",
-        wrap(async (_, res) => {
-            const msg = await messenger.getBoot();
-            res.send(msg.data).end();
+        wrap(async (req, res) => {
+            await handle(controller.getBoot, req, res);
         }),
     );
     router.get(
         "/region/:regionName/realms",
         wrap(async (req, res) => {
-            const msg = await messenger.getStatus(req.params["regionName"]);
-            if (msg.code === code.notFound) {
-                res.status(HttpStatus.NOT_FOUND).end();
-
-                return;
-            }
-
-            const response: IStatusResponse = {
-                realms: msg.data!.realms.map(realm => {
-                    return { ...realm, regionName: req.params["regionName"] };
-                }),
-            };
-
-            res.send(response).end();
+            await handle(controller.getRealms, req, res);
         }),
     );
     router.post(
         "/region/:regionName/realm/:realmSlug/auctions",
         wrap(async (req, res) => {
-            const {
-                count,
-                page,
-                sortDirection,
-                sortKind,
-                ownerFilters,
-                itemFilters,
-            } = req.body as IAuctionsRequestBody;
-            const msg = await messenger.getAuctions({
-                count,
-                item_filters: itemFilters,
-                owner_filters: ownerFilters,
-                page,
-                realm_slug: req.params["realmSlug"],
-                region_name: req.params["regionName"],
-                sort_direction: sortDirection,
-                sort_kind: sortKind,
-            });
-            switch (msg.code) {
-                case code.ok:
-                    const itemIds = msg.data!.auctions.map(v => v.itemId);
-                    const itemsMsg = await messenger.getItems(itemIds);
-                    if (itemsMsg.code !== code.ok) {
-                        res.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .send(msg.error!.message)
-                            .end();
-
-                        return;
-                    }
-
-                    res.send({ ...msg.data!, items: itemsMsg.data!.items }).end();
-
-                    return;
-                case code.notFound:
-                    res.status(HttpStatus.NOT_FOUND)
-                        .send(msg.error!.message)
-                        .end();
-
-                    return;
-                case code.userError:
-                    res.status(HttpStatus.BAD_REQUEST)
-                        .send(msg.error!.message)
-                        .end();
-
-                    return;
-                default:
-                    res.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .send(msg.error!.message)
-                        .end();
-
-                    return;
-            }
+            await handle(controller.getAuctions, req, res);
         }),
     );
     router.post(
         "/region/:regionName/realm/:realmSlug/owners",
         wrap(async (req, res) => {
-            const { query } = req.body as IOwnersRequestBody;
-            const msg = await messenger.getOwners({
-                query,
-                realm_slug: req.params["realmSlug"],
-                region_name: req.params["regionName"],
-            });
-            handleMessage(res, msg);
+            await handle(controller.getOwners, req, res);
         }),
     );
     router.post(
@@ -202,52 +120,7 @@ export const getRouter = (dbConn: Connection, messenger: Messenger) => {
     router.post(
         "/region/:regionName/realm/:realmSlug/query-auctions",
         wrap(async (req, res) => {
-            const { query } = req.body as IAuctionsQueryRequestBody;
-
-            const itemsMessage = await messenger.queryItems(query);
-            if (itemsMessage.code !== code.ok) {
-                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: itemsMessage.error });
-
-                return;
-            }
-
-            const ownersMessage = await messenger.queryOwners({
-                query,
-                realm_slug: req.params["realmSlug"],
-                region_name: req.params["regionName"],
-            });
-            if (ownersMessage.code !== code.ok) {
-                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: ownersMessage.error });
-
-                return;
-            }
-
-            let items: IAuctionsQueryItem[] = [
-                ...itemsMessage.data!.items.map(v => {
-                    const result: IAuctionsQueryItem = { ...v, owner: null };
-
-                    return result;
-                }),
-                ...ownersMessage.data!.items.map(v => {
-                    const result: IAuctionsQueryItem = { ...v, item: null };
-
-                    return result;
-                }),
-            ];
-            items = items.sort((a, b) => {
-                if (a.rank !== b.rank) {
-                    return a.rank > b.rank ? 1 : -1;
-                }
-
-                if (a.target !== b.target) {
-                    return a.target > b.target ? 1 : -1;
-                }
-
-                return 0;
-            });
-            items = items.slice(0, 10);
-
-            res.json({ items });
+            await handle(controller.queryAuctions, req, res);
         }),
     );
     router.post(

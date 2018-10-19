@@ -5,9 +5,9 @@ import * as bcrypt from "bcrypt";
 import * as HTTPStatus from "http-status";
 import { v4 as uuidv4 } from "uuid";
 
+import { UserLevel } from "../../../entities/user";
 import { getLogger } from "../../../lib/logger";
 import { getTestHelper, setup } from "../../../lib/test-helper";
-import { UserLevel } from "../../../models/user";
 
 const helper = async () => {
     const { request, models } = await setup({

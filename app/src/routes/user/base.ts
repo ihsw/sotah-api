@@ -1,34 +1,17 @@
 import { wrap } from "async-middleware";
 import { Request, Response, Router } from "express";
-import * as HTTPStatus from "http-status";
 
+import { User } from "../../entities";
 import { auth } from "../../lib/session";
-import { IModels } from "../../models";
-import { IUserInstance, withoutPassword } from "../../models/user";
 
-export const getRouter = (models: IModels) => {
+export const getRouter = () => {
     const router = Router();
-    const { User } = models;
 
     router.get(
         "/",
         auth,
         wrap(async (req: Request, res: Response) => {
-            res.json(withoutPassword(req.user as IUserInstance));
-        }),
-    );
-
-    router.get(
-        "/:id",
-        wrap(async (req: Request, res: Response) => {
-            const user = await User.findById(req.params["id"]);
-            if (user === null) {
-                res.status(HTTPStatus.NOT_FOUND).send();
-
-                return;
-            }
-
-            res.json(withoutPassword(user));
+            res.json(req.user as User);
         }),
     );
 

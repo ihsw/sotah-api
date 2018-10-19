@@ -3,11 +3,9 @@ import { Express } from "express";
 import * as HTTPStatus from "http-status";
 import * as nats from "nats";
 import * as supertest from "supertest";
+import { Connection, createConnection } from "typeorm";
 
-import { createModels, IModels } from "../models";
-import { IPricelistAttributes } from "../models/pricelist";
-import { IPricelistEntryAttributes } from "../models/pricelist-entry";
-import { IProfessionPricelistAttributes } from "../models/profession-pricelist";
+import { Preference, Pricelist, PricelistEntry, ProfessionPricelist, User } from "../entities";
 import { getApp, IOptions } from "./app";
 import { ExpansionName } from "./expansion";
 import { Messenger } from "./messenger";
@@ -17,24 +15,27 @@ import { ProfessionName } from "./profession";
 interface ISetupSettings {
     app: Express;
     messenger: Messenger;
+    dbConn: Connection;
     request: supertest.SuperTest<supertest.Test>;
-    models: IModels;
 }
 
 export const setup = async (opts: IOptions): Promise<ISetupSettings> => {
     const app = await getApp(opts);
     const request = supertest(app);
     const messenger = new Messenger(nats.connect({ url: `nats://${opts.natsHost}:${opts.natsPort}` }));
-    const sequelize = new Sequelize("postgres", "postgres", "", {
-        define: { timestamps: false },
-        dialect: "postgres",
+    const dbConn = await createConnection({
+        database: "postgres",
+        entities: [Preference, Pricelist, PricelistEntry, ProfessionPricelist, User],
         host: opts.dbHost,
         logging: false,
-        operatorsAliases: false,
+        password: "",
+        port: 5432,
+        synchronize: false,
+        type: "postgres",
+        username: "postgres",
     });
-    const models = createModels(sequelize);
 
-    return { app, messenger, request, models };
+    return { app, messenger, dbConn, request };
 };
 
 // user test-helper

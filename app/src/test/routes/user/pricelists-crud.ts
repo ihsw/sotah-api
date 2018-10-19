@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { getLogger } from "../../../lib/logger";
 import { getTestHelper, setup } from "../../../lib/test-helper";
+import { IGetUserPricelistsResponse } from "../../../requests";
 
 const helper = async () => {
     const { request } = await setup({
@@ -85,10 +86,11 @@ test("Pricelists crud endpoint Should return pricelists", async t => {
     }
 
     res = await request.get(`/user/pricelists`).set("Authorization", `Bearer ${token}`);
-    const { body, status } = res;
+    const { status } = res;
+    const body: IGetUserPricelistsResponse = res.body;
     t.is(status, HTTPStatus.OK);
     t.is(body.pricelists.length, 5);
-    t.is(body.pricelists.reduce((total, v) => total + v.pricelist_entries.length, 0), 5);
+    t.is(body.pricelists.reduce((total: number, v) => total + v.entries.length, 0), 5);
 });
 
 test("Pricelists crud endpoint Should return pricelists", async t => {
@@ -112,10 +114,11 @@ test("Pricelists crud endpoint Should return pricelists", async t => {
     }
 
     res = await request.get("/user/pricelists").set("Authorization", `Bearer ${token}`);
-    const { body, status } = res;
+    const { status } = res;
+    const body: IGetUserPricelistsResponse = res.body;
     t.is(status, HTTPStatus.OK);
     t.is(body.pricelists.length, 5);
-    t.is(body.pricelists.reduce((total, v) => total + v.pricelist_entries.length, 0), 5);
+    t.is(body.pricelists.reduce((total, v) => total + v.entries.length, 0), 5);
 });
 
 test("Pricelists crud endpoint Should update a pricelist", async t => {

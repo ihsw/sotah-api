@@ -6,10 +6,6 @@ import { Connection } from "typeorm";
 import { User } from "../entities";
 import { code, Messenger } from "./messenger";
 
-export interface ISessionSecretResponse {
-    session_secret: string;
-}
-
 export interface IJwtOptions {
     audience: string;
     issuer: string;
