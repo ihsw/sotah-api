@@ -1,25 +1,11 @@
 import { wrap } from "async-middleware";
 import { Request, Response, Router } from "express";
-import * as HTTPStatus from "http-status";
 import { Connection } from "typeorm";
 
 import { handle } from "../../controllers";
 import { PricelistCrudController } from "../../controllers/user/pricelist-crud";
-import { Pricelist, PricelistEntry, User } from "../../entities";
 import { Messenger } from "../../lib/messenger";
 import { auth } from "../../lib/session";
-import { PricelistRequestBodyRules } from "../../lib/validator-rules";
-
-interface IPricelistRequestBody {
-    pricelist: {
-        name: string;
-    };
-    entries: Array<{
-        id?: number;
-        item_id: number;
-        quantity_modifier: number;
-    }>;
-}
 
 export const getRouter = (dbConn: Connection, messenger: Messenger) => {
     const router = Router();
@@ -61,20 +47,7 @@ export const getRouter = (dbConn: Connection, messenger: Messenger) => {
         "/:id",
         auth,
         wrap(async (req: Request, res: Response) => {
-            // resolving the pricelist
-            const user = req.user as User;
-            const pricelist = await dbConn.getRepository(Pricelist).findOne({
-                where: { id: req.params["id"], user_id: user.id },
-            });
-            if (typeof pricelist === "undefined") {
-                res.status(HTTPStatus.NOT_FOUND);
-
-                return;
-            }
-
-            await Promise.all(pricelist.entries.map(v => dbConn.manager.remove(v)));
-            await dbConn.manager.remove(pricelist);
-            res.json({});
+            await handle(controller.deletePricelist, req, res);
         }),
     );
 

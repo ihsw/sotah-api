@@ -5,7 +5,7 @@ import { Pricelist, PricelistEntry } from "../../entities";
 import { Messenger } from "../../lib/messenger";
 import { PricelistRequestBodyRules } from "../../lib/validator-rules";
 import { ItemId } from "../../types/item";
-import { IErrorResponse, IValidationErrorResponse } from "../contracts";
+import { IValidationErrorResponse } from "../contracts";
 import {
     ICreatePricelistRequest,
     ICreatePricelistResponse,
@@ -183,6 +183,28 @@ export class PricelistCrudController {
                 entries: [...receivedEntries, ...newEntries],
                 pricelist,
             },
+            status: HTTPStatus.OK,
+        };
+    };
+
+    public deletePricelist: RequestHandler<null, null> = async req => {
+        // resolving the pricelist
+        const user = req.user!;
+        const pricelist = await this.dbConn.getRepository(Pricelist).findOne({
+            where: { id: req.params["id"], user_id: user.id },
+        });
+        if (typeof pricelist === "undefined") {
+            return {
+                data: null,
+                status: HTTPStatus.NOT_FOUND,
+            };
+        }
+
+        await Promise.all(pricelist.entries.map(v => this.dbConn.manager.remove(v)));
+        await this.dbConn.manager.remove(pricelist);
+
+        return {
+            data: null,
             status: HTTPStatus.OK,
         };
     };
