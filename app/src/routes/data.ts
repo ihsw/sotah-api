@@ -1,17 +1,13 @@
 import { wrap } from "async-middleware";
 import { Request, Response, Router } from "express";
-import * as HttpStatus from "http-status";
 import { Connection } from "typeorm";
 
 import { DataController, handle } from "../controllers";
-import { ProfessionPricelist } from "../entities";
-import { ItemId } from "../lib/auction";
-import { code, Messenger } from "../lib/messenger";
-import { IUnmetDemandRequestBody } from "../lib/price-list";
+import { Messenger } from "../lib/messenger";
 
 export const getRouter = (dbConn: Connection, messenger: Messenger) => {
     const router = Router();
-    const controller = new DataController(messenger);
+    const controller = new DataController(messenger, dbConn);
 
     router.get(
         "/regions",
@@ -82,87 +78,13 @@ export const getRouter = (dbConn: Connection, messenger: Messenger) => {
     router.post(
         "/region/:regionName/realm/:realmSlug/unmet-demand",
         wrap(async (req, res) => {
-            // gathering profession-pricelists
-            const { expansion } = req.body as IUnmetDemandRequestBody;
-            const professionPricelists = await dbConn.getRepository(ProfessionPricelist).find({
-                where: { expansion },
-            });
-
-            // gathering included item-ids
-            const itemIds = professionPricelists.reduce((previousValue: ItemId[], v: ProfessionPricelist) => {
-                const pricelistItemIds = v.pricelist.entries.map(entry => entry.itemId);
-                for (const itemId of pricelistItemIds) {
-                    if (previousValue.indexOf(itemId) === -1) {
-                        previousValue.push(itemId);
-                    }
-                }
-
-                return previousValue;
-            }, []);
-
-            // gathering items
-            const itemsMsg = await messenger.getItems(itemIds);
-            if (itemsMsg.code !== code.ok) {
-                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: itemsMsg.error });
-
-                return;
-            }
-            const items = itemsMsg.data!.items;
-
-            // gathering pricing data
-            const msg = await messenger.getPriceList({
-                item_ids: itemIds,
-                realm_slug: req.params["realmSlug"],
-                region_name: req.params["regionName"],
-            });
-            if (msg.code !== code.ok) {
-                res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ error: msg.error });
-
-                return;
-            }
-            const msgData = msg.data!;
-
-            // gathering unmet items
-            const unmetItemIds = itemIds.filter(v => !(v.toString() in msgData.price_list));
-
-            // filtering in unmet profession-pricelists
-            const unmetProfessionPricelists = professionPricelists.filter(v => {
-                const unmetPricelistItemIds = v.pricelist.entries
-                    .map(entry => entry.itemId)
-                    .filter(itemId => unmetItemIds.indexOf(itemId) > -1);
-
-                return unmetPricelistItemIds.length > 0;
-            });
-
-            res.json({
-                items,
-                professionPricelists: unmetProfessionPricelists,
-                unmetItemIds,
-            });
+            await handle(controller.getUnmetDemand, req, res);
         }),
     );
     router.get(
         "/profession-pricelists/:profession_name",
         wrap(async (req: Request, res: Response) => {
-            // gathering pricelists associated with this user, region, and realm
-            const professionPricelists = await dbConn.getRepository(ProfessionPricelist).find({
-                where: { name: req.param["profession_name"] },
-            });
-
-            // gathering related items
-            const itemIds: ItemId[] = professionPricelists.reduce((pricelistItemIds: ItemId[], professionPricelist) => {
-                return professionPricelist.pricelist.entries.reduce((entryItemIds: ItemId[], entry) => {
-                    if (entryItemIds.indexOf(entry.itemId) === -1) {
-                        entryItemIds.push(entry.itemId);
-                    }
-
-                    return entryItemIds;
-                }, pricelistItemIds);
-            }, []);
-            const items = (await messenger.getItems(itemIds)).data!.items;
-
-            // dumping out a response
-            res.json({ profession_pricelists: professionPricelists, items });
+            await handle(controller.getProfessionPricelists, req, res);
         }),
     );
 

@@ -1,7 +1,10 @@
 import * as boll from "bollinger-bands";
 import * as HTTPStatus from "http-status";
+import { Connection } from "typeorm";
 
+import { ProfessionPricelist } from "../entities/profession-pricelist";
 import { code, Messenger } from "../lib/messenger";
+import { ItemId } from "../types/item";
 import {
     IBollingerBands,
     IItemMarketPrices,
@@ -22,8 +25,11 @@ import {
     IGetPricelistHistoriesResponse,
     IGetPricelistRequest,
     IGetPricelistResponse,
+    IGetProfessionPricelistsResponse,
     IGetRealmsResponse,
     IGetRegionsResponse,
+    IGetUnmetDemandRequest,
+    IGetUnmetDemandResponse,
     IQueryAuctionsItem,
     IQueryAuctionsRequest,
     IQueryAuctionsResponse,
@@ -36,9 +42,11 @@ import { RequestHandler } from "./index";
 
 export class DataController {
     private messenger: Messenger;
+    private dbConn: Connection;
 
-    constructor(messenger: Messenger) {
+    constructor(messenger: Messenger, dbConn: Connection) {
         this.messenger = messenger;
+        this.dbConn = dbConn;
     }
 
     public getRegions: RequestHandler<null, IGetRegionsResponse> = async () => {
@@ -331,6 +339,99 @@ export class DataController {
 
         return {
             data: { history, items, itemPriceLimits, overallPriceLimits, itemMarketPrices },
+            status: HTTPStatus.OK,
+        };
+    };
+
+    public getUnmetDemand: RequestHandler<
+        IGetUnmetDemandRequest,
+        IGetUnmetDemandResponse | IErrorResponse
+    > = async req => {
+        // gathering profession-pricelists
+        const { expansion } = req.body;
+        const professionPricelists = await this.dbConn.getRepository(ProfessionPricelist).find({
+            where: { expansion },
+        });
+
+        // gathering included item-ids
+        const itemIds = professionPricelists.reduce((previousValue: ItemId[], v: ProfessionPricelist) => {
+            const pricelistItemIds = v.pricelist.entries.map(entry => entry.itemId);
+            for (const itemId of pricelistItemIds) {
+                if (previousValue.indexOf(itemId) === -1) {
+                    previousValue.push(itemId);
+                }
+            }
+
+            return previousValue;
+        }, []);
+
+        // gathering items
+        const itemsMsg = await this.messenger.getItems(itemIds);
+        if (itemsMsg.code !== code.ok) {
+            return {
+                data: { error: itemsMsg.error!.message },
+                status: HTTPStatus.INTERNAL_SERVER_ERROR,
+            };
+        }
+        const items = itemsMsg.data!.items;
+
+        // gathering pricing data
+        const msg = await this.messenger.getPriceList({
+            item_ids: itemIds,
+            realm_slug: req.params["realmSlug"],
+            region_name: req.params["regionName"],
+        });
+        if (msg.code !== code.ok) {
+            return {
+                data: { error: msg.error!.message },
+                status: HTTPStatus.INTERNAL_SERVER_ERROR,
+            };
+        }
+        const msgData = msg.data!;
+
+        // gathering unmet items
+        const unmetItemIds = itemIds.filter(v => !(v.toString() in msgData.price_list));
+
+        // filtering in unmet profession-pricelists
+        const unmetProfessionPricelists = professionPricelists.filter(v => {
+            const unmetPricelistItemIds = v.pricelist.entries
+                .map(entry => entry.itemId)
+                .filter(itemId => unmetItemIds.indexOf(itemId) > -1);
+
+            return unmetPricelistItemIds.length > 0;
+        });
+
+        return {
+            data: {
+                items,
+                professionPricelists: unmetProfessionPricelists,
+                unmetItemIds,
+            },
+            status: HTTPStatus.OK,
+        };
+    };
+
+    public getProfessionPricelists: RequestHandler<null, IGetProfessionPricelistsResponse> = async req => {
+        // gathering pricelists associated with this user, region, and realm
+        const professionPricelists = await this.dbConn.getRepository(ProfessionPricelist).find({
+            where: { name: req.param["profession_name"] },
+        });
+
+        // gathering related items
+        const itemIds: ItemId[] = professionPricelists.reduce((pricelistItemIds: ItemId[], professionPricelist) => {
+            return professionPricelist.pricelist.entries.reduce((entryItemIds: ItemId[], entry) => {
+                if (entryItemIds.indexOf(entry.itemId) === -1) {
+                    entryItemIds.push(entry.itemId);
+                }
+
+                return entryItemIds;
+            }, pricelistItemIds);
+        }, []);
+        const items = (await this.messenger.getItems(itemIds)).data!.items;
+
+        // dumping out a response
+        return {
+            data: { profession_pricelists: professionPricelists, items },
             status: HTTPStatus.OK,
         };
     };

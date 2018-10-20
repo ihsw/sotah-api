@@ -1,6 +1,7 @@
+import { ProfessionPricelist } from "../../entities/profession-pricelist";
 import { SortDirection, SortKind } from "../../types";
 import { IAuction, IOwner, OwnerName } from "../../types/auction";
-import { IExpansion } from "../../types/expansion";
+import { ExpansionName, IExpansion } from "../../types/expansion";
 import { IItem, IItemsMap, ItemId } from "../../types/item";
 import { IItemClass } from "../../types/item-class";
 import {
@@ -132,4 +133,19 @@ export interface IGetPricelistHistoriesResponse {
     itemPriceLimits: IItemPriceLimits;
     overallPriceLimits: IPriceLimits;
     itemMarketPrices: IItemMarketPrices;
+}
+
+export interface IGetUnmetDemandRequest {
+    expansion: ExpansionName;
+}
+
+export interface IGetUnmetDemandResponse {
+    items: IItemsMap;
+    professionPricelists: ProfessionPricelist[];
+    unmetItemIds: ItemId[];
+}
+
+export interface IGetProfessionPricelistsResponse {
+    profession_pricelists: ProfessionPricelist[];
+    items: IItemsMap;
 }
