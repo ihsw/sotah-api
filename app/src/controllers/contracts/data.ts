@@ -3,8 +3,9 @@ import { IAuction, IOwner, OwnerName } from "../../types/auction";
 import { IExpansion } from "../../types/expansion";
 import { IItem, IItemsMap, ItemId } from "../../types/item";
 import { IItemClass } from "../../types/item-class";
+import { IPriceListMap } from "../../types/pricelist";
 import { IProfession } from "../../types/profession";
-import { IRealm, IRegion } from "../../types/region";
+import { IRealm, IRegion, realmSlug, regionName } from "../../types/region";
 
 export type IGetRegionsResponse = IRegion[];
 
@@ -68,4 +69,43 @@ export interface IQueryAuctionsItem {
 
 export interface IQueryAuctionsResponse {
     items: IQueryAuctionsItem[];
+}
+
+export interface IQueryOwnerItemsRequest {
+    region_name: regionName;
+    realm_slug: realmSlug;
+    items: ItemId[];
+}
+
+export interface IQueryOwnerItemsResponse {
+    total_value: number;
+    total_volume: number;
+    ownership: {
+        [ownerName: string]: {
+            owned_value: number;
+            owned_volume: number;
+        };
+    };
+}
+
+export interface IQueryItemsRequest {
+    query: string;
+}
+
+export interface IQueryItemsResponse {
+    items: Array<{
+        item: IItem;
+        target: string;
+        rank: number;
+    }>;
+}
+
+export interface IGetPricelistRequest {
+    region_name: regionName;
+    realm_slug: realmSlug;
+    item_ids: ItemId[];
+}
+
+export interface IGetPricelistResponse {
+    price_list: IPriceListMap;
 }

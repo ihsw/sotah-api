@@ -9,11 +9,17 @@ import {
     IGetItemsClassesResponse,
     IGetOwnersRequest,
     IGetOwnersResponse,
+    IGetPricelistRequest,
+    IGetPricelistResponse,
     IGetRealmsResponse,
     IGetRegionsResponse,
     IQueryAuctionsItem,
     IQueryAuctionsRequest,
     IQueryAuctionsResponse,
+    IQueryItemsRequest,
+    IQueryItemsResponse,
+    IQueryOwnerItemsRequest,
+    IQueryOwnerItemsResponse,
 } from "./contracts/data";
 import { RequestHandler } from "./index";
 
@@ -168,6 +174,45 @@ export class DataController {
 
         return {
             data: { items },
+            status: HTTPStatus.OK,
+        };
+    };
+
+    public queryOwnerItems: RequestHandler<IQueryOwnerItemsRequest, IQueryOwnerItemsResponse> = async req => {
+        const { items } = req.body;
+        const msg = await this.messenger.queryOwnerItems({
+            items,
+            realm_slug: req.params["realmSlug"],
+            region_name: req.params["regionName"],
+        });
+
+        return {
+            data: msg.data!,
+            status: HTTPStatus.OK,
+        };
+    };
+
+    public queryItems: RequestHandler<IQueryItemsRequest, IQueryItemsResponse> = async req => {
+        const { query } = req.body;
+        const msg = await this.messenger.queryItems(query);
+
+        return {
+            data: msg.data!,
+            status: HTTPStatus.OK,
+        };
+    };
+
+    public getPricelist: RequestHandler<IGetPricelistRequest, IGetPricelistResponse> = async req => {
+        const { item_ids } = req.body;
+        const price_list = (await this.messenger.getPriceList({
+            item_ids,
+            realm_slug: req.params["realmSlug"],
+            region_name: req.params["regionName"],
+        })).data!.price_list;
+        const items = (await this.messenger.getItems(item_ids)).data!.items;
+
+        return {
+            data: { price_list, items },
             status: HTTPStatus.OK,
         };
     };

@@ -112,9 +112,7 @@ export const getRouter = (dbConn: Connection, messenger: Messenger) => {
     router.post(
         "/items",
         wrap(async (req, res) => {
-            const { query } = req.body as IItemsRequestBody;
-            const msg = await messenger.queryItems(query);
-            handleMessage(res, msg);
+            await handle(controller.queryItems, req, res);
         }),
     );
     router.post(
@@ -126,27 +124,13 @@ export const getRouter = (dbConn: Connection, messenger: Messenger) => {
     router.post(
         "/region/:regionName/realm/:realmSlug/query-owner-items",
         wrap(async (req, res) => {
-            const { items } = req.body as IOwnersQueryByItemsRequestBody;
-            const msg = await messenger.queryOwnerItems({
-                items,
-                realm_slug: req.params["realmSlug"],
-                region_name: req.params["regionName"],
-            });
-            handleMessage(res, msg);
+            await handle(controller.queryOwnerItems, req, res);
         }),
     );
     router.post(
         "/region/:regionName/realm/:realmSlug/price-list",
         wrap(async (req, res) => {
-            const { item_ids } = req.body as IPriceListRequestBody;
-            const price_list = (await messenger.getPriceList({
-                item_ids,
-                realm_slug: req.params["realmSlug"],
-                region_name: req.params["regionName"],
-            })).data!.price_list;
-            const items = (await messenger.getItems(item_ids)).data!.items;
-
-            res.json({ price_list, items });
+            await handle(controller.getPricelist, req, res);
         }),
     );
     router.post(

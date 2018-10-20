@@ -26,9 +26,6 @@ export enum SortKind {
 // auctions
 
 // items
-export interface IItemsRequestBody {
-    query: string;
-}
 
 // owners-query
 
