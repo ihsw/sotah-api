@@ -44,10 +44,6 @@ export interface IGetAuctionsRequest {
     itemFilters: ItemId[];
 }
 
-export interface IErrorResponse {
-    error: string;
-}
-
 export interface IGetAuctionsResponse {
     auctions: IAuction[];
     total: number;

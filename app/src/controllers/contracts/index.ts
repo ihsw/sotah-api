@@ -5,3 +5,11 @@ export interface IGetUserPricelistsResponse {
     items: IItemsMap;
     pricelists: Pricelist[];
 }
+
+export interface IErrorResponse {
+    error: string;
+}
+
+export interface IValidationErrorResponse {
+    [path: string]: string;
+}
