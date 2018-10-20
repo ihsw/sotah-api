@@ -3,12 +3,12 @@ import { Request, Response, Router } from "express";
 import { Connection } from "typeorm";
 
 import { handle } from "../../controllers";
-import { PreferenceController } from "../../controllers/user/preference";
+import { PreferencesController } from "../../controllers/user/preferences";
 import { auth } from "../../lib/session";
 
 export const getRouter = (dbConn: Connection) => {
     const router = Router();
-    const controller = new PreferenceController(dbConn);
+    const controller = new PreferencesController(dbConn);
 
     router.get(
         "/",

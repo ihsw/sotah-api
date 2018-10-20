@@ -10,10 +10,10 @@ import {
     IGetPreferencesResponse,
     IUpdatePreferencesRequest,
     IUpdatePreferencesResponse,
-} from "../contracts/user/preference";
+} from "../contracts/user/preferences";
 import { RequestHandler } from "../index";
 
-export class PreferenceController {
+export class PreferencesController {
     private dbConn: Connection;
 
     constructor(dbConn: Connection) {
