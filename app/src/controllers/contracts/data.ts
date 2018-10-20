@@ -3,7 +3,13 @@ import { IAuction, IOwner, OwnerName } from "../../types/auction";
 import { IExpansion } from "../../types/expansion";
 import { IItem, IItemsMap, ItemId } from "../../types/item";
 import { IItemClass } from "../../types/item-class";
-import { IPriceListMap } from "../../types/pricelist";
+import {
+    IItemMarketPrices,
+    IItemPriceLimits,
+    IPriceLimits,
+    IPricelistHistoryMap,
+    IPriceListMap,
+} from "../../types/pricelist";
 import { IProfession } from "../../types/profession";
 import { IRealm, IRegion, realmSlug, regionName } from "../../types/region";
 
@@ -108,4 +114,22 @@ export interface IGetPricelistRequest {
 
 export interface IGetPricelistResponse {
     price_list: IPriceListMap;
+}
+
+export interface IGetPricelistHistoriesRequest {
+    region_name: regionName;
+    realm_slug: realmSlug;
+    item_ids: ItemId[];
+    lower_bounds: number;
+    upper_bounds: number;
+}
+
+export interface IGetPricelistHistoriesResponse {
+    history: {
+        [itemId: number]: IPricelistHistoryMap;
+    };
+    items: IItemsMap;
+    itemPriceLimits: IItemPriceLimits;
+    overallPriceLimits: IPriceLimits;
+    itemMarketPrices: IItemMarketPrices;
 }

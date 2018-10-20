@@ -1,73 +1,13 @@
 import { wrap } from "async-middleware";
-import * as boll from "bollinger-bands";
 import { Request, Response, Router } from "express";
 import * as HttpStatus from "http-status";
 import { Connection } from "typeorm";
 
 import { DataController, handle } from "../controllers";
 import { ProfessionPricelist } from "../entities";
-import {
-    IAuctionsQueryItem,
-    IAuctionsQueryRequestBody,
-    IItemsRequestBody,
-    IOwnersQueryByItemsRequestBody,
-    ItemId,
-} from "../lib/auction";
+import { ItemId } from "../lib/auction";
 import { code, Messenger } from "../lib/messenger";
-import { Message } from "../lib/messenger/message";
-import {
-    IPricelistHistoryMap,
-    IPricelistHistoryRequest,
-    IPriceListRequestBody,
-    IPrices,
-    IUnmetDemandRequestBody,
-} from "../lib/price-list";
-
-interface IPriceLimits {
-    upper: number;
-    lower: number;
-}
-
-interface IItemPriceLimits {
-    [itemId: number]: IPriceLimits;
-}
-
-interface IItemMarketPrices {
-    [itemId: number]: number;
-}
-
-interface IBollingerBands {
-    upper: number[];
-    mid: number[];
-    lower: number[];
-}
-
-export const handleMessage = <T>(res: Response, msg: Message<T>) => {
-    switch (msg.code) {
-        case code.ok:
-            res.send(msg.data).end();
-
-            return;
-        case code.notFound:
-            res.status(HttpStatus.NOT_FOUND)
-                .send(msg.error!.message)
-                .end();
-
-            return;
-        case code.userError:
-            res.status(HttpStatus.BAD_REQUEST)
-                .send(msg.error!.message)
-                .end();
-
-            return;
-        default:
-            res.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .send(msg.error!.message)
-                .end();
-
-            return;
-    }
-};
+import { IUnmetDemandRequestBody } from "../lib/price-list";
 
 export const getRouter = (dbConn: Connection, messenger: Messenger) => {
     const router = Router();
@@ -136,104 +76,7 @@ export const getRouter = (dbConn: Connection, messenger: Messenger) => {
     router.post(
         "/region/:regionName/realm/:realmSlug/price-list-history",
         wrap(async (req, res) => {
-            const { item_ids } = req.body as IPricelistHistoryRequest;
-            const currentUnixTimestamp = Math.floor(Date.now() / 1000);
-            const lowerBounds = currentUnixTimestamp - 60 * 60 * 24 * 14;
-            const history = (await messenger.getPricelistHistories({
-                item_ids,
-                lower_bounds: lowerBounds,
-                realm_slug: req.params["realmSlug"],
-                region_name: req.params["regionName"],
-                upper_bounds: currentUnixTimestamp,
-            })).data!.history;
-            const items = (await messenger.getItems(item_ids)).data!.items;
-
-            const itemMarketPrices: IItemMarketPrices = [];
-
-            const itemPriceLimits: IItemPriceLimits = item_ids.reduce((previousItemPriceLimits, itemId) => {
-                const out: IPriceLimits = {
-                    lower: 0,
-                    upper: 0,
-                };
-
-                if (!(itemId in history)) {
-                    return {
-                        ...previousItemPriceLimits,
-                        [itemId]: out,
-                    };
-                }
-
-                const itemPriceHistory: IPricelistHistoryMap = history[itemId];
-                const itemPrices: IPrices[] = Object.keys(itemPriceHistory).map(v => itemPriceHistory[v]);
-                if (itemPrices.length > 0) {
-                    const bands: IBollingerBands = boll(
-                        itemPrices.map(v => v.min_buyout_per),
-                        itemPrices.length > 4 ? 4 : itemPrices.length,
-                    );
-                    const minBandMid = bands.mid.filter(v => !!v).reduce((previousValue, v) => {
-                        if (v === 0) {
-                            return previousValue;
-                        }
-
-                        if (previousValue === 0) {
-                            return v;
-                        }
-
-                        if (v < previousValue) {
-                            return v;
-                        }
-
-                        return previousValue;
-                    }, 0);
-                    const maxBandUpper = bands.upper.filter(v => !!v).reduce((previousValue, v) => {
-                        if (v === 0) {
-                            return previousValue;
-                        }
-
-                        if (previousValue === 0) {
-                            return v;
-                        }
-
-                        if (v > previousValue) {
-                            return v;
-                        }
-
-                        return previousValue;
-                    }, 0);
-                    out.lower = minBandMid;
-                    out.upper = maxBandUpper;
-                }
-
-                return {
-                    ...previousItemPriceLimits,
-                    [itemId]: out,
-                };
-            }, {});
-
-            const overallPriceLimits: IPriceLimits = { lower: 0, upper: 0 };
-            overallPriceLimits.lower = item_ids.reduce((overallLower, itemId) => {
-                if (itemPriceLimits[itemId].lower === 0) {
-                    return overallLower;
-                }
-                if (overallLower === 0) {
-                    return itemPriceLimits[itemId].lower;
-                }
-
-                if (itemPriceLimits[itemId].lower < overallLower) {
-                    return itemPriceLimits[itemId].lower;
-                }
-
-                return overallLower;
-            }, 0);
-            overallPriceLimits.upper = item_ids.reduce((overallUpper, itemId) => {
-                if (overallUpper > itemPriceLimits[itemId].upper) {
-                    return overallUpper;
-                }
-
-                return itemPriceLimits[itemId].upper;
-            }, 0);
-
-            res.json({ history, items, itemPriceLimits, overallPriceLimits, itemMarketPrices });
+            await handle(controller.getPricelistHistories, req, res);
         }),
     );
     router.post(

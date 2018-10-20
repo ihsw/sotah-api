@@ -1,6 +1,15 @@
+import * as boll from "bollinger-bands";
 import * as HTTPStatus from "http-status";
 
 import { code, Messenger } from "../lib/messenger";
+import {
+    IBollingerBands,
+    IItemMarketPrices,
+    IItemPriceLimits,
+    IPriceLimits,
+    IPricelistHistoryMap,
+    IPrices,
+} from "../types/pricelist";
 import {
     IErrorResponse,
     IGetAuctionsRequest,
@@ -9,6 +18,8 @@ import {
     IGetItemsClassesResponse,
     IGetOwnersRequest,
     IGetOwnersResponse,
+    IGetPricelistHistoriesRequest,
+    IGetPricelistHistoriesResponse,
     IGetPricelistRequest,
     IGetPricelistResponse,
     IGetRealmsResponse,
@@ -213,6 +224,113 @@ export class DataController {
 
         return {
             data: { price_list, items },
+            status: HTTPStatus.OK,
+        };
+    };
+
+    public getPricelistHistories: RequestHandler<
+        IGetPricelistHistoriesRequest,
+        IGetPricelistHistoriesResponse
+    > = async req => {
+        const { item_ids } = req.body;
+        const currentUnixTimestamp = Math.floor(Date.now() / 1000);
+        const lowerBounds = currentUnixTimestamp - 60 * 60 * 24 * 14;
+        const history = (await this.messenger.getPricelistHistories({
+            item_ids,
+            lower_bounds: lowerBounds,
+            realm_slug: req.params["realmSlug"],
+            region_name: req.params["regionName"],
+            upper_bounds: currentUnixTimestamp,
+        })).data!.history;
+        const items = (await this.messenger.getItems(item_ids)).data!.items;
+
+        const itemMarketPrices: IItemMarketPrices = [];
+
+        const itemPriceLimits: IItemPriceLimits = item_ids.reduce((previousItemPriceLimits, itemId) => {
+            const out: IPriceLimits = {
+                lower: 0,
+                upper: 0,
+            };
+
+            if (!(itemId in history)) {
+                return {
+                    ...previousItemPriceLimits,
+                    [itemId]: out,
+                };
+            }
+
+            const itemPriceHistory: IPricelistHistoryMap = history[itemId];
+            const itemPrices: IPrices[] = Object.keys(itemPriceHistory).map(v => itemPriceHistory[v]);
+            if (itemPrices.length > 0) {
+                const bands: IBollingerBands = boll(
+                    itemPrices.map(v => v.min_buyout_per),
+                    itemPrices.length > 4 ? 4 : itemPrices.length,
+                );
+                const minBandMid = bands.mid.filter(v => !!v).reduce((previousValue, v) => {
+                    if (v === 0) {
+                        return previousValue;
+                    }
+
+                    if (previousValue === 0) {
+                        return v;
+                    }
+
+                    if (v < previousValue) {
+                        return v;
+                    }
+
+                    return previousValue;
+                }, 0);
+                const maxBandUpper = bands.upper.filter(v => !!v).reduce((previousValue, v) => {
+                    if (v === 0) {
+                        return previousValue;
+                    }
+
+                    if (previousValue === 0) {
+                        return v;
+                    }
+
+                    if (v > previousValue) {
+                        return v;
+                    }
+
+                    return previousValue;
+                }, 0);
+                out.lower = minBandMid;
+                out.upper = maxBandUpper;
+            }
+
+            return {
+                ...previousItemPriceLimits,
+                [itemId]: out,
+            };
+        }, {});
+
+        const overallPriceLimits: IPriceLimits = { lower: 0, upper: 0 };
+        overallPriceLimits.lower = item_ids.reduce((overallLower, itemId) => {
+            if (itemPriceLimits[itemId].lower === 0) {
+                return overallLower;
+            }
+            if (overallLower === 0) {
+                return itemPriceLimits[itemId].lower;
+            }
+
+            if (itemPriceLimits[itemId].lower < overallLower) {
+                return itemPriceLimits[itemId].lower;
+            }
+
+            return overallLower;
+        }, 0);
+        overallPriceLimits.upper = item_ids.reduce((overallUpper, itemId) => {
+            if (overallUpper > itemPriceLimits[itemId].upper) {
+                return overallUpper;
+            }
+
+            return itemPriceLimits[itemId].upper;
+        }, 0);
+
+        return {
+            data: { history, items, itemPriceLimits, overallPriceLimits, itemMarketPrices },
             status: HTTPStatus.OK,
         };
     };
