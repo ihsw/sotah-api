@@ -15,10 +15,10 @@ export class ProfessionPricelist {
     @JoinColumn({ name: "pricelist_id" })
     public pricelist: Pricelist | undefined;
 
-    @Column("string")
+    @Column("varchar", { length: 255 })
     public name: ProfessionName;
 
-    @Column("string")
+    @Column("varchar", { length: 255 })
     public expansion: ExpansionName;
 
     constructor() {

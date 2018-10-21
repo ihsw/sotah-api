@@ -19,13 +19,12 @@ export class Pricelist {
     @OneToMany(() => PricelistEntry, entry => entry.pricelist, {
         eager: true,
     })
-    public entries: PricelistEntry[];
+    public entries: PricelistEntry[] | undefined;
 
     @Column()
     public name: string;
 
     constructor() {
-        this.entries = [];
         this.name = "";
     }
 }

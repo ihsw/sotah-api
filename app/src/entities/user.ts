@@ -20,7 +20,7 @@ export class User {
     public preference: Preference | undefined;
 
     @ManyToOne(() => Pricelist, pricelist => pricelist.user)
-    public pricelists: Pricelist[];
+    public pricelists: Pricelist[] | undefined;
 
     @Column({ nullable: false })
     public email: string;
@@ -32,7 +32,6 @@ export class User {
     public level: UserLevel;
 
     constructor() {
-        this.pricelists = [];
         this.email = "";
         this.hashedPassword = "";
         this.level = UserLevel.Regular;
