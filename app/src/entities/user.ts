@@ -14,10 +14,10 @@ export enum UserLevel {
 @Entity()
 export class User {
     @PrimaryGeneratedColumn()
-    public id: number;
+    public id: number | undefined;
 
     @OneToOne(() => Preference, preference => preference.user)
-    public preference: Preference;
+    public preference: Preference | undefined;
 
     @ManyToOne(() => Pricelist, pricelist => pricelist.user)
     public pricelists: Pricelist[];
@@ -30,6 +30,13 @@ export class User {
 
     @Column("int", { nullable: false })
     public level: UserLevel;
+
+    constructor() {
+        this.pricelists = [];
+        this.email = "";
+        this.hashedPassword = "";
+        this.level = UserLevel.Regular;
+    }
 
     public async generateJwtToken(messenger: Messenger): Promise<string> {
         const jwtOptions = await getJwtOptions(messenger);

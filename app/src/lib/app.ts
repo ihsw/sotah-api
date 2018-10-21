@@ -60,7 +60,7 @@ export const getApp = async (opts: IOptions): Promise<express.Express> => {
     // route init
     app.use("/", defaultRouter);
     app.use("/", getDataRouter(dbConn, messenger));
-    app.use("/", getUserRouter(models, messenger));
+    app.use("/", getUserRouter(dbConn, messenger));
 
     // error handler
     app.use((err: Error, _: express.Request, res: express.Response, next: () => void) => {

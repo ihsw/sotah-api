@@ -7,11 +7,11 @@ import { User } from "./user";
 @Entity()
 export class Pricelist {
     @PrimaryGeneratedColumn()
-    public id: number;
+    public id: number | undefined;
 
     @ManyToOne(() => User, user => user.pricelists, { eager: true })
     @JoinColumn({ name: "user_id" })
-    public user: User;
+    public user: User | undefined;
 
     @OneToOne(() => ProfessionPricelist, professionPricelist => professionPricelist.pricelist)
     public professionPricelist: ProfessionPricelist | undefined;
@@ -23,4 +23,9 @@ export class Pricelist {
 
     @Column()
     public name: string;
+
+    constructor() {
+        this.entries = [];
+        this.name = "";
+    }
 }

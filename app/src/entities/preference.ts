@@ -5,15 +5,20 @@ import { User } from "./user";
 @Entity()
 export class Preference {
     @PrimaryGeneratedColumn()
-    public id: number;
+    public id: number | undefined;
 
     @OneToOne(() => User, user => user.preference, { nullable: false })
     @JoinColumn({ name: "user_id" })
-    public user: User;
+    public user: User | undefined;
 
     @Column({ name: "current_region", nullable: true })
     public currentRegion: string | null;
 
     @Column({ name: "current_realm", nullable: true })
     public currentRealm: string | null;
+
+    constructor() {
+        this.currentRegion = null;
+        this.currentRealm = null;
+    }
 }
