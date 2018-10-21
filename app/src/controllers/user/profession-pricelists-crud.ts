@@ -99,14 +99,14 @@ export class ProfessionPricelistsCrudController {
             };
         }
 
-        if (professionPricelist.pricelist.user.id !== user.id) {
+        if (professionPricelist.pricelist!.user!.id !== user.id) {
             return {
                 data: null,
                 status: HTTPStatus.UNAUTHORIZED,
             };
         }
 
-        await Promise.all(professionPricelist.pricelist.entries.map(v => this.dbConn.manager.remove(v)));
+        await Promise.all(professionPricelist.pricelist!.entries.map(v => this.dbConn.manager.remove(v)));
         await this.dbConn.manager.remove(professionPricelist);
         await this.dbConn.manager.remove(professionPricelist.pricelist);
 
