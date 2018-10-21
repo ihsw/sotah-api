@@ -22,14 +22,14 @@ const setup = (): ISetupSettings => {
     return { messenger };
 };
 
-test("Messenger Should fetch regions", async t => {
+test.skip("Messenger Should fetch regions", async t => {
     const { messenger } = setup();
 
     const regions = (await messenger.getRegions()).data!;
     t.true(regions.length > 0);
 });
 
-test("Messenger Should throw error when requesting from generic test errors queue", async t => {
+test.skip("Messenger Should throw error when requesting from generic test errors queue", async t => {
     const { messenger } = setup();
 
     try {
@@ -42,7 +42,7 @@ test("Messenger Should throw error when requesting from generic test errors queu
     }
 });
 
-test("Messenger Should fetch region statuses", async t => {
+test.skip("Messenger Should fetch region statuses", async t => {
     const { messenger } = setup();
 
     const regions = (await messenger.getRegions()).data!;
@@ -50,7 +50,7 @@ test("Messenger Should fetch region statuses", async t => {
     t.true(status.realms.length > 0);
 });
 
-test("Messenger Should fetch auctions", async t => {
+test.skip("Messenger Should fetch auctions", async t => {
     const { messenger } = setup();
 
     const [reg] = (await messenger.getRegions()).data!;
@@ -68,7 +68,7 @@ test("Messenger Should fetch auctions", async t => {
     t.true(auctions.auctions.length > 0);
 });
 
-test("Messenger Should fetch items", async t => {
+test.skip("Messenger Should fetch items", async t => {
     const { messenger } = setup();
 
     const res = (await messenger.queryItems("")).data!;
