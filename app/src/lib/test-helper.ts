@@ -4,6 +4,7 @@ import * as HTTPStatus from "http-status";
 import * as nats from "nats";
 import * as supertest from "supertest";
 import { Connection, createConnection } from "typeorm";
+import { v4 as uuidv4 } from "uuid";
 
 import { ICreatePricelistRequest, ICreatePricelistResponse } from "../controllers/contracts/user/pricelist-crud";
 import {
@@ -31,6 +32,7 @@ export const setup = async (opts: IOptions): Promise<ISetupSettings> => {
         entities: [Preference, Pricelist, PricelistEntry, ProfessionPricelist, User],
         host: opts.dbHost,
         logging: false,
+        name: `test-${uuidv4()}`,
         password: "",
         port: 5432,
         synchronize: false,

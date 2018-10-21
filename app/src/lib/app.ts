@@ -3,6 +3,7 @@ import * as express from "express";
 import * as HttpStatus from "http-status";
 import * as nats from "nats";
 import { createConnection } from "typeorm";
+import { v4 as uuidv4 } from "uuid";
 import { LoggerInstance } from "winston";
 
 import { Preference, Pricelist, PricelistEntry, ProfessionPricelist, User } from "../entities";
@@ -34,6 +35,7 @@ export const getApp = async (opts: IOptions): Promise<express.Express> => {
         entities: [Preference, Pricelist, PricelistEntry, ProfessionPricelist, User],
         host: dbHost,
         logging: false,
+        name: `app-${uuidv4()}`,
         password: "",
         port: 5432,
         synchronize: false,
