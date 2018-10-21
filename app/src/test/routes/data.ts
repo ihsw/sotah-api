@@ -97,7 +97,7 @@ test("Status Should return 400 on invalid count", async t => {
     clearTimeout(tId);
 
     t.is(res.status, HttpStatus.BAD_REQUEST);
-    t.is(res.text, "Count must be >0");
+    t.deepEqual(res.body, { error: "Count must be >0" });
 });
 
 test("Status Should return 404 on invalid region name", async t => {
