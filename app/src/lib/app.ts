@@ -4,7 +4,7 @@ import * as HttpStatus from "http-status";
 import * as nats from "nats";
 import { createConnection } from "typeorm";
 import { v4 as uuidv4 } from "uuid";
-import { LoggerInstance } from "winston";
+import { Logger } from "winston";
 
 import { Preference, Pricelist, PricelistEntry, ProfessionPricelist, User } from "../entities";
 import { defaultRouter, getDataRouter, getUserRouter } from "../routes";
@@ -12,7 +12,7 @@ import { Messenger } from "./messenger";
 import { appendSessions } from "./session";
 
 export interface IOptions {
-    logger: LoggerInstance;
+    logger: Logger;
     natsHost: string;
     natsPort: string;
     dbHost: string;
