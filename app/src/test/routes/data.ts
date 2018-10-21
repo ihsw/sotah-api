@@ -3,10 +3,10 @@ import * as process from "process";
 import { test } from "ava";
 import * as HttpStatus from "http-status";
 
-import { SortDirection, SortKind } from "../../lib/auction";
 import { getLogger } from "../../lib/logger";
-import { IRegion } from "../../lib/region";
 import { setup } from "../../lib/test-helper";
+import { SortDirection, SortKind } from "../../types";
+import { IRegion } from "../../types/region";
 
 const helper = async () => {
     const { request, messenger } = await setup({

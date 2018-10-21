@@ -5,12 +5,12 @@ import * as bcrypt from "bcrypt";
 import * as HTTPStatus from "http-status";
 import { v4 as uuidv4 } from "uuid";
 
-import { UserLevel } from "../../../entities/user";
+import { User, UserLevel } from "../../../entities/user";
 import { getLogger } from "../../../lib/logger";
 import { getTestHelper, setup } from "../../../lib/test-helper";
 
 const helper = async () => {
-    const { request, models } = await setup({
+    const { request, dbConn } = await setup({
         dbHost: process.env["DB_HOST"] as string,
         logger: getLogger(),
         natsHost: process.env["NATS_HOST"] as string,
@@ -18,19 +18,22 @@ const helper = async () => {
     });
     const { createUser, requestProfessionPricelist, createProfessionPricelist } = getTestHelper(request);
 
-    return { request, models, createUser, requestProfessionPricelist, createProfessionPricelist };
+    return { request, dbConn, createUser, requestProfessionPricelist, createProfessionPricelist };
 };
 
 test("Profession pricelists crud endpoint Should create a profession-pricelist", async t => {
-    const { models, request, requestProfessionPricelist } = await helper();
+    const { dbConn, request, requestProfessionPricelist } = await helper();
 
     const password = "testtest";
-    const user = await models.User.create({
-        email: `create-profession-pricelists+${uuidv4()}@test.com`,
-        hashed_password: await bcrypt.hash(password, 10),
-        level: UserLevel.Admin,
-    });
-    let res = await request.post("/login").send({ email: user.get("email"), password });
+    const user = await (async () => {
+        const out = new User();
+        out.email = `create-profession-pricelists+${uuidv4()}@test.com`;
+        out.hashedPassword = await bcrypt.hash(password, 10);
+        out.level = UserLevel.Admin;
+
+        return dbConn.manager.save(out);
+    })();
+    let res = await request.post("/login").send({ email: user.email, password });
     t.is(res.status, HTTPStatus.OK);
     const { token } = res.body;
 
@@ -54,15 +57,18 @@ test("Profession pricelists crud endpoint Should create a profession-pricelist",
 });
 
 test("Profession pricelists crud endpoint Should delete a profession-pricelist", async t => {
-    const { models, request, createProfessionPricelist } = await helper();
+    const { dbConn, request, createProfessionPricelist } = await helper();
 
     const password = "testtest";
-    const user = await models.User.create({
-        email: `delete-profession-pricelists+${uuidv4()}@test.com`,
-        hashed_password: await bcrypt.hash(password, 10),
-        level: UserLevel.Admin,
-    });
-    let res = await request.post("/login").send({ email: user.get("email"), password });
+    const user = await (async () => {
+        const out = new User();
+        out.email = `delete-profession-pricelists+${uuidv4()}@test.com`;
+        out.hashedPassword = await bcrypt.hash(password, 10);
+        out.level = UserLevel.Admin;
+
+        return dbConn.manager.save(out);
+    })();
+    let res = await request.post("/login").send({ email: user.email, password });
     t.is(res.status, HTTPStatus.OK);
     const { token } = res.body;
 
@@ -80,15 +86,18 @@ test("Profession pricelists crud endpoint Should delete a profession-pricelist",
 });
 
 test("Profession pricelists crud endpoint Should fail on deleting a non-owned profession-pricelist", async t => {
-    const { models, request, createProfessionPricelist, createUser } = await helper();
+    const { dbConn, request, createProfessionPricelist, createUser } = await helper();
 
     const password = "testtest";
-    const user = await models.User.create({
-        email: `delete-fail-profession-pricelists+${uuidv4()}@test.com`,
-        hashed_password: await bcrypt.hash(password, 10),
-        level: UserLevel.Admin,
-    });
-    let res = await request.post("/login").send({ email: user.get("email"), password });
+    const user = await (async () => {
+        const out = new User();
+        out.email = `delete-fail-profession-pricelists+${uuidv4()}@test.com`;
+        out.hashedPassword = await bcrypt.hash(password, 10);
+        out.level = UserLevel.Admin;
+
+        return dbConn.manager.save(out);
+    })();
+    let res = await request.post("/login").send({ email: user.email, password });
     t.is(res.status, HTTPStatus.OK);
     const { token } = res.body;
 

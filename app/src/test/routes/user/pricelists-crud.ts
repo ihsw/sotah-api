@@ -4,9 +4,9 @@ import test from "ava";
 import * as HTTPStatus from "http-status";
 import { v4 as uuidv4 } from "uuid";
 
+import { IGetPricelistsResponse } from "../../../controllers/contracts/user/pricelist-crud";
 import { getLogger } from "../../../lib/logger";
 import { getTestHelper, setup } from "../../../lib/test-helper";
-import { IGetUserPricelistsResponse } from "../../../requests";
 
 const helper = async () => {
     const { request } = await setup({
@@ -87,7 +87,7 @@ test("Pricelists crud endpoint Should return pricelists", async t => {
 
     res = await request.get(`/user/pricelists`).set("Authorization", `Bearer ${token}`);
     const { status } = res;
-    const body: IGetUserPricelistsResponse = res.body;
+    const body: IGetPricelistsResponse = res.body;
     t.is(status, HTTPStatus.OK);
     t.is(body.pricelists.length, 5);
     t.is(body.pricelists.reduce((total: number, v) => total + v.entries.length, 0), 5);
@@ -115,7 +115,7 @@ test("Pricelists crud endpoint Should return pricelists", async t => {
 
     res = await request.get("/user/pricelists").set("Authorization", `Bearer ${token}`);
     const { status } = res;
-    const body: IGetUserPricelistsResponse = res.body;
+    const body: IGetPricelistsResponse = res.body;
     t.is(status, HTTPStatus.OK);
     t.is(body.pricelists.length, 5);
     t.is(body.pricelists.reduce((total, v) => total + v.entries.length, 0), 5);
@@ -145,7 +145,7 @@ test("Pricelists crud endpoint Should update a pricelist", async t => {
             entries: entries.map(v => {
                 return {
                     ...v,
-                    quantity_modifier: v.quantity_modifier + 1,
+                    quantity_modifier: v.quantityModifier + 1,
                 };
             }),
             pricelist: { name: "test2" },
@@ -180,7 +180,7 @@ test("Pricelists crud endpoint Should update all entries", async t => {
             entries: entries.map(v => {
                 return {
                     ...v,
-                    quantity_modifier: v.quantity_modifier + 5,
+                    quantity_modifier: v.quantityModifier + 5,
                 };
             }),
             pricelist: { name: "test2" },

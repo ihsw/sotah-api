@@ -5,11 +5,14 @@ import * as nats from "nats";
 import * as supertest from "supertest";
 import { Connection, createConnection } from "typeorm";
 
+import { ICreatePricelistRequest, ICreatePricelistResponse } from "../controllers/contracts/user/pricelist-crud";
+import {
+    ICreateProfessionPricelistRequest,
+    ICreateProfessionPricelistResponse,
+} from "../controllers/contracts/user/profession-pricelists-crud";
 import { Preference, Pricelist, PricelistEntry, ProfessionPricelist, User } from "../entities";
 import { getApp, IOptions } from "./app";
-import { ExpansionName } from "./expansion";
 import { Messenger } from "./messenger";
-import { ProfessionName } from "./profession";
 
 // setup func
 interface ISetupSettings {
@@ -68,23 +71,8 @@ const getUserTestHelper = (request: supertest.SuperTest<supertest.Test>) => {
 };
 
 // pricelist test-helper
-export interface IPricelistResponse {
-    pricelist: IPricelistAttributes;
-    entries: IPricelistEntryAttributes[];
-}
-
-export interface IPricelistRequest {
-    pricelist: {
-        name: string;
-    };
-    entries: Array<{
-        item_id: number;
-        quantity_modifier: number;
-    }>;
-}
-
 const getPricelistTestHelper = (request: supertest.SuperTest<supertest.Test>) => {
-    const requestPricelist = (token: string, body: IPricelistRequest) => {
+    const requestPricelist = (token: string, body: ICreatePricelistRequest) => {
         return request
             .post("/user/pricelists")
             .set("Authorization", `Bearer ${token}`)
@@ -93,8 +81,8 @@ const getPricelistTestHelper = (request: supertest.SuperTest<supertest.Test>) =>
     const createPricelist = async (
         t: TestContext,
         token: string,
-        body: IPricelistRequest,
-    ): Promise<IPricelistResponse> => {
+        body: ICreatePricelistRequest,
+    ): Promise<ICreatePricelistResponse> => {
         const res = await requestPricelist(token, body);
         const { status, body: responseBody, header } = res;
         t.is(status, HTTPStatus.CREATED);
@@ -115,20 +103,8 @@ const getPricelistTestHelper = (request: supertest.SuperTest<supertest.Test>) =>
     return { requestPricelist, createPricelist };
 };
 
-// profession-pricelist test-helper
-export interface IProfessionPricelistResponse {
-    profession_pricelist: IProfessionPricelistAttributes;
-    pricelist: IPricelistAttributes;
-    entries: IPricelistEntryAttributes[];
-}
-
-export interface IProfessionPricelistRequest extends IPricelistRequest {
-    profession_name: ProfessionName;
-    expansion_name: ExpansionName;
-}
-
 const getProfessionPricelistTestHelper = (request: supertest.SuperTest<supertest.Test>) => {
-    const requestProfessionPricelist = (token: string, body: IProfessionPricelistRequest) => {
+    const requestProfessionPricelist = (token: string, body: ICreateProfessionPricelistRequest) => {
         return request
             .post("/user/profession-pricelists")
             .set("Authorization", `Bearer ${token}`)
@@ -137,8 +113,8 @@ const getProfessionPricelistTestHelper = (request: supertest.SuperTest<supertest
     const createProfessionPricelist = async (
         t: TestContext,
         token: string,
-        body: IProfessionPricelistRequest,
-    ): Promise<IProfessionPricelistResponse> => {
+        body: ICreateProfessionPricelistRequest,
+    ): Promise<ICreateProfessionPricelistResponse> => {
         const res = await requestProfessionPricelist(token, body);
         const { status, body: responseBody, header } = res;
         t.is(status, HTTPStatus.CREATED);

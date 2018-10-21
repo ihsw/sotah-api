@@ -3,9 +3,9 @@ import * as process from "process";
 import { test } from "ava";
 import * as nats from "nats";
 
-import { SortDirection, SortKind } from "../lib/auction";
 import { code, Messenger, subjects } from "../lib/messenger";
 import { MessageError } from "../lib/messenger/message-error";
+import { SortDirection, SortKind } from "../types";
 
 interface ISetupSettings {
     messenger: Messenger;
