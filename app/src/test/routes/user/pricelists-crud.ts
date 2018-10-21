@@ -91,7 +91,7 @@ test("Pricelists crud endpoint Should return pricelists", async t => {
     const body: IGetPricelistsResponse = res.body;
     t.is(status, HTTPStatus.OK);
     t.is(body.pricelists.length, 5);
-    t.is(body.pricelists.reduce((total: number, v) => total + v.entries.length, 0), 5);
+    t.is(body.pricelists.reduce((total: number, v) => total + v.entries!.length, 0), 5);
 });
 
 test("Pricelists crud endpoint Should return pricelists", async t => {
@@ -119,7 +119,7 @@ test("Pricelists crud endpoint Should return pricelists", async t => {
     const body: IGetPricelistsResponse = res.body;
     t.is(status, HTTPStatus.OK);
     t.is(body.pricelists.length, 5);
-    t.is(body.pricelists.reduce((total, v) => total + v.entries.length, 0), 5);
+    t.is(body.pricelists.reduce((total, v) => total + v.entries!.length, 0), 5);
 });
 
 test("Pricelists crud endpoint Should update a pricelist", async t => {

@@ -74,7 +74,7 @@ export class PricelistCrudController {
 
         // gathering related items
         const itemIds: ItemId[] = pricelists.reduce((pricelistsItemIds: ItemId[], pricelist) => {
-            return pricelist.entries.reduce((entriesItemIds: ItemId[], entry) => {
+            return pricelist.entries!.reduce((entriesItemIds: ItemId[], entry) => {
                 if (entriesItemIds.indexOf(entry.itemId) === -1) {
                     entriesItemIds.push(entry.itemId);
                 }
@@ -143,7 +143,7 @@ export class PricelistCrudController {
         await this.dbConn.manager.save(pricelist);
 
         // misc
-        const entries = pricelist.entries;
+        const entries = pricelist.entries!;
 
         // creating new entries
         const newRequestEntries = result.entries.filter(v => !!v.id === false);
@@ -200,7 +200,7 @@ export class PricelistCrudController {
             };
         }
 
-        await Promise.all(pricelist.entries.map(v => this.dbConn.manager.remove(v)));
+        await Promise.all(pricelist.entries!.map(v => this.dbConn.manager.remove(v)));
         await this.dbConn.manager.remove(pricelist);
 
         return {

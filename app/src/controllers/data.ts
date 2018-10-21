@@ -355,7 +355,7 @@ export class DataController {
 
         // gathering included item-ids
         const itemIds = professionPricelists.reduce((previousValue: ItemId[], v: ProfessionPricelist) => {
-            const pricelistItemIds = v.pricelist!.entries.map(entry => entry.itemId);
+            const pricelistItemIds = v.pricelist!.entries!.map(entry => entry.itemId);
             for (const itemId of pricelistItemIds) {
                 if (previousValue.indexOf(itemId) === -1) {
                     previousValue.push(itemId);
@@ -395,7 +395,7 @@ export class DataController {
         // filtering in unmet profession-pricelists
         const unmetProfessionPricelists = professionPricelists.filter(v => {
             const unmetPricelistItemIds = v
-                .pricelist!.entries.map(entry => entry.itemId)
+                .pricelist!.entries!.map(entry => entry.itemId)
                 .filter(itemId => unmetItemIds.indexOf(itemId) > -1);
 
             return unmetPricelistItemIds.length > 0;
@@ -419,7 +419,7 @@ export class DataController {
 
         // gathering related items
         const itemIds: ItemId[] = professionPricelists.reduce((pricelistItemIds: ItemId[], professionPricelist) => {
-            return professionPricelist.pricelist!.entries.reduce((entryItemIds: ItemId[], entry) => {
+            return professionPricelist.pricelist!.entries!.reduce((entryItemIds: ItemId[], entry) => {
                 if (entryItemIds.indexOf(entry.itemId) === -1) {
                     entryItemIds.push(entry.itemId);
                 }

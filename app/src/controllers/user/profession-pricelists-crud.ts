@@ -106,7 +106,7 @@ export class ProfessionPricelistsCrudController {
             };
         }
 
-        await Promise.all(professionPricelist.pricelist!.entries.map(v => this.dbConn.manager.remove(v)));
+        await Promise.all(professionPricelist.pricelist!.entries!.map(v => this.dbConn.manager.remove(v)));
         await this.dbConn.manager.remove(professionPricelist);
         await this.dbConn.manager.remove(professionPricelist.pricelist);
 
