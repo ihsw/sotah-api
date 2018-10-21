@@ -1,5 +1,6 @@
 import * as http from "http";
 import * as process from "process";
+import "reflect-metadata";
 
 import { getApp } from "./lib/app";
 import { getLogger } from "./lib/logger";

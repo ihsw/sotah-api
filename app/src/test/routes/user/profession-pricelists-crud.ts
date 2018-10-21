@@ -1,4 +1,5 @@
 import * as process from "process";
+import "reflect-metadata";
 
 import test from "ava";
 import * as bcrypt from "bcrypt";
