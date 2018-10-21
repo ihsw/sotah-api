@@ -11,10 +11,10 @@ export class Preference {
     @JoinColumn({ name: "user_id" })
     public user: User | undefined;
 
-    @Column({ name: "current_region", nullable: true })
+    @Column("varchar", { length: 255, name: "current_region", nullable: true })
     public currentRegion: string | null;
 
-    @Column({ name: "current_realm", nullable: true })
+    @Column("varchar", { length: 255, name: "current_realm", nullable: true })
     public currentRealm: string | null;
 
     constructor() {
