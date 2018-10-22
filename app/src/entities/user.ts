@@ -13,7 +13,7 @@ export enum UserLevel {
 
 @Entity({ name: "users" })
 export class User {
-    @PrimaryGeneratedColumn({ name: "id" })
+    @PrimaryGeneratedColumn()
     public id: number | undefined;
 
     @OneToOne(() => Preference, preference => preference.user)
