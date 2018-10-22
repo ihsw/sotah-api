@@ -52,7 +52,7 @@ export class UserController {
         return {
             data: {
                 token: await user.generateJwtToken(this.messenger),
-                user,
+                user: user.toJson(),
             },
             status: HTTPStatus.CREATED,
         };

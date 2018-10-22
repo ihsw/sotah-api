@@ -11,6 +11,12 @@ export enum UserLevel {
     Regular = 5,
 }
 
+export interface IUserJson {
+    id: number;
+    email: string;
+    level: UserLevel;
+}
+
 @Entity({ name: "users" })
 export class User {
     @PrimaryGeneratedColumn()
@@ -44,5 +50,13 @@ export class User {
             audience: jwtOptions.audience,
             issuer: jwtOptions.issuer,
         });
+    }
+
+    public toJson(): IUserJson {
+        return {
+            email: this.email,
+            id: this.id!,
+            level: this.level,
+        };
     }
 }

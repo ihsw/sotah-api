@@ -1,4 +1,4 @@
-import { User } from "../../entities";
+import { IUserJson } from "../../entities/user";
 
 export interface ICreateUserRequest {
     email: string;
@@ -7,7 +7,7 @@ export interface ICreateUserRequest {
 
 export interface ICreateUserResponse {
     token: string;
-    user: User;
+    user: IUserJson;
 }
 
 export interface ILoginRequest {
