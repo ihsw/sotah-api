@@ -4,8 +4,8 @@ import { User } from "./user";
 
 export interface IPreferenceJson {
     id: number;
-    currentRegion: string | null;
-    currentRealm: string | null;
+    current_region: string | null;
+    current_realm: string | null;
 }
 
 @Entity({ name: "preferences" })
@@ -30,8 +30,8 @@ export class Preference {
 
     public toJson(): IPreferenceJson {
         return {
-            currentRealm: this.currentRealm,
-            currentRegion: this.currentRegion,
+            current_realm: this.currentRealm,
+            current_region: this.currentRegion,
             id: this.id!,
         };
     }
