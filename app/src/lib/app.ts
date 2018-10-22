@@ -68,6 +68,8 @@ export const getApp = async (opts: IOptions): Promise<express.Express> => {
 
     // error handler
     app.use((err: Error, _: express.Request, res: express.Response, next: () => void) => {
+        logger.error("Dumping out error response", { error: err.message });
+
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err.message);
         next();
     });
