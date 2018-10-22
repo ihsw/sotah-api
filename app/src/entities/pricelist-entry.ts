@@ -12,10 +12,10 @@ export class PricelistEntry {
     @JoinColumn({ name: "pricelist_id" })
     public pricelist: Pricelist | undefined;
 
-    @Column("int")
+    @Column("int", { name: "item_id" })
     public itemId: ItemId;
 
-    @Column("int")
+    @Column("int", { name: "quantity_modifier" })
     public quantityModifier: number;
 
     constructor() {
