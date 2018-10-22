@@ -160,12 +160,14 @@ export class PricelistCrudController {
 
         // updating existing entries
         const receivedRequestEntries = result.entries.filter(v => typeof v.id !== "undefined");
-        let receivedEntries = await this.dbConn.getRepository(PricelistEntry).find({
-            where: { id: receivedRequestEntries.map(v => v.id) },
-        });
+        let receivedEntries = await this.dbConn
+            .getRepository(PricelistEntry)
+            .createQueryBuilder("entries")
+            .whereInIds(receivedRequestEntries.map(v => v.id))
+            .getMany();
         receivedEntries = await Promise.all(
             receivedEntries.map((v, i) => {
-                v.itemId = receivedRequestEntries[i].id!;
+                v.itemId = receivedRequestEntries[i].item_id;
                 v.quantityModifier = receivedEntries[i].quantityModifier;
 
                 return this.dbConn.manager.save(v);
