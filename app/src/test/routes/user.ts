@@ -33,9 +33,8 @@ test("User creation endpoint Should create a new user", async t => {
     t.not(String(res.header["content-type"]).match(/^application\/json/), null);
 
     const body = res.body;
-    t.true("user" in body);
-    t.true("id" in body.user);
-    t.is(typeof body.user.id, "number");
+    t.true("token" in body);
+    t.is(typeof body.token, "string");
 });
 
 test("User creation endpoint Should fail on invalid username", async t => {
