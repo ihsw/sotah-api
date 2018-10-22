@@ -1,5 +1,5 @@
 import * as jwt from "jsonwebtoken";
-import { Column, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 import { Messenger } from "../lib/messenger";
 import { getJwtOptions } from "../lib/session";
@@ -11,15 +11,15 @@ export enum UserLevel {
     Regular = 5,
 }
 
-@Entity()
+@Entity({ name: "users" })
 export class User {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({ name: "id" })
     public id: number | undefined;
 
     @OneToOne(() => Preference, preference => preference.user)
     public preference: Preference | undefined;
 
-    @ManyToOne(() => Pricelist, pricelist => pricelist.user)
+    @OneToMany(() => Pricelist, pricelist => pricelist.user)
     public pricelists: Pricelist[] | undefined;
 
     @Column({ nullable: false })
