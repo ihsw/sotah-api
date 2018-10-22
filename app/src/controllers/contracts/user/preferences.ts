@@ -1,8 +1,8 @@
-import { Preference } from "../../../entities/preference";
+import { IPreferenceJson } from "../../../entities/preference";
 import { realmSlug, regionName } from "../../../types/region";
 
 export interface IGetPreferencesResponse {
-    preference: Preference;
+    preference: IPreferenceJson;
 }
 
 export interface ICreatePreferencesRequest {

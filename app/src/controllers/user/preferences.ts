@@ -32,7 +32,7 @@ export class PreferencesController {
         }
 
         return {
-            data: { preference },
+            data: { preference: preference.toJson() },
             status: HTTPStatus.OK,
         };
     };
@@ -42,8 +42,7 @@ export class PreferencesController {
         ICreatePreferencesResponse | IErrorResponse | IValidationErrorResponse
     > = async req => {
         const user = req.user!;
-        let preference = await this.dbConn.getRepository(Preference).findOne({ where: { user_id: user.id } });
-
+        let preference = await this.dbConn.getRepository(Preference).findOne({ where: { user: { id: user.id } } });
         if (typeof preference !== "undefined") {
             return {
                 data: { error: "User already has preferences." },
@@ -69,7 +68,7 @@ export class PreferencesController {
         preference.currentRegion = result.current_region;
         await this.dbConn.manager.save(preference);
         return {
-            data: { preference },
+            data: { preference: preference.toJson() },
             status: HTTPStatus.CREATED,
         };
     };
@@ -104,7 +103,7 @@ export class PreferencesController {
         preference.currentRegion = result.current_region;
         await this.dbConn.manager.save(preference);
         return {
-            data: { preference },
+            data: { preference: preference.toJson() },
             status: HTTPStatus.OK,
         };
     };

@@ -2,12 +2,18 @@ import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "ty
 
 import { User } from "./user";
 
-@Entity()
+export interface IPreferenceJson {
+    id: number;
+    currentRegion: string | null;
+    currentRealm: string | null;
+}
+
+@Entity({ name: "preferences" })
 export class Preference {
     @PrimaryGeneratedColumn()
     public id: number | undefined;
 
-    @OneToOne(() => User, user => user.preference, { nullable: false })
+    @OneToOne(() => User, user => user.preference, { nullable: false, eager: true })
     @JoinColumn({ name: "user_id" })
     public user: User | undefined;
 
@@ -20,5 +26,13 @@ export class Preference {
     constructor() {
         this.currentRegion = null;
         this.currentRealm = null;
+    }
+
+    public toJson(): IPreferenceJson {
+        return {
+            currentRealm: this.currentRealm,
+            currentRegion: this.currentRegion,
+            id: this.id!,
+        };
     }
 }
