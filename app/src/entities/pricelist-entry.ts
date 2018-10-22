@@ -3,7 +3,7 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "t
 import { ItemId } from "../types/item";
 import { Pricelist } from "./pricelist";
 
-@Entity()
+@Entity({ name: "pricelist_entries" })
 export class PricelistEntry {
     @PrimaryGeneratedColumn()
     public id: number | undefined;

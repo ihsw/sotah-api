@@ -4,7 +4,7 @@ import { PricelistEntry } from "./pricelist-entry";
 import { ProfessionPricelist } from "./profession-pricelist";
 import { User } from "./user";
 
-@Entity()
+@Entity({ name: "pricelists" })
 export class Pricelist {
     @PrimaryGeneratedColumn()
     public id: number | undefined;
