@@ -6,6 +6,7 @@ import * as supertest from "supertest";
 import { Connection, createConnection } from "typeorm";
 import { v4 as uuidv4 } from "uuid";
 
+import { ICreateUserRequest, ICreateUserResponse } from "../controllers/contracts/user";
 import { ICreatePricelistRequest, ICreatePricelistResponse } from "../controllers/contracts/user/pricelist-crud";
 import {
     ICreateProfessionPricelistRequest,
@@ -44,24 +45,14 @@ export const setup = async (opts: IOptions): Promise<ISetupSettings> => {
 };
 
 // user test-helper
-export interface IUserResponse {
-    id: number;
-    email: string;
-}
-
-export interface IUserRequest {
-    email: string;
-    password: string;
-}
-
 const getUserTestHelper = (request: supertest.SuperTest<supertest.Test>) => {
-    const requestUser = (body: IUserRequest) => request.post("/users").send(body);
-    const createUser = async (t: TestContext, body: IUserRequest) => {
+    const requestUser = (body: ICreateUserRequest) => request.post("/users").send(body);
+    const createUser = async (t: TestContext, body: ICreateUserRequest) => {
         const res = await requestUser(body);
         t.is(res.status, HTTPStatus.CREATED);
         t.not(String(res.header["content-type"]).match(/^application\/json/), null);
 
-        const responseBody = res.body;
+        const responseBody: ICreateUserResponse = res.body;
         t.true("user" in responseBody);
         t.true("id" in responseBody.user);
         t.is(typeof responseBody.user.id, "number");
