@@ -56,7 +56,7 @@ export class PricelistCrudController {
             }),
         );
         return {
-            data: { entries, pricelist: pricelist.toJson() },
+            data: { entries: entries.map(v => v.toJson()), pricelist: pricelist.toJson() },
             status: HTTPStatus.CREATED,
         };
     };
@@ -180,7 +180,7 @@ export class PricelistCrudController {
         // dumping out a response
         return {
             data: {
-                entries: [...receivedEntries, ...newEntries],
+                entries: [...receivedEntries, ...newEntries].map(v => v.toJson()),
                 pricelist: pricelist.toJson(),
             },
             status: HTTPStatus.OK,

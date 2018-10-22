@@ -1,12 +1,13 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
-import { PricelistEntry } from "./pricelist-entry";
+import { IPricelistEntryJson, PricelistEntry } from "./pricelist-entry";
 import { ProfessionPricelist } from "./profession-pricelist";
 import { User } from "./user";
 
 export interface IPricelistJson {
     id: number;
     name: string;
+    entries: IPricelistEntryJson[];
 }
 
 @Entity({ name: "pricelists" })
@@ -34,7 +35,16 @@ export class Pricelist {
     }
 
     public toJson(): IPricelistJson {
+        const entries: IPricelistEntryJson[] = (() => {
+            if (typeof this.entries === "undefined") {
+                return [];
+            }
+
+            return this.entries.map(v => v.toJson());
+        })();
+
         return {
+            entries,
             id: this.id!,
             name: this.name,
         };

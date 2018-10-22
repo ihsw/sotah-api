@@ -3,6 +3,12 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "t
 import { ItemId } from "../types/item";
 import { Pricelist } from "./pricelist";
 
+export interface IPricelistEntryJson {
+    id: number;
+    item_id: ItemId;
+    quantity_modifier: number;
+}
+
 @Entity({ name: "pricelist_entries" })
 export class PricelistEntry {
     @PrimaryGeneratedColumn()
@@ -21,5 +27,13 @@ export class PricelistEntry {
     constructor() {
         this.itemId = -1;
         this.quantityModifier = -1;
+    }
+
+    public toJson(): IPricelistEntryJson {
+        return {
+            id: this.id!,
+            item_id: this.itemId,
+            quantity_modifier: this.quantityModifier,
+        };
     }
 }
