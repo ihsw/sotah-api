@@ -1,4 +1,4 @@
-import { Pricelist } from "../../../entities/pricelist";
+import { IPricelistJson } from "../../../entities/pricelist";
 import { PricelistEntry } from "../../../entities/pricelist-entry";
 import { IItemsMap } from "../../../types/item";
 
@@ -14,17 +14,17 @@ export interface ICreatePricelistRequest {
 }
 
 export interface ICreatePricelistResponse {
-    pricelist: Pricelist;
+    pricelist: IPricelistJson;
     entries: PricelistEntry[];
 }
 
 export interface IGetPricelistsResponse {
-    pricelists: Pricelist[];
+    pricelists: IPricelistJson[];
     items: IItemsMap;
 }
 
 export interface IGetPricelistResponse {
-    pricelist: Pricelist;
+    pricelist: IPricelistJson;
 }
 
 export type IUpdatePricelistRequest = ICreatePricelistRequest;

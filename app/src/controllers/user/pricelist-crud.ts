@@ -56,7 +56,7 @@ export class PricelistCrudController {
             }),
         );
         return {
-            data: { entries, pricelist },
+            data: { entries, pricelist: pricelist.toJson() },
             status: HTTPStatus.CREATED,
         };
     };
@@ -86,7 +86,7 @@ export class PricelistCrudController {
 
         // dumping out a response
         return {
-            data: { pricelists, items },
+            data: { pricelists: pricelists.map(v => v.toJson()), items },
             status: HTTPStatus.OK,
         };
     };
@@ -104,7 +104,7 @@ export class PricelistCrudController {
         }
 
         return {
-            data: { pricelist },
+            data: { pricelist: pricelist.toJson() },
             status: HTTPStatus.OK,
         };
     };
@@ -181,7 +181,7 @@ export class PricelistCrudController {
         return {
             data: {
                 entries: [...receivedEntries, ...newEntries],
-                pricelist,
+                pricelist: pricelist.toJson(),
             },
             status: HTTPStatus.OK,
         };

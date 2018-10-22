@@ -4,6 +4,11 @@ import { PricelistEntry } from "./pricelist-entry";
 import { ProfessionPricelist } from "./profession-pricelist";
 import { User } from "./user";
 
+export interface IPricelistJson {
+    id: number;
+    name: string;
+}
+
 @Entity({ name: "pricelists" })
 export class Pricelist {
     @PrimaryGeneratedColumn()
@@ -26,5 +31,12 @@ export class Pricelist {
 
     constructor() {
         this.name = "";
+    }
+
+    public toJson(): IPricelistJson {
+        return {
+            id: this.id!,
+            name: this.name,
+        };
     }
 }
