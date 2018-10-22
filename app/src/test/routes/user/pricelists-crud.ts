@@ -91,7 +91,7 @@ test("Pricelists crud endpoint Should return pricelists", async t => {
     const body: IGetPricelistsResponse = res.body;
     t.is(status, HTTPStatus.OK);
     t.is(body.pricelists.length, 5);
-    t.is(body.pricelists.reduce((total: number, v) => total + v.entries!.length, 0), 5);
+    t.is(body.pricelists.reduce((total: number, v) => total + v.pricelist_entries!.length, 0), 5);
 });
 
 test("Pricelists crud endpoint Should return pricelists", async t => {
@@ -119,7 +119,7 @@ test("Pricelists crud endpoint Should return pricelists", async t => {
     const body: IGetPricelistsResponse = res.body;
     t.is(status, HTTPStatus.OK);
     t.is(body.pricelists.length, 5);
-    t.is(body.pricelists.reduce((total, v) => total + v.entries!.length, 0), 5);
+    t.is(body.pricelists.reduce((total, v) => total + v.pricelist_entries!.length, 0), 5);
 });
 
 test("Pricelists crud endpoint Should update a pricelist", async t => {
@@ -146,7 +146,7 @@ test("Pricelists crud endpoint Should update a pricelist", async t => {
             entries: entries.map(v => {
                 return {
                     ...v,
-                    quantity_modifier: v.quantityModifier + 1,
+                    quantity_modifier: v.quantity_modifier + 1,
                 };
             }),
             pricelist: { name: "test2" },
@@ -181,7 +181,7 @@ test("Pricelists crud endpoint Should update all entries", async t => {
             entries: entries.map(v => {
                 return {
                     ...v,
-                    quantity_modifier: v.quantityModifier + 5,
+                    quantity_modifier: v.quantity_modifier + 5,
                 };
             }),
             pricelist: { name: "test2" },

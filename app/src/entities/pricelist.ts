@@ -7,7 +7,7 @@ import { User } from "./user";
 export interface IPricelistJson {
     id: number;
     name: string;
-    entries: IPricelistEntryJson[];
+    pricelist_entries: IPricelistEntryJson[];
 }
 
 @Entity({ name: "pricelists" })
@@ -44,9 +44,9 @@ export class Pricelist {
         })();
 
         return {
-            entries,
             id: this.id!,
             name: this.name,
+            pricelist_entries: entries,
         };
     }
 }
