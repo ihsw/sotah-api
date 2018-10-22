@@ -21,6 +21,8 @@ export interface IOptions {
 export const getApp = async (opts: IOptions): Promise<express.Express> => {
     const { logger, natsHost, natsPort, dbHost } = opts;
 
+    logger.info("Starting app");
+
     // express init
     let app = express();
     app.use(express.json());
