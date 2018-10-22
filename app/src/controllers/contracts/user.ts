@@ -1,3 +1,5 @@
+import { User } from "../../entities";
+
 export interface ICreateUserRequest {
     email: string;
     password: string;
@@ -5,6 +7,7 @@ export interface ICreateUserRequest {
 
 export interface ICreateUserResponse {
     token: string;
+    user: User;
 }
 
 export interface ILoginRequest {

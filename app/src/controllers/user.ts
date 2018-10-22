@@ -27,8 +27,9 @@ export class UserController {
         try {
             result = (await UserRequestBodyRules.validate(req.body)) as ICreateUserRequest;
         } catch (err) {
+            const validationErrorResponse: IValidationErrorResponse = { [err.path]: err.message };
             return {
-                data: { [err.path]: err.message },
+                data: validationErrorResponse,
                 status: HTTPStatus.BAD_REQUEST,
             };
         }
@@ -51,6 +52,7 @@ export class UserController {
         return {
             data: {
                 token: await user.generateJwtToken(this.messenger),
+                user,
             },
             status: HTTPStatus.CREATED,
         };
