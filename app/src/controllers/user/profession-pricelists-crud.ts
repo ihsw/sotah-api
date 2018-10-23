@@ -4,8 +4,8 @@ import { Connection } from "typeorm";
 import { Pricelist } from "../../entities/pricelist";
 import { PricelistEntry } from "../../entities/pricelist-entry";
 import { ProfessionPricelist } from "../../entities/profession-pricelist";
-import { UserLevel } from "../../entities/user";
 import { ProfessionPricelistRequestBodyRules } from "../../lib/validator-rules";
+import { UserLevel } from "../../types/entities";
 import { IValidationErrorResponse } from "../contracts";
 import {
     ICreateProfessionPricelistRequest,

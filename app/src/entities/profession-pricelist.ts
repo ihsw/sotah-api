@@ -1,5 +1,6 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
+import { IProfessionPricelistJson } from "../types/entities";
 import { ExpansionName } from "../types/expansion";
 import { ProfessionName } from "../types/profession";
 import { Pricelist } from "./pricelist";
@@ -24,5 +25,13 @@ export class ProfessionPricelist {
     constructor() {
         this.name = "";
         this.expansion = "";
+    }
+
+    public toJson(): IProfessionPricelistJson {
+        return {
+            expansion: this.expansion,
+            id: this.id!,
+            name: this.name,
+        };
     }
 }

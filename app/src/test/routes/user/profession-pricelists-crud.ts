@@ -6,9 +6,10 @@ import * as bcrypt from "bcrypt";
 import * as HTTPStatus from "http-status";
 import { v4 as uuidv4 } from "uuid";
 
-import { User, UserLevel } from "../../../entities/user";
+import { User } from "../../../entities/user";
 import { getLogger } from "../../../lib/logger";
 import { getTestHelper, setup } from "../../../lib/test-helper";
+import { UserLevel } from "../../../types/entities";
 
 const helper = async () => {
     const { request, dbConn } = await setup({

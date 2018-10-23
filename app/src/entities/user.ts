@@ -3,19 +3,9 @@ import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typ
 
 import { Messenger } from "../lib/messenger";
 import { getJwtOptions } from "../lib/session";
+import { IUserJson, UserLevel } from "../types/entities";
 import { Preference } from "./preference";
 import { Pricelist } from "./pricelist";
-
-export enum UserLevel {
-    Admin = 60,
-    Regular = 5,
-}
-
-export interface IUserJson {
-    id: number;
-    email: string;
-    level: UserLevel;
-}
 
 @Entity({ name: "users" })
 export class User {

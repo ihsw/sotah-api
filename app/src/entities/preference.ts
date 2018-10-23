@@ -1,12 +1,7 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
+import { IPreferenceJson } from "../types/entities";
 import { User } from "./user";
-
-export interface IPreferenceJson {
-    id: number;
-    current_region: string | null;
-    current_realm: string | null;
-}
 
 @Entity({ name: "preferences" })
 export class Preference {

@@ -1,5 +1,4 @@
-import { IPricelistJson } from "../../../entities/pricelist";
-import { IPricelistEntryJson } from "../../../entities/pricelist-entry";
+import { IPricelistEntryJson, IPricelistJson } from "../../../types/entities";
 import { IItemsMap } from "../../../types/item";
 
 export interface ICreatePricelistRequest {

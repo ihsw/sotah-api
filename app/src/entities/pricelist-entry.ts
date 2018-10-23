@@ -1,13 +1,8 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
+import { IPricelistEntryJson } from "../types/entities";
 import { ItemId } from "../types/item";
 import { Pricelist } from "./pricelist";
-
-export interface IPricelistEntryJson {
-    id: number;
-    item_id: ItemId;
-    quantity_modifier: number;
-}
 
 @Entity({ name: "pricelist_entries" })
 export class PricelistEntry {
