@@ -17,7 +17,11 @@ env:
 install:
 - cd ./app && npm install -s
 before_script:
-- cd ../ && docker-compose up -d sotah-server-test && cd ./app
+- cd ../
+- git clone git@github.com:ihsw/sotah-infra.git
+- cd ./sotah-infra
+- docker-compose up -d sotah-server-api sotah-server-live-auctions sotah-server-pricelist-histories db
+- cd ../app
 script:
 - npm run -s build
 - npm run -s lint
