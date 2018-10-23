@@ -66,7 +66,7 @@ export class PricelistCrudController {
 
         // gathering pricelists associated with this user
         let pricelists = await this.dbConn.getRepository(Pricelist).find({
-            where: { user_id: user.id },
+            where: { user: { id: user.id } },
         });
 
         // filtering out profession-pricelists
@@ -94,7 +94,7 @@ export class PricelistCrudController {
     public getPricelist: RequestHandler<null, IGetPricelistResponse | null> = async req => {
         const user = req.user!;
         const pricelist = await this.dbConn.manager.getRepository(Pricelist).findOne({
-            where: { id: req.params["id"], user_id: user.id },
+            where: { id: req.params["id"], user: { id: user.id } },
         });
         if (typeof pricelist === "undefined") {
             return {
@@ -116,7 +116,7 @@ export class PricelistCrudController {
         // resolving the pricelist
         const user = req.user!;
         const pricelist = await this.dbConn.getRepository(Pricelist).findOne({
-            where: { id: req.params["id"], user_id: user.id },
+            where: { id: req.params["id"], user: { id: user.id } },
         });
         if (typeof pricelist === "undefined") {
             return {
@@ -193,7 +193,7 @@ export class PricelistCrudController {
         // resolving the pricelist
         const user = req.user!;
         const pricelist = await this.dbConn.getRepository(Pricelist).findOne({
-            where: { id: req.params["id"], user_id: user.id },
+            where: { id: req.params["id"], user: { id: user.id } },
         });
         if (typeof pricelist === "undefined") {
             return {
