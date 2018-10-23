@@ -5,8 +5,11 @@ import * as nats from "nats";
 import { createConnection } from "typeorm";
 import { v4 as uuidv4 } from "uuid";
 import { Logger } from "winston";
-
-import { Preference, Pricelist, PricelistEntry, ProfessionPricelist, User } from "../entities";
+import { Preference } from "../entities/preference";
+import { Pricelist } from "../entities/pricelist";
+import { PricelistEntry } from "../entities/pricelist-entry";
+import { ProfessionPricelist } from "../entities/profession-pricelist";
+import { User } from "../entities/user";
 import { defaultRouter, getDataRouter, getUserRouter } from "../routes";
 import { Messenger } from "./messenger";
 import { appendSessions } from "./session";
@@ -68,7 +71,7 @@ export const getApp = async (opts: IOptions): Promise<express.Express> => {
 
     // error handler
     app.use((err: Error, _: express.Request, res: express.Response, next: () => void) => {
-        logger.error("Dumping out error response", { error: err.message });
+        logger.error("Dumping out error response", { error: err });
 
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(err.message);
         next();

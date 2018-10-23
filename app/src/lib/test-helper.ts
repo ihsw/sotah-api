@@ -12,7 +12,11 @@ import {
     ICreateProfessionPricelistRequest,
     ICreateProfessionPricelistResponse,
 } from "../controllers/contracts/user/profession-pricelists-crud";
-import { Preference, Pricelist, PricelistEntry, ProfessionPricelist, User } from "../entities";
+import { Preference } from "../entities/preference";
+import { Pricelist } from "../entities/pricelist";
+import { PricelistEntry } from "../entities/pricelist-entry";
+import { ProfessionPricelist } from "../entities/profession-pricelist";
+import { User } from "../entities/user";
 import { getApp, IOptions } from "./app";
 import { Messenger } from "./messenger";
 
