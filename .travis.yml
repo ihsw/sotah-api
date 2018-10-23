@@ -18,7 +18,7 @@ install:
 - cd ./app && npm install -s
 before_script:
 - cd ../
-- git clone git@github.com:ihsw/sotah-infra.git
+- git clone https://github.com/ihsw/sotah-infra.git
 - cd ./sotah-infra
 - docker-compose up -d sotah-server-api sotah-server-live-auctions sotah-server-pricelist-histories db
 - cd ../app
