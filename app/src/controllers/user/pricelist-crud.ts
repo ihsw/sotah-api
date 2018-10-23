@@ -168,7 +168,7 @@ export class PricelistCrudController {
         receivedEntries = await Promise.all(
             receivedEntries.map((v, i) => {
                 v.itemId = receivedRequestEntries[i].item_id;
-                v.quantityModifier = receivedEntries[i].quantityModifier;
+                v.quantityModifier = receivedRequestEntries[i].quantity_modifier;
 
                 return this.dbConn.manager.save(v);
             }),
