@@ -4,16 +4,7 @@ import { Connection } from "typeorm";
 
 import { ProfessionPricelist } from "../entities/profession-pricelist";
 import { code, Messenger } from "../lib/messenger";
-import { ItemId } from "../types/item";
-import {
-    IBollingerBands,
-    IItemMarketPrices,
-    IItemPriceLimits,
-    IPriceLimits,
-    IPricelistHistoryMap,
-    IPrices,
-} from "../types/pricelist";
-import { IErrorResponse } from "./contracts";
+import { IErrorResponse } from "../types/contracts";
 import {
     IGetAuctionsRequest,
     IGetAuctionsResponse,
@@ -37,7 +28,16 @@ import {
     IQueryItemsResponse,
     IQueryOwnerItemsRequest,
     IQueryOwnerItemsResponse,
-} from "./contracts/data";
+} from "../types/contracts/data";
+import { ItemId } from "../types/item";
+import {
+    IBollingerBands,
+    IItemMarketPrices,
+    IItemPriceLimits,
+    IPriceLimits,
+    IPricelistHistoryMap,
+    IPrices,
+} from "../types/pricelist";
 import { RequestHandler } from "./index";
 
 export class DataController {

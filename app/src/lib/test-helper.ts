@@ -6,17 +6,17 @@ import * as supertest from "supertest";
 import { Connection, createConnection } from "typeorm";
 import { v4 as uuidv4 } from "uuid";
 
-import { ICreateUserRequest, ICreateUserResponse } from "../controllers/contracts/user";
-import { ICreatePricelistRequest, ICreatePricelistResponse } from "../controllers/contracts/user/pricelist-crud";
-import {
-    ICreateProfessionPricelistRequest,
-    ICreateProfessionPricelistResponse,
-} from "../controllers/contracts/user/profession-pricelists-crud";
 import { Preference } from "../entities/preference";
 import { Pricelist } from "../entities/pricelist";
 import { PricelistEntry } from "../entities/pricelist-entry";
 import { ProfessionPricelist } from "../entities/profession-pricelist";
 import { User } from "../entities/user";
+import { ICreateUserRequest, ICreateUserResponse } from "../types/contracts/user";
+import { ICreatePricelistRequest, ICreatePricelistResponse } from "../types/contracts/user/pricelist-crud";
+import {
+    ICreateProfessionPricelistRequest,
+    ICreateProfessionPricelistResponse,
+} from "../types/contracts/user/profession-pricelists-crud";
 import { getApp, IOptions } from "./app";
 import { Messenger } from "./messenger";
 

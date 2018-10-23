@@ -5,9 +5,9 @@ import test from "ava";
 import * as HTTPStatus from "http-status";
 import { v4 as uuidv4 } from "uuid";
 
-import { IGetPricelistsResponse } from "../../../controllers/contracts/user/pricelist-crud";
 import { getLogger } from "../../../lib/logger";
 import { getTestHelper, setup } from "../../../lib/test-helper";
+import { IGetPricelistsResponse } from "../../../types/contracts/user/pricelist-crud";
 
 const helper = async () => {
     const { request } = await setup({

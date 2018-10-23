@@ -5,8 +5,7 @@ import { Pricelist } from "../../entities/pricelist";
 import { PricelistEntry } from "../../entities/pricelist-entry";
 import { Messenger } from "../../lib/messenger";
 import { PricelistRequestBodyRules } from "../../lib/validator-rules";
-import { ItemId } from "../../types/item";
-import { IValidationErrorResponse } from "../contracts";
+import { IValidationErrorResponse } from "../../types/contracts";
 import {
     ICreatePricelistRequest,
     ICreatePricelistResponse,
@@ -14,7 +13,8 @@ import {
     IGetPricelistsResponse,
     IUpdatePricelistRequest,
     IUpdatePricelistResponse,
-} from "../contracts/user/pricelist-crud";
+} from "../../types/contracts/user/pricelist-crud";
+import { ItemId } from "../../types/item";
 import { RequestHandler } from "../index";
 
 export class PricelistCrudController {

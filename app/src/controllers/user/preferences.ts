@@ -3,14 +3,14 @@ import { Connection } from "typeorm";
 
 import { Preference } from "../../entities/preference";
 import { PreferenceRules } from "../../lib/validator-rules";
-import { IErrorResponse, IValidationErrorResponse } from "../contracts";
+import { IErrorResponse, IValidationErrorResponse } from "../../types/contracts";
 import {
     ICreatePreferencesRequest,
     ICreatePreferencesResponse,
     IGetPreferencesResponse,
     IUpdatePreferencesRequest,
     IUpdatePreferencesResponse,
-} from "../contracts/user/preferences";
+} from "../../types/contracts/user/preferences";
 import { RequestHandler } from "../index";
 
 export class PreferencesController {

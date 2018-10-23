@@ -5,9 +5,9 @@ import { Connection } from "typeorm";
 import { User } from "../entities/user";
 import { Messenger } from "../lib/messenger";
 import { UserRequestBodyRules } from "../lib/validator-rules";
+import { IValidationErrorResponse } from "../types/contracts";
+import { ICreateUserRequest, ICreateUserResponse, ILoginRequest, ILoginResponse } from "../types/contracts/user";
 import { UserLevel } from "../types/entities";
-import { IValidationErrorResponse } from "./contracts";
-import { ICreateUserRequest, ICreateUserResponse, ILoginRequest, ILoginResponse } from "./contracts/user";
 import { RequestHandler } from "./index";
 
 export class UserController {
