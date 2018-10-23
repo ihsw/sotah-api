@@ -1,6 +1,6 @@
 import { createLogger, format, Logger, transports } from "winston";
 
-export const getLogger = (level: string = "warn"): Logger => {
+export const getLogger = (level: string = "info"): Logger => {
     return createLogger({
         format: format.json(),
         level,
