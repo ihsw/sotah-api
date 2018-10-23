@@ -4,7 +4,7 @@ import { ExpansionName } from "../types/expansion";
 import { ProfessionName } from "../types/profession";
 import { Pricelist } from "./pricelist";
 
-@Entity()
+@Entity({ name: "profession_pricelists" })
 export class ProfessionPricelist {
     @PrimaryGeneratedColumn()
     public id: number | undefined;
