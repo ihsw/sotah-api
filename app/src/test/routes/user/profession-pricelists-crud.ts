@@ -81,7 +81,7 @@ test("Profession pricelists crud endpoint Should delete a profession-pricelist",
     });
 
     res = await request
-        .delete(`/user/profession-pricelists/${responseBody.pricelist.id}`)
+        .delete(`/user/profession-pricelists/${responseBody.profession_pricelist.id}`)
         .set("Authorization", `Bearer ${token}`);
     t.is(res.status, HTTPStatus.OK);
 });
