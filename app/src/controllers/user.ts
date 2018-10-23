@@ -2,8 +2,7 @@ import * as bcrypt from "bcrypt";
 import * as HTTPStatus from "http-status";
 import { Connection } from "typeorm";
 
-import { User } from "../entities";
-import { UserLevel } from "../entities/user";
+import { User, UserLevel } from "../entities/user";
 import { Messenger } from "../lib/messenger";
 import { UserRequestBodyRules } from "../lib/validator-rules";
 import { IValidationErrorResponse } from "./contracts";

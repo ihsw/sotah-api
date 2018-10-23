@@ -1,7 +1,9 @@
 import * as HTTPStatus from "http-status";
 import { Connection } from "typeorm";
 
-import { Pricelist, PricelistEntry, ProfessionPricelist } from "../../entities";
+import { Pricelist } from "../../entities/pricelist";
+import { PricelistEntry } from "../../entities/pricelist-entry";
+import { ProfessionPricelist } from "../../entities/profession-pricelist";
 import { UserLevel } from "../../entities/user";
 import { ProfessionPricelistRequestBodyRules } from "../../lib/validator-rules";
 import { IValidationErrorResponse } from "../contracts";

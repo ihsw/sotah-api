@@ -1,7 +1,7 @@
 import * as HTTPStatus from "http-status";
 import { Connection } from "typeorm";
 
-import { Preference } from "../../entities";
+import { Preference } from "../../entities/preference";
 import { PreferenceRules } from "../../lib/validator-rules";
 import { IErrorResponse, IValidationErrorResponse } from "../contracts";
 import {

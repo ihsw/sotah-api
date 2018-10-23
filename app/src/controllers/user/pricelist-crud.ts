@@ -1,7 +1,8 @@
 import * as HTTPStatus from "http-status";
 import { Connection } from "typeorm";
 
-import { Pricelist, PricelistEntry } from "../../entities";
+import { Pricelist } from "../../entities/pricelist";
+import { PricelistEntry } from "../../entities/pricelist-entry";
 import { Messenger } from "../../lib/messenger";
 import { PricelistRequestBodyRules } from "../../lib/validator-rules";
 import { ItemId } from "../../types/item";
