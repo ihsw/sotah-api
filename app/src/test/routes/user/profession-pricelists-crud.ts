@@ -22,12 +22,10 @@ const helper = async () => {
     return { request, dbConn, createUser, requestProfessionPricelist, createProfessionPricelist };
 };
 
-test.only("Profession pricelists crud endpoint Should create a profession-pricelist", async t => {
+test("Profession pricelists crud endpoint Should create a profession-pricelist", async t => {
     const { dbConn, request, requestProfessionPricelist } = await helper();
-    const logger = getLogger("info");
 
     const password = "testtest";
-    logger.info("Getting user");
     const user = await (async () => {
         const out = new User();
         out.email = `create-profession-pricelists+${uuidv4()}@test.com`;
@@ -36,12 +34,10 @@ test.only("Profession pricelists crud endpoint Should create a profession-pricel
 
         return dbConn.manager.save(out);
     })();
-    logger.info("Logging in");
     let res = await request.post("/login").send({ email: user.email, password });
     t.is(res.status, HTTPStatus.OK);
     const { token } = res.body;
 
-    logger.info("Requesting pricelist");
     res = await requestProfessionPricelist(token, {
         entries: [{ item_id: -1, quantity_modifier: -1 }],
         expansion_name: "test-expansion",
