@@ -17,10 +17,10 @@ env:
 install:
 - cd ./app && npm install -s
 before_script:
-- cd ../
-- git clone https://github.com/ihsw/sotah-infra.git
-- cd ./sotah-infra
-- docker-compose up -d sotah-server-api sotah-server-live-auctions sotah-server-pricelist-histories db
+- cd ../ && git clone https://github.com/ihsw/sotah-server.git
+- cd ./sotah-server && docker build -t ihsw/sotah-server .
+- cd ../ && git clone https://github.com/ihsw/sotah-infra.git
+- cd ./sotah-infra && docker-compose up -d sotah-server-api sotah-server-live-auctions sotah-server-pricelist-histories db
 - cd ../app
 script:
 - npm run -s build
