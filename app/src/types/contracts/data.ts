@@ -106,11 +106,9 @@ export interface IGetPricelistResponse {
 }
 
 export interface IGetPricelistHistoriesRequest {
-    region_name: regionName;
-    realm_slug: realmSlug;
     item_ids: ItemId[];
-    lower_bounds: number;
-    upper_bounds: number;
+    lower_bounds?: number;
+    upper_bounds?: number;
 }
 
 export interface IGetPricelistHistoriesResponse {
