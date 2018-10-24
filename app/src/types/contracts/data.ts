@@ -6,7 +6,7 @@ import { IItem, IItemsMap, ItemId } from "../item";
 import { IItemClass } from "../item-class";
 import { IItemMarketPrices, IItemPriceLimits, IPriceLimits, IPricelistHistoryMap, IPriceListMap } from "../pricelist";
 import { IProfession } from "../profession";
-import { IRealm, IRegion, realmSlug, regionName } from "../region";
+import { IRealm, IRegion } from "../region";
 
 export type IGetRegionsResponse = IRegion[];
 
@@ -69,8 +69,6 @@ export interface IQueryAuctionsResponse {
 }
 
 export interface IQueryOwnerItemsRequest {
-    region_name: regionName;
-    realm_slug: realmSlug;
     items: ItemId[];
 }
 
