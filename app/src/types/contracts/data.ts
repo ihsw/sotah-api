@@ -21,7 +21,7 @@ export interface IGetBootResponse {
     professions: IProfession[];
 }
 
-interface IStatusRealm extends IRealm {
+export interface IStatusRealm extends IRealm {
     regionName: string;
 }
 
