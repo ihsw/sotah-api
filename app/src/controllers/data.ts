@@ -404,7 +404,7 @@ export class DataController {
         return {
             data: {
                 items,
-                professionPricelists: unmetProfessionPricelists,
+                professionPricelists: unmetProfessionPricelists.map(v => v.toJson()),
                 unmetItemIds,
             },
             status: HTTPStatus.OK,
@@ -431,7 +431,7 @@ export class DataController {
 
         // dumping out a response
         return {
-            data: { profession_pricelists: professionPricelists, items },
+            data: { profession_pricelists: professionPricelists.map(v => v.toJson()), items },
             status: HTTPStatus.OK,
         };
     };

@@ -72,9 +72,9 @@ export class ProfessionPricelistsCrudController {
 
         return {
             data: {
-                entries,
-                pricelist,
-                profession_pricelist: professionPricelist,
+                entries: entries.map(v => v.toJson()),
+                pricelist: pricelist.toJson(),
+                profession_pricelist: professionPricelist.toJson(),
             },
             status: HTTPStatus.CREATED,
         };
