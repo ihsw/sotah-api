@@ -5,11 +5,11 @@ import { IItem, IItemsMap, ItemId } from "../../../types/item";
 import { IItemClass } from "../../../types/item-class";
 import { IPricelistHistoryMap, IPriceListMap } from "../../../types/pricelist";
 import { IProfession } from "../../../types/profession";
-import { IRegion, realmSlug, regionName } from "../../../types/region";
+import { IRegion, RealmSlug, RegionName } from "../../../types/region";
 
 export interface IGetAuctionsRequest {
-    region_name: regionName;
-    realm_slug: realmSlug;
+    region_name: RegionName;
+    realm_slug: RealmSlug;
     page: number;
     count: number;
     sort_kind: SortKind;
@@ -25,8 +25,8 @@ export interface IGetAuctionsResponse {
 }
 
 export interface IGetPricelistRequest {
-    region_name: regionName;
-    realm_slug: realmSlug;
+    region_name: RegionName;
+    realm_slug: RealmSlug;
     item_ids: ItemId[];
 }
 
@@ -36,8 +36,8 @@ export interface IGetPricelistResponse {
 
 export interface IGetOwnersRequest {
     query: string;
-    region_name: regionName;
-    realm_slug: realmSlug;
+    region_name: RegionName;
+    realm_slug: RealmSlug;
 }
 
 export interface IGetOwnersResponse {
@@ -58,8 +58,8 @@ export interface IQueryItemsResponse {
 
 export interface IQueryOwnersRequest {
     query: string;
-    region_name: regionName;
-    realm_slug: realmSlug;
+    region_name: RegionName;
+    realm_slug: RealmSlug;
 }
 
 export interface IQueryOwnersResponse {
@@ -86,8 +86,8 @@ export interface IGetBootResponse {
 }
 
 export interface IGetPricelistHistoriesRequest {
-    region_name: regionName;
-    realm_slug: realmSlug;
+    region_name: RegionName;
+    realm_slug: RealmSlug;
     item_ids: ItemId[];
     lower_bounds: number;
     upper_bounds: number;
@@ -100,8 +100,8 @@ export interface IGetPricelistHistoriesResponse {
 }
 
 export interface IQueryOwnerItemsRequest {
-    region_name: regionName;
-    realm_slug: realmSlug;
+    region_name: RegionName;
+    realm_slug: RealmSlug;
     items: ItemId[];
 }
 

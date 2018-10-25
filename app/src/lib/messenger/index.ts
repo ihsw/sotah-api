@@ -2,7 +2,7 @@ import * as nats from "nats";
 import * as zlib from "zlib";
 
 import { ItemId } from "../../types/item";
-import { IRegion, IStatus, regionName } from "../../types/region";
+import { IRegion, IStatus, RegionName } from "../../types/region";
 import {
     IGetAuctionsRequest,
     IGetAuctionsResponse,
@@ -90,7 +90,7 @@ export class Messenger {
         this.client = client;
     }
 
-    public getStatus(regionNameValue: regionName): Promise<Message<IStatus>> {
+    public getStatus(regionNameValue: RegionName): Promise<Message<IStatus>> {
         return this.request(subjects.status, { body: JSON.stringify({ region_name: regionNameValue }) });
     }
 
