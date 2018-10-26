@@ -32,7 +32,7 @@ export class ProfessionPricelist {
             expansion: this.expansion,
             id: this.id!,
             name: this.name,
-            pricelist_id: this.pricelist!.id!,
+            pricelist: this.pricelist!.toJson(),
         };
     }
 }
