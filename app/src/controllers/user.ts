@@ -85,7 +85,10 @@ export class UserController {
 
         // issuing a jwt token
         return {
-            data: { token: await user.generateJwtToken(this.messenger) },
+            data: {
+                token: await user.generateJwtToken(this.messenger),
+                user: user.toJson(),
+            },
             status: HTTPStatus.OK,
         };
     };
