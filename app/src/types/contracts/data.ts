@@ -72,11 +72,13 @@ export interface IQueryOwnerItemsRequest {
     items: ItemId[];
 }
 
+export interface IQueryOwnerItem {
+    owned_value: number;
+    owned_volume: number;
+}
+
 export interface IQueryOwnerItemsMap {
-    [ownerName: string]: {
-        owned_value: number;
-        owned_volume: number;
-    };
+    [ownerName: string]: IQueryOwnerItem;
 }
 
 export interface IQueryOwnerItemsResponse {
