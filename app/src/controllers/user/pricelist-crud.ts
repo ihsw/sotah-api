@@ -103,9 +103,11 @@ export class PricelistCrudController {
                 status: HTTPStatus.NOT_FOUND,
             };
         }
+        const itemIds = pricelist.entries!.map(v => v.itemId);
+        const items = (await this.messenger.getItems(itemIds)).data!.items;
 
         return {
-            data: { pricelist: pricelist.toJson() },
+            data: { items, pricelist: pricelist.toJson() },
             status: HTTPStatus.OK,
         };
     };
