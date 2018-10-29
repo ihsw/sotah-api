@@ -93,10 +93,12 @@ export interface IGetPricelistHistoriesRequest {
     upper_bounds: number;
 }
 
+export interface IItemPricelistHistoryMap {
+    [itemId: number]: IPricelistHistoryMap;
+}
+
 export interface IGetPricelistHistoriesResponse {
-    history: {
-        [itemId: number]: IPricelistHistoryMap;
-    };
+    history: IItemPricelistHistoryMap;
 }
 
 export interface IQueryOwnerItemsRequest {
