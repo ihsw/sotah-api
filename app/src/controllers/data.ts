@@ -30,7 +30,14 @@ import {
     IQueryOwnerItemsResponse,
 } from "../types/contracts/data";
 import { ItemId } from "../types/item";
-import { IBollingerBands, IItemPriceLimits, IPriceLimits, IPricelistHistoryMap, IPrices } from "../types/pricelist";
+import {
+    IBollingerBands,
+    IItemPriceLimits,
+    IItemPricelistHistoryMap,
+    IPriceLimits,
+    IPricelistHistoryMap,
+    IPrices,
+} from "../types/pricelist";
 import { RequestHandler } from "./index";
 
 export class DataController {
@@ -236,7 +243,7 @@ export class DataController {
         const { item_ids } = req.body;
         const currentUnixTimestamp = Math.floor(Date.now() / 1000);
         const lowerBounds = currentUnixTimestamp - 60 * 60 * 24 * 14;
-        const history = (await this.messenger.getPricelistHistories({
+        let history = (await this.messenger.getPricelistHistories({
             item_ids,
             lower_bounds: lowerBounds,
             realm_slug: req.params["realmSlug"],
@@ -244,6 +251,85 @@ export class DataController {
             upper_bounds: currentUnixTimestamp,
         })).data!.history;
         const items = (await this.messenger.getItems(item_ids)).data!.items;
+
+        // gathering unix timestamps for all items
+        const historyUnixTimestamps: number[] = item_ids.reduce((previousHistoryUnixTimestamps: number[], itemId) => {
+            if (!(itemId in history)) {
+                return previousHistoryUnixTimestamps;
+            }
+
+            const itemUnixTimestamps = Object.keys(history[itemId]).map(Number);
+            for (const itemUnixTimestamp of itemUnixTimestamps) {
+                if (previousHistoryUnixTimestamps.indexOf(itemUnixTimestamp) > -1) {
+                    continue;
+                }
+
+                previousHistoryUnixTimestamps.push(itemUnixTimestamp);
+            }
+
+            return previousHistoryUnixTimestamps;
+        }, []);
+
+        // normalizing all histories to have zeroed data where missing
+        history = item_ids.reduce((previousHistory: IItemPricelistHistoryMap, itemId) => {
+            // generating a full zeroed pricelist-history for this item
+            if (!(itemId in history)) {
+                const blankItemHistory: IPricelistHistoryMap = historyUnixTimestamps.reduce(
+                    (previousBlankItemHistory: IPricelistHistoryMap, unixTimestamp) => {
+                        const blankPrices: IPrices = {
+                            average_buyout_per: 0,
+                            max_buyout_per: 0,
+                            median_buyout_per: 0,
+                            min_buyout_per: 0,
+                            volume: 0,
+                        };
+
+                        return {
+                            ...previousBlankItemHistory,
+                            [unixTimestamp]: blankPrices,
+                        };
+                    },
+                    {},
+                );
+
+                return {
+                    ...previousHistory,
+                    [itemId]: blankItemHistory,
+                };
+            }
+
+            // reforming the item-history with zeroed blank prices where none found
+            const currentItemHistory = history[itemId];
+            const newItemHistory: IPricelistHistoryMap = historyUnixTimestamps.reduce(
+                (previousNewItemHistory: IPricelistHistoryMap, unixTimestamp) => {
+                    if (!(unixTimestamp in currentItemHistory)) {
+                        const blankPrices: IPrices = {
+                            average_buyout_per: 0,
+                            max_buyout_per: 0,
+                            median_buyout_per: 0,
+                            min_buyout_per: 0,
+                            volume: 0,
+                        };
+
+                        return {
+                            ...previousNewItemHistory,
+                            [unixTimestamp]: blankPrices,
+                        };
+                    }
+
+                    return {
+                        ...previousNewItemHistory,
+                        [unixTimestamp]: currentItemHistory[unixTimestamp],
+                    };
+                },
+                {},
+            );
+
+            return {
+                ...previousHistory,
+                [itemId]: newItemHistory,
+            };
+        }, {});
 
         const itemPriceLimits: IItemPriceLimits = item_ids.reduce((previousItemPriceLimits, itemId) => {
             const out: IPriceLimits = {
