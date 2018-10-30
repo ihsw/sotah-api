@@ -30,14 +30,7 @@ import {
     IQueryOwnerItemsResponse,
 } from "../types/contracts/data";
 import { ItemId } from "../types/item";
-import {
-    IBollingerBands,
-    IItemMarketPrices,
-    IItemPriceLimits,
-    IPriceLimits,
-    IPricelistHistoryMap,
-    IPrices,
-} from "../types/pricelist";
+import { IBollingerBands, IItemPriceLimits, IPriceLimits, IPricelistHistoryMap, IPrices } from "../types/pricelist";
 import { RequestHandler } from "./index";
 
 export class DataController {
