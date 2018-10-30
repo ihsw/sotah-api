@@ -414,7 +414,7 @@ export class DataController {
     public getProfessionPricelists: RequestHandler<null, IGetProfessionPricelistsResponse> = async req => {
         // gathering pricelists associated with this user, region, and realm
         const professionPricelists = await this.dbConn.getRepository(ProfessionPricelist).find({
-            where: { name: req.param["profession_name"] },
+            where: { name: req.params["profession_name"] },
         });
 
         // gathering related items
