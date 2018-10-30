@@ -67,6 +67,7 @@ export class PricelistCrudController {
 
         // gathering pricelists associated with this user
         let pricelists = await this.dbConn.getRepository(Pricelist).find({
+            relations: ["profession_pricelists"],
             where: { user: { id: user.id } },
         });
 
