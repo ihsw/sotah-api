@@ -67,12 +67,14 @@ export class PricelistCrudController {
 
         // gathering pricelists associated with this user
         let pricelists = await this.dbConn.getRepository(Pricelist).find({
-            relations: ["profession_pricelists"],
+            relations: ["professionPricelist"],
             where: { user: { id: user.id } },
         });
 
         // filtering out profession-pricelists
-        pricelists = pricelists.filter(v => typeof v.professionPricelist === "undefined");
+        pricelists = pricelists.filter(
+            v => typeof v.professionPricelist === "undefined" || v.professionPricelist === null,
+        );
 
         // gathering related items
         const itemIds: ItemId[] = pricelists.reduce((pricelistsItemIds: ItemId[], pricelist) => {
