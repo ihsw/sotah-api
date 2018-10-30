@@ -78,7 +78,7 @@ export class PreferencesController {
         IUpdatePreferencesResponse | IErrorResponse | IValidationErrorResponse | null
     > = async req => {
         const user = req.user!;
-        const preference = await this.dbConn.getRepository(Preference).findOne({ where: { user_id: user.id } });
+        const preference = await this.dbConn.getRepository(Preference).findOne({ where: { user: { id: user.id } } });
 
         if (typeof preference === "undefined") {
             return {
