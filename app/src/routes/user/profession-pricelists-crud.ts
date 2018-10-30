@@ -19,7 +19,7 @@ export const getRouter = (dbConn: Connection) => {
     );
 
     router.delete(
-        "/:id",
+        "/:pricelist_id",
         auth,
         wrap(async (req: Request, res: Response) => {
             await handle(controller.deleteProfessionPricelist, req, res);

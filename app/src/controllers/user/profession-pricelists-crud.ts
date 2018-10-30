@@ -92,7 +92,7 @@ export class ProfessionPricelistsCrudController {
         }
 
         const professionPricelist = await this.dbConn.getRepository(ProfessionPricelist).findOne({
-            where: { id: req.params["id"] },
+            where: { pricelist: { id: req.params["pricelist_id"] } },
         });
         if (typeof professionPricelist === "undefined") {
             return {
