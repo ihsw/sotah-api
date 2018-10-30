@@ -252,8 +252,6 @@ export class DataController {
         })).data!.history;
         const items = (await this.messenger.getItems(item_ids)).data!.items;
 
-        const itemMarketPrices: IItemMarketPrices = [];
-
         const itemPriceLimits: IItemPriceLimits = item_ids.reduce((previousItemPriceLimits, itemId) => {
             const out: IPriceLimits = {
                 lower: 0,
@@ -338,7 +336,7 @@ export class DataController {
         }, 0);
 
         return {
-            data: { history, items, itemPriceLimits, overallPriceLimits, itemMarketPrices },
+            data: { history, items, itemPriceLimits, overallPriceLimits },
             status: HTTPStatus.OK,
         };
     };
