@@ -14,8 +14,7 @@
     "build:w": "tsc -w && echo built",
     "ava": "ava --verbose",
     "lint": "tslint './src/**/*.ts' && echo linted",
-    "migrate-up": "sequelize db:migrate --config ./dist/sequelize-config.js --migrations-path ./dist/migrations",
-    "migrate-down": "sequelize db:migrate:undo --config ./dist/sequelize-config.js --migrations-path ./dist/migrations",
+    "migrate-up": "typeorm migration:run",
     "run:w": "nodemon --watch ./dist ./dist/index.js",
     "run": "node ./dist/index.js",
     "run:prod": "node ./dist/index-prod.js"
