@@ -18,13 +18,13 @@ export class User {
     @OneToMany(() => Pricelist, pricelist => pricelist.user)
     public pricelists: Pricelist[] | undefined;
 
-    @Column({ nullable: false })
+    @Column({ nullable: false, unique: true })
     public email: string;
 
     @Column({ name: "hashed_password", nullable: false })
     public hashedPassword: string;
 
-    @Column("int", { nullable: false })
+    @Column("int", { default: UserLevel.Regular, nullable: false })
     public level: UserLevel;
 
     constructor() {
