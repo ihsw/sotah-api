@@ -229,7 +229,7 @@ test("Pricelists crud endpoint Should remove absent entries", async t => {
     t.is(body.pricelist.pricelist_entries.length, 1);
 });
 
-test("Pricelists crud endpoint Should add new entries", async t => {
+test.only("Pricelists crud endpoint Should add new entries", async t => {
     const { createUser, request, createPricelist } = await helper();
 
     // creating the user
@@ -253,7 +253,7 @@ test("Pricelists crud endpoint Should add new entries", async t => {
         .put(`/user/pricelists/${pricelist.id}`)
         .set("Authorization", `Bearer ${token}`)
         .send({
-            entries: [...entries.slice(0, 1), { item_id: -2, quantity_modifier: -2 }],
+            entries: [...entries.slice(0, 1), { id: -1, item_id: -2, quantity_modifier: -2 }],
             pricelist: { name: "test2" },
         });
     t.is(res.status, HTTPStatus.OK);
