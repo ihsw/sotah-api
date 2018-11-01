@@ -185,10 +185,13 @@ export class PricelistCrudController {
         const removedEntries = entries.filter(v => receivedEntryIds.indexOf(v.id) === -1);
         await Promise.all(removedEntries.map(v => this.dbConn.manager.remove(v)));
 
+        // updating the pricelist object
+        pricelist.entries = [...receivedEntries, ...newEntries];
+
         // dumping out a response
         return {
             data: {
-                entries: [...receivedEntries, ...newEntries].map(v => v.toJson()),
+                entries: pricelist.entries.map(v => v.toJson()),
                 pricelist: pricelist.toJson(),
             },
             status: HTTPStatus.OK,
