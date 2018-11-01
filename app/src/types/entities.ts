@@ -37,3 +37,8 @@ export interface IUserJson {
     email: string;
     level: UserLevel;
 }
+
+export interface IPostJson {
+    id: number;
+    title: string;
+}

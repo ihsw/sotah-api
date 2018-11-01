@@ -4,6 +4,7 @@ import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typ
 import { Messenger } from "../lib/messenger";
 import { getJwtOptions } from "../lib/session";
 import { IUserJson, UserLevel } from "../types/entities";
+import { Post } from "./post";
 import { Preference } from "./preference";
 import { Pricelist } from "./pricelist";
 
@@ -17,6 +18,9 @@ export class User {
 
     @OneToMany(() => Pricelist, pricelist => pricelist.user)
     public pricelists: Pricelist[] | undefined;
+
+    @OneToMany(() => Post, post => post.user)
+    public posts: Post[] | undefined;
 
     @Column({ nullable: false, unique: true })
     public email: string;
