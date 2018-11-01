@@ -30,5 +30,5 @@ script:
 - npm run -s migrate-up
 - ./bin/run-tests-coverage && npm run -s coveralls-coverage
 - npm run -s test-coverage-report
-- cd ./sotah-infra && docker-compose stop && cd ../app
+- cd ../sotah-infra && docker-compose stop && cd ../app
 - git clean -xfd && docker build -t $DOCKER_IMAGE_NAME ../
