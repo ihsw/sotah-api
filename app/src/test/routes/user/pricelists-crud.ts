@@ -229,7 +229,7 @@ test("Pricelists crud endpoint Should remove absent entries", async t => {
     t.is(body.pricelist.pricelist_entries.length, 1);
 });
 
-test.only("Pricelists crud endpoint Should add new entries", async t => {
+test("Pricelists crud endpoint Should add new entries", async t => {
     const { createUser, request, createPricelist } = await helper();
 
     // creating the user
