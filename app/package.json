@@ -15,6 +15,7 @@
     "ava": "ava --verbose",
     "lint": "tslint './src/**/*.ts' && echo linted",
     "migrate-up": "typeorm migration:run",
+    "migrate-down": "typeorm migration:revert",
     "run:w": "nodemon --watch ./dist ./dist/index.js",
     "run": "node ./dist/index.js",
     "run:prod": "node ./dist/index-prod.js"
