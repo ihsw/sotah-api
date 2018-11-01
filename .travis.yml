@@ -30,4 +30,4 @@ script:
 - ./bin/run-tests-coverage && npm run -s coveralls-coverage
 - npm run -s test-coverage-report
 - cd $TRAVIS_BUILD_DIR/../sotah-infra && docker-compose stop
-- cd $TRAVIS_BUILD_DIR && git clean -xfd && docker build -t $DOCKER_IMAGE_NAME ../
+- cd $TRAVIS_BUILD_DIR && git clean -xfd && docker build -t $DOCKER_IMAGE_NAME .
