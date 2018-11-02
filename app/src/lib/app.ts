@@ -5,6 +5,7 @@ import * as nats from "nats";
 import { createConnection } from "typeorm";
 import { v4 as uuidv4 } from "uuid";
 import { Logger } from "winston";
+import { Post } from "../entities/post";
 import { Preference } from "../entities/preference";
 import { Pricelist } from "../entities/pricelist";
 import { PricelistEntry } from "../entities/pricelist-entry";
@@ -37,7 +38,7 @@ export const getApp = async (opts: IOptions): Promise<express.Express> => {
     // db init
     const dbConn = await createConnection({
         database: "postgres",
-        entities: [Preference, Pricelist, PricelistEntry, ProfessionPricelist, User],
+        entities: [Preference, Pricelist, PricelistEntry, ProfessionPricelist, User, Post],
         host: dbHost,
         logging: false,
         name: `app-${uuidv4()}`,

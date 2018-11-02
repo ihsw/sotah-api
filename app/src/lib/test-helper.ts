@@ -6,12 +6,14 @@ import * as supertest from "supertest";
 import { Connection, createConnection } from "typeorm";
 import { v4 as uuidv4 } from "uuid";
 
+import { Post } from "../entities/post";
 import { Preference } from "../entities/preference";
 import { Pricelist } from "../entities/pricelist";
 import { PricelistEntry } from "../entities/pricelist-entry";
 import { ProfessionPricelist } from "../entities/profession-pricelist";
 import { User } from "../entities/user";
 import { ICreateUserRequest, ICreateUserResponse } from "../types/contracts/user";
+import { ICreatePostRequest, ICreatePostResponse } from "../types/contracts/user/post-crud";
 import { ICreatePricelistRequest, ICreatePricelistResponse } from "../types/contracts/user/pricelist-crud";
 import {
     ICreateProfessionPricelistRequest,
@@ -34,7 +36,7 @@ export const setup = async (opts: IOptions): Promise<ISetupSettings> => {
     const messenger = new Messenger(nats.connect({ url: `nats://${opts.natsHost}:${opts.natsPort}` }));
     const dbConn = await createConnection({
         database: "postgres",
-        entities: [Preference, Pricelist, PricelistEntry, ProfessionPricelist, User],
+        entities: [Preference, Pricelist, PricelistEntry, ProfessionPricelist, User, Post],
         host: opts.dbHost,
         logging: false,
         name: `test-${uuidv4()}`,
@@ -136,11 +138,35 @@ const getProfessionPricelistTestHelper = (request: supertest.SuperTest<supertest
     return { requestProfessionPricelist, createProfessionPricelist };
 };
 
+const getPostTestHelper = (request: supertest.SuperTest<supertest.Test>) => {
+    const requestPost = (token: string, body: ICreatePostRequest) => {
+        return request
+            .post("/user/posts")
+            .set("Authorization", `Bearer ${token}`)
+            .send(body);
+    };
+    const createPost = async (
+        t: TestContext,
+        token: string,
+        body: ICreatePostRequest,
+    ): Promise<ICreatePostResponse> => {
+        const res = await requestPost(token, body);
+        const { status, body: responseBody, header } = res;
+        t.is(status, HTTPStatus.CREATED);
+        t.not(String(header["content-type"]).match(/^application\/json/), null);
+
+        return responseBody;
+    };
+
+    return { requestPost, createPost };
+};
+
 // final test-helper
 export const getTestHelper = (request: supertest.SuperTest<supertest.Test>) => {
     return {
         ...getUserTestHelper(request),
         ...getPricelistTestHelper(request),
         ...getProfessionPricelistTestHelper(request),
+        ...getPostTestHelper(request),
     };
 };
