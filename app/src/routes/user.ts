@@ -15,7 +15,7 @@ export const getRouter = (dbConn: Connection, messenger: Messenger) => {
     const router = Router();
     const controller = new UserController(messenger, dbConn);
 
-    router.use("/user/posts", getPostsRouter());
+    router.use("/user/posts", getPostsRouter(dbConn));
     router.use("/user/preferences", getPreferencesRouter(dbConn));
     router.use("/user/pricelists", getPricelistsCrudRouter(dbConn, messenger));
     router.use("/user/profession-pricelists", getProfessionPricelistsCrudRouter(dbConn));

@@ -1,4 +1,5 @@
 import * as HTTPStatus from "http-status";
+import { Connection } from "typeorm";
 
 import { Post } from "../../entities/post";
 import { IValidationErrorResponse } from "../../types/contracts";
@@ -7,6 +8,12 @@ import { UserLevel } from "../../types/entities";
 import { RequestHandler } from "../index";
 
 export class PostCrudController {
+    private dbConn: Connection;
+
+    constructor(dbConn: Connection) {
+        this.dbConn = dbConn;
+    }
+
     public createPost: RequestHandler<
         ICreatePostRequest,
         ICreatePostResponse | IValidationErrorResponse | null
@@ -17,11 +24,12 @@ export class PostCrudController {
         }
 
         const post = new Post();
-        post.id = -1;
+        post.title = req.body.title;
+        await this.dbConn.manager.save(post);
 
         return {
             data: { post: post.toJson() },
-            status: HTTPStatus.INTERNAL_SERVER_ERROR,
+            status: HTTPStatus.CREATED,
         };
     };
 }
