@@ -1,5 +1,7 @@
 import * as yup from "yup";
 
+import { ICreatePostRequest } from "../types/contracts/user/post-crud";
+
 export const PreferenceRules = yup
     .object()
     .shape({
@@ -57,6 +59,6 @@ export const UserRequestBodyRules = yup
     .noUnknown();
 
 export const PostRequestBodyRules = yup
-    .object()
+    .object<ICreatePostRequest>()
     .shape({ title: yup.string().required("Post title is requred") })
     .noUnknown();
