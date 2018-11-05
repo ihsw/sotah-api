@@ -72,3 +72,26 @@ test("Posts crud endpoint Should create a post", async t => {
     t.true(isValidPost);
     t.is(post.title, "test");
 });
+
+test("Posts crud endpoint Should fail on blank title", async t => {
+    const { request, dbConn } = await helper();
+
+    const password = "testtest";
+    const user = await (async () => {
+        const out = new User();
+        out.email = `create-profession-pricelists+${uuidv4()}@test.com`;
+        out.hashedPassword = await bcrypt.hash(password, 10);
+        out.level = UserLevel.Admin;
+
+        return dbConn.manager.save(out);
+    })();
+    let res = await request.post("/login").send({ email: user.email, password });
+    t.is(res.status, HTTPStatus.OK);
+    const { token } = res.body;
+
+    res = await request
+        .post("/user/posts")
+        .set("Authorization", `Bearer ${token}`)
+        .send({ title: "" });
+    t.is(res.status, HTTPStatus.BAD_REQUEST);
+});

@@ -55,3 +55,8 @@ export const UserRequestBodyRules = yup
             .required("Password is required"),
     })
     .noUnknown();
+
+export const PostRequestBodyRules = yup
+    .object()
+    .shape({ title: yup.string().required("Post title is requred") })
+    .noUnknown();
