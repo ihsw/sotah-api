@@ -14,7 +14,7 @@ export const getRouter = (dbConn: Connection) => {
         "/",
         auth,
         wrap(async (req: Request, res: Response) => {
-            await handle(controller.createPost, req, res);
+            await handle(controller.createPost.bind(controller), req, res);
         }),
     );
 

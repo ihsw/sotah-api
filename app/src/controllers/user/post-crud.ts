@@ -6,7 +6,7 @@ import { PostRequestBodyRules } from "../../lib/validator-rules";
 import { IValidationErrorResponse } from "../../types/contracts";
 import { ICreatePostRequest, ICreatePostResponse } from "../../types/contracts/user/post-crud";
 import { UserLevel } from "../../types/entities";
-import { RequestHandler } from "../index";
+import { IRequest, IRequestResult } from "../index";
 
 export class PostCrudController {
     private dbConn: Connection;
@@ -15,10 +15,7 @@ export class PostCrudController {
         this.dbConn = dbConn;
     }
 
-    public createPost: RequestHandler<
-        ICreatePostRequest,
-        ICreatePostResponse | IValidationErrorResponse | null
-    > = async req => {
+    public async createPost(req: IRequest<ICreatePostRequest>): Promise<IRequestResult<ICreatePostResponse | IValidationErrorResponse | null>> {
         const user = req.user!;
         if (user.level < UserLevel.Admin) {
             return { data: null, status: HTTPStatus.UNAUTHORIZED };

@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { User } from "../entities/user";
 export { DataController } from "./data";
 
-interface IRequest<T> extends Request {
+export interface IRequest<T> extends Request {
     body: T;
     user?: User;
     params: {
