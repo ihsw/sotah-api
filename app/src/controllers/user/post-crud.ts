@@ -46,6 +46,7 @@ export class PostCrudController {
     ): Promise<IRequestResult<IUpdatePostResponse | IValidationErrorResponse>> {
         const user = req.user!;
         const post = await this.dbConn.getRepository(Post).findOne({
+            relations: ["user"],
             where: {
                 id: req.params["post_id"],
             },
