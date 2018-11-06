@@ -1,3 +1,4 @@
+import { Response } from "express";
 import * as HTTPStatus from "http-status";
 import { Connection } from "typeorm";
 
@@ -6,7 +7,7 @@ import { PostRequestBodyRules } from "../../lib/validator-rules";
 import { IValidationErrorResponse } from "../../types/contracts";
 import { ICreatePostRequest, ICreatePostResponse } from "../../types/contracts/user/post-crud";
 import { UserLevel } from "../../types/entities";
-import { IRequest, IRequestResult } from "../index";
+import { IRequest, IRequestResult, Validator } from "../index";
 
 export class PostCrudController {
     private dbConn: Connection;
@@ -15,26 +16,17 @@ export class PostCrudController {
         this.dbConn = dbConn;
     }
 
-    public async createPost(req: IRequest<ICreatePostRequest>): Promise<IRequestResult<ICreatePostResponse | IValidationErrorResponse | null>> {
+    @Validator<ICreatePostRequest, ICreatePostResponse>(PostRequestBodyRules)
+    public async createPost(req: IRequest<ICreatePostRequest>, _res: Response): Promise<IRequestResult<ICreatePostResponse | IValidationErrorResponse>> {
         const user = req.user!;
         if (user.level < UserLevel.Admin) {
-            return { data: null, status: HTTPStatus.UNAUTHORIZED };
-        }
+            const validationErrors: IValidationErrorResponse = { "unauthorized": "Unauthorized" };
 
-        let result: ICreatePostRequest | null = null;
-        try {
-            result = (await PostRequestBodyRules.validate(req.body)) as ICreatePostRequest;
-        } catch (err) {
-            const validationErrors: IValidationErrorResponse = { [err.path]: err.message };
-
-            return {
-                data: validationErrors,
-                status: HTTPStatus.BAD_REQUEST,
-            };
+            return { data: validationErrors, status: HTTPStatus.UNAUTHORIZED };
         }
 
         const post = new Post();
-        post.title = result.title;
+        post.title = req.body.title;
         await this.dbConn.manager.save(post);
 
         return {
