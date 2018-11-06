@@ -81,4 +81,46 @@ export class PostCrudController {
             status: HTTPStatus.OK,
         };
     }
+
+    @Authenticator<null, null>(UserLevel.Admin)
+    public async deletePost(
+        req: IRequest<null>,
+        _res: Response,
+    ): Promise<IRequestResult<null | IValidationErrorResponse>> {
+        const user = req.user!;
+        const post = await this.dbConn.getRepository(Post).findOne({
+            relations: ["user"],
+            where: {
+                id: req.params["post_id"],
+            },
+        });
+        if (typeof post === "undefined" || post === null) {
+            const validationResponse: IValidationErrorResponse = {
+                notFound: "Not Found",
+            };
+
+            return {
+                data: validationResponse,
+                status: HTTPStatus.NOT_FOUND,
+            };
+        }
+
+        if (post.user!.id !== user.id) {
+            const validationResponse: IValidationErrorResponse = {
+                unauthorized: "Unauthorized",
+            };
+
+            return {
+                data: validationResponse,
+                status: HTTPStatus.UNAUTHORIZED,
+            };
+        }
+
+        await this.dbConn.manager.remove(post);
+
+        return {
+            data: null,
+            status: HTTPStatus.OK,
+        };
+    }
 }

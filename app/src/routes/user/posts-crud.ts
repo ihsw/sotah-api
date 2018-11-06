@@ -26,5 +26,13 @@ export const getRouter = (dbConn: Connection) => {
         }),
     );
 
+    router.delete(
+        "/:post_id",
+        auth,
+        wrap(async (req: Request, res: Response) => {
+            await handle(controller.deletePost.bind(controller), req, res);
+        }),
+    );
+
     return router;
 };

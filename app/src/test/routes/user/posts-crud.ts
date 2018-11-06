@@ -126,3 +126,30 @@ test("Posts crud endpoint Should update a post", async t => {
     t.is(res.status, HTTPStatus.OK);
     t.is(res.body.post.title, "test2");
 });
+
+test("Posts crud endpoint Should delete a post", async t => {
+    const { request, createPost, dbConn } = await helper();
+
+    const password = "testtest";
+    const user = await (async () => {
+        const out = new User();
+        out.email = `delete-post+${uuidv4()}@test.com`;
+        out.hashedPassword = await bcrypt.hash(password, 10);
+        out.level = UserLevel.Admin;
+
+        return dbConn.manager.save(out);
+    })();
+    let res = await request.post("/login").send({ email: user.email, password });
+    t.is(res.status, HTTPStatus.OK);
+    const { token } = res.body;
+
+    const { post } = await createPost(t, token, {
+        title: "test",
+    });
+    const isValidPost = post.id > -1;
+    t.true(isValidPost);
+    t.is(post.title, "test");
+
+    res = await request.delete(`/user/posts/${post.id}`).set("Authorization", `Bearer ${token}`);
+    t.is(res.status, HTTPStatus.OK);
+});
