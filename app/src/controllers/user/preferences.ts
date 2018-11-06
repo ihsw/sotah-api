@@ -94,6 +94,7 @@ export class PreferencesController {
         preference.currentRealm = req.body.current_realm;
         preference.currentRegion = req.body.current_region;
         await this.dbConn.manager.save(preference);
+
         return {
             data: { preference: preference.toJson() },
             status: HTTPStatus.OK,
