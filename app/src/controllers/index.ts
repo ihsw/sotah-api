@@ -62,7 +62,7 @@ export function Authenticator<T, A>(requiredLevel: UserLevel) {
 
         descriptor.value = async function (req, res): Promise<IRequestResult<A | IValidationErrorResponse>> {
             const user = req.user;
-            if (typeof user === "undefined") {
+            if (typeof user === "undefined" || user === null) {
                 const validationErrors: IValidationErrorResponse = { "unauthorized": "Unauthorized" };
     
                 return { data: validationErrors, status: HTTPStatus.UNAUTHORIZED };
