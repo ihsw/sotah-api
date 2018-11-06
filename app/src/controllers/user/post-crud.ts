@@ -18,7 +18,10 @@ export class PostCrudController {
 
     @Authenticator<ICreatePostRequest, ICreatePostResponse>(UserLevel.Admin)
     @Validator<ICreatePostRequest, ICreatePostResponse>(PostRequestBodyRules)
-    public async createPost(req: IRequest<ICreatePostRequest>, _res: Response): Promise<IRequestResult<ICreatePostResponse | IValidationErrorResponse>> {
+    public async createPost(
+        req: IRequest<ICreatePostRequest>,
+        _res: Response,
+    ): Promise<IRequestResult<ICreatePostResponse | IValidationErrorResponse>> {
         const post = new Post();
         post.title = req.body.title;
         post.user = req.user!;
@@ -28,5 +31,5 @@ export class PostCrudController {
             data: { post: post.toJson() },
             status: HTTPStatus.CREATED,
         };
-    };
+    }
 }
