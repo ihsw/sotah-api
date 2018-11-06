@@ -18,5 +18,13 @@ export const getRouter = (dbConn: Connection) => {
         }),
     );
 
+    router.put(
+        "/:post_id",
+        auth,
+        wrap(async (req: Request, res: Response) => {
+            await handle(controller.updatePost.bind(controller), req, res);
+        }),
+    );
+
     return router;
 };
