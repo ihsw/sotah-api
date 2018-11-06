@@ -7,7 +7,7 @@ import { PostRequestBodyRules } from "../../lib/validator-rules";
 import { IValidationErrorResponse } from "../../types/contracts";
 import { ICreatePostRequest, ICreatePostResponse } from "../../types/contracts/user/post-crud";
 import { UserLevel } from "../../types/entities";
-import { IRequest, IRequestResult, Validator } from "../index";
+import { Authenticator, IRequest, IRequestResult, Validator } from "../index";
 
 export class PostCrudController {
     private dbConn: Connection;
@@ -16,15 +16,9 @@ export class PostCrudController {
         this.dbConn = dbConn;
     }
 
+    @Authenticator<ICreatePostRequest, ICreatePostResponse>(UserLevel.Admin)
     @Validator<ICreatePostRequest, ICreatePostResponse>(PostRequestBodyRules)
     public async createPost(req: IRequest<ICreatePostRequest>, _res: Response): Promise<IRequestResult<ICreatePostResponse | IValidationErrorResponse>> {
-        const user = req.user!;
-        if (user.level < UserLevel.Admin) {
-            const validationErrors: IValidationErrorResponse = { "unauthorized": "Unauthorized" };
-
-            return { data: validationErrors, status: HTTPStatus.UNAUTHORIZED };
-        }
-
         const post = new Post();
         post.title = req.body.title;
         await this.dbConn.manager.save(post);

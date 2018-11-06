@@ -4,6 +4,7 @@ import { ObjectSchema } from "yup";
 
 import { User } from "../entities/user";
 import { IValidationErrorResponse } from "../types/contracts";
+import { UserLevel } from "../types/entities";
 export { DataController } from "./data";
 
 export interface IRequest<T> extends Request {
@@ -46,6 +47,33 @@ export function Validator<T, A>(schema: ObjectSchema<T>) {
             }
 
             req.body = result!;
+            const returnValue: IRequestResult<A | IValidationErrorResponse> = await originalMethod.apply(this, [req, res]);
+
+            return returnValue;
+        };
+
+        return descriptor;
+    }
+}
+
+export function Authenticator<T, A>(requiredLevel: UserLevel) {
+    return function (_target: any, _propertyKey: string, descriptor: TypedPropertyDescriptor<ControllerDescriptor<T, A>>) {
+        const originalMethod = descriptor.value!;
+
+        descriptor.value = async function (req, res): Promise<IRequestResult<A | IValidationErrorResponse>> {
+            const user = req.user;
+            if (typeof user === "undefined") {
+                const validationErrors: IValidationErrorResponse = { "unauthorized": "Unauthorized" };
+    
+                return { data: validationErrors, status: HTTPStatus.UNAUTHORIZED };
+            }
+
+            if (user.level < requiredLevel) {
+                const validationErrors: IValidationErrorResponse = { "unauthorized": "Unauthorized" };
+    
+                return { data: validationErrors, status: HTTPStatus.UNAUTHORIZED };
+            }
+
             const returnValue: IRequestResult<A | IValidationErrorResponse> = await originalMethod.apply(this, [req, res]);
 
             return returnValue;
