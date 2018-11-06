@@ -14,7 +14,7 @@ export const getRouter = (dbConn: Connection) => {
         "/",
         auth,
         wrap(async (req: Request, res: Response) => {
-            await handle(controller.getPreferences, req, res);
+            await handle(controller.getPreferences.bind(controller), req, res);
         }),
     );
 
@@ -22,7 +22,7 @@ export const getRouter = (dbConn: Connection) => {
         "/",
         auth,
         wrap(async (req: Request, res: Response) => {
-            await handle(controller.createPreferences, req, res);
+            await handle(controller.createPreferences.bind(controller), req, res);
         }),
     );
 
@@ -30,7 +30,7 @@ export const getRouter = (dbConn: Connection) => {
         "/",
         auth,
         wrap(async (req: Request, res: Response) => {
-            await handle(controller.updatePreferences, req, res);
+            await handle(controller.updatePreferences.bind(controller), req, res);
         }),
     );
 

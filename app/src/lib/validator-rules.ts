@@ -1,9 +1,10 @@
 import * as yup from "yup";
 
 import { ICreatePostRequest } from "../types/contracts/user/post-crud";
+import { ICreatePreferencesRequest } from "../types/contracts/user/preferences";
 
 export const PreferenceRules = yup
-    .object()
+    .object<ICreatePreferencesRequest>()
     .shape({
         current_realm: yup.string(),
         current_region: yup.string(),
