@@ -55,7 +55,7 @@ test("Posts crud endpoint Should create a post", async t => {
     const password = "testtest";
     const user = await (async () => {
         const out = new User();
-        out.email = `create-profession-pricelists+${uuidv4()}@test.com`;
+        out.email = `create-post+${uuidv4()}@test.com`;
         out.hashedPassword = await bcrypt.hash(password, 10);
         out.level = UserLevel.Admin;
 
@@ -79,7 +79,7 @@ test("Posts crud endpoint Should fail on blank title", async t => {
     const password = "testtest";
     const user = await (async () => {
         const out = new User();
-        out.email = `create-profession-pricelists+${uuidv4()}@test.com`;
+        out.email = `create-post+${uuidv4()}@test.com`;
         out.hashedPassword = await bcrypt.hash(password, 10);
         out.level = UserLevel.Admin;
 
@@ -94,4 +94,35 @@ test("Posts crud endpoint Should fail on blank title", async t => {
         .set("Authorization", `Bearer ${token}`)
         .send({ title: "" });
     t.is(res.status, HTTPStatus.BAD_REQUEST);
+});
+
+test("Posts crud endpoint Should update a post", async t => {
+    const { request, createPost, dbConn } = await helper();
+
+    const password = "testtest";
+    const user = await (async () => {
+        const out = new User();
+        out.email = `update-post+${uuidv4()}@test.com`;
+        out.hashedPassword = await bcrypt.hash(password, 10);
+        out.level = UserLevel.Admin;
+
+        return dbConn.manager.save(out);
+    })();
+    let res = await request.post("/login").send({ email: user.email, password });
+    t.is(res.status, HTTPStatus.OK);
+    const { token } = res.body;
+
+    const { post } = await createPost(t, token, {
+        title: "test",
+    });
+    const isValidPost = post.id > -1;
+    t.true(isValidPost);
+    t.is(post.title, "test");
+
+    res = await request
+        .put(`/user/posts/${post.id}`)
+        .set("Authorization", `Bearer ${token}`)
+        .send({ title: "test2" });
+    t.is(res.status, HTTPStatus.OK);
+    t.is(res.body.post.title, "test2");
 });
