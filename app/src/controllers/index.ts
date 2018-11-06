@@ -29,7 +29,7 @@ export async function handle<T, A>(handlerFunc: RequestHandler<T, A>, req: IRequ
 
 type ControllerDescriptor<T, A> = (
     req: IRequest<T>,
-    _res: Response,
+    res: Response,
 ) => Promise<IRequestResult<A | IValidationErrorResponse>>;
 
 export function Validator<T, A>(schema: ObjectSchema<T>) {
