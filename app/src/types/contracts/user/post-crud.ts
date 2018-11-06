@@ -7,3 +7,7 @@ export interface ICreatePostRequest {
 export interface ICreatePostResponse {
     post: IPostJson;
 }
+
+export type IUpdatePostRequest = ICreatePostRequest;
+
+export type IUpdatePostResponse = ICreatePostResponse;

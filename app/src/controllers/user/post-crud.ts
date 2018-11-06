@@ -5,7 +5,12 @@ import { Connection } from "typeorm";
 import { Post } from "../../entities/post";
 import { PostRequestBodyRules } from "../../lib/validator-rules";
 import { IValidationErrorResponse } from "../../types/contracts";
-import { ICreatePostRequest, ICreatePostResponse } from "../../types/contracts/user/post-crud";
+import {
+    ICreatePostRequest,
+    ICreatePostResponse,
+    IUpdatePostRequest,
+    IUpdatePostResponse,
+} from "../../types/contracts/user/post-crud";
 import { UserLevel } from "../../types/entities";
 import { Authenticator, IRequest, IRequestResult, Validator } from "../index";
 
@@ -30,6 +35,49 @@ export class PostCrudController {
         return {
             data: { post: post.toJson() },
             status: HTTPStatus.CREATED,
+        };
+    }
+
+    @Authenticator<IUpdatePostRequest, IUpdatePostResponse>(UserLevel.Admin)
+    @Validator<IUpdatePostRequest, IUpdatePostResponse>(PostRequestBodyRules)
+    public async updatePost(
+        req: IRequest<IUpdatePostRequest>,
+        _res: Response,
+    ): Promise<IRequestResult<IUpdatePostResponse | IValidationErrorResponse>> {
+        const user = req.user!;
+        const post = await this.dbConn.getRepository(Post).findOne({
+            where: {
+                id: req.params["post_id"],
+            },
+        });
+        if (typeof post === "undefined" || post === null) {
+            const validationResponse: IValidationErrorResponse = {
+                notFound: "Not Found",
+            };
+
+            return {
+                data: validationResponse,
+                status: HTTPStatus.NOT_FOUND,
+            };
+        }
+
+        if (post.user!.id !== user.id) {
+            const validationResponse: IValidationErrorResponse = {
+                unauthorized: "Unauthorized",
+            };
+
+            return {
+                data: validationResponse,
+                status: HTTPStatus.UNAUTHORIZED,
+            };
+        }
+
+        post.title = req.body.title;
+        await this.dbConn.manager.save(post);
+
+        return {
+            data: { post: post.toJson() },
+            status: HTTPStatus.OK,
         };
     }
 }
