@@ -21,6 +21,7 @@ export class PostCrudController {
     public async createPost(req: IRequest<ICreatePostRequest>, _res: Response): Promise<IRequestResult<ICreatePostResponse | IValidationErrorResponse>> {
         const post = new Post();
         post.title = req.body.title;
+        post.user = req.user!;
         await this.dbConn.manager.save(post);
 
         return {
