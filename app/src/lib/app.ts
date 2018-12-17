@@ -5,6 +5,7 @@ import * as nats from "nats";
 import { createConnection } from "typeorm";
 import { v4 as uuidv4 } from "uuid";
 import { Logger } from "winston";
+
 import { Post } from "../entities/post";
 import { Preference } from "../entities/preference";
 import { Pricelist } from "../entities/pricelist";
