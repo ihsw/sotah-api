@@ -25,8 +25,12 @@ export class Pricelist {
     @Column()
     public name: string;
 
+    @Column("varchar", { length: 255, nullable: true })
+    public slug: string | null;
+
     constructor() {
         this.name = "";
+        this.slug = null;
     }
 
     public toJson(): IPricelistJson {
@@ -42,6 +46,7 @@ export class Pricelist {
             id: this.id!,
             name: this.name,
             pricelist_entries: entries,
+            slug: this.slug,
         };
     }
 }
