@@ -24,6 +24,11 @@ export const PricelistRules = yup
     .object()
     .shape({
         name: yup.string().required(),
+        slug: yup
+            .string()
+            .min(4)
+            .matches(/^[a-z|0-9|_|\-]+$/)
+            .required(),
     })
     .noUnknown();
 

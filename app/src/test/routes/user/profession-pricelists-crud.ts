@@ -42,7 +42,7 @@ test("Profession pricelists crud endpoint Should create a profession-pricelist",
     res = await requestProfessionPricelist(token, {
         entries: [{ item_id: -1, quantity_modifier: -1 }],
         expansion_name: "test-expansion",
-        pricelist: { name: "test" },
+        pricelist: { name: "test", slug: "test" },
         profession_name: "jewelcrafting",
     });
     const { status, body } = res;
@@ -77,7 +77,7 @@ test("Profession pricelists crud endpoint Should delete a profession-pricelist",
     const responseBody = await createProfessionPricelist(t, token, {
         entries: [{ item_id: -1, quantity_modifier: -1 }],
         expansion_name: "test-expansion",
-        pricelist: { name: "test" },
+        pricelist: { name: "test", slug: "test" },
         profession_name: "jewelcrafting",
     });
 
@@ -106,7 +106,7 @@ test("Profession pricelists crud endpoint Should fail on deleting a non-owned pr
     const responseBody = await createProfessionPricelist(t, token, {
         entries: [{ item_id: -1, quantity_modifier: -1 }],
         expansion_name: "test-expansion",
-        pricelist: { name: "test" },
+        pricelist: { name: "test", slug: "test" },
         profession_name: "jewelcrafting",
     });
 

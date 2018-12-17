@@ -35,7 +35,7 @@ test("Pricelists crud endpoint Should create a pricelist", async t => {
 
     res = await requestPricelist(token, {
         entries: [{ item_id: -1, quantity_modifier: -1 }],
-        pricelist: { name: "test" },
+        pricelist: { name: "test", slug: "test" },
     });
     const { status, body } = res;
     t.is(status, HTTPStatus.CREATED);
@@ -58,7 +58,7 @@ test("Pricelists crud endpoint Should return a pricelist", async t => {
 
     const { pricelist } = await createPricelist(t, res.body.token, {
         entries: [{ item_id: -1, quantity_modifier: -1 }],
-        pricelist: { name: "test" },
+        pricelist: { name: "test", slug: "test" },
     });
 
     res = await request.get(`/user/pricelists/${pricelist.id}`).set("Authorization", `Bearer ${token}`);
@@ -82,7 +82,7 @@ test("Pricelists crud endpoint Should return pricelists", async t => {
     for (let i = 0; i < count; i++) {
         await createPricelist(t, res.body.token, {
             entries: [{ item_id: -1, quantity_modifier: -1 }],
-            pricelist: { name: "test" },
+            pricelist: { name: "test", slug: "test" },
         });
     }
 
@@ -110,7 +110,7 @@ test("Pricelists crud endpoint Should return pricelists", async t => {
     for (let i = 0; i < count; i++) {
         await createPricelist(t, res.body.token, {
             entries: [{ item_id: -1, quantity_modifier: -1 }],
-            pricelist: { name: "test" },
+            pricelist: { name: "test", slug: "test" },
         });
     }
 
@@ -136,7 +136,7 @@ test("Pricelists crud endpoint Should update a pricelist", async t => {
 
     const { pricelist, entries } = await createPricelist(t, res.body.token, {
         entries: [{ item_id: -1, quantity_modifier: -1 }],
-        pricelist: { name: "test" },
+        pricelist: { name: "test", slug: "test" },
     });
 
     res = await request
@@ -149,7 +149,7 @@ test("Pricelists crud endpoint Should update a pricelist", async t => {
                     quantity_modifier: v.quantity_modifier + 1,
                 };
             }),
-            pricelist: { name: "test2" },
+            pricelist: { name: "test2", slug: "test2" },
         });
     const { body, status } = res;
     t.is(status, HTTPStatus.OK);
@@ -171,7 +171,7 @@ test("Pricelists crud endpoint Should update all entries", async t => {
 
     const { pricelist, entries } = await createPricelist(t, res.body.token, {
         entries: [{ item_id: -1, quantity_modifier: -1 }],
-        pricelist: { name: "test" },
+        pricelist: { name: "test", slug: "test" },
     });
 
     res = await request
@@ -184,7 +184,7 @@ test("Pricelists crud endpoint Should update all entries", async t => {
                     quantity_modifier: v.quantity_modifier + 5,
                 };
             }),
-            pricelist: { name: "test2" },
+            pricelist: { name: "test2", slug: "test2" },
         });
     const { status, body } = res;
     t.is(status, HTTPStatus.OK);
@@ -209,7 +209,7 @@ test("Pricelists crud endpoint Should remove absent entries", async t => {
     // creating the pricelist
     const { pricelist, entries } = await createPricelist(t, res.body.token, {
         entries: [{ item_id: -1, quantity_modifier: -1 }, { item_id: -1, quantity_modifier: -1 }],
-        pricelist: { name: "test" },
+        pricelist: { name: "test", slug: "test" },
     });
 
     // updating the pricelist with missing entries
@@ -218,7 +218,7 @@ test("Pricelists crud endpoint Should remove absent entries", async t => {
         .set("Authorization", `Bearer ${token}`)
         .send({
             entries: entries.slice(0, 1),
-            pricelist: { name: "test2" },
+            pricelist: { name: "test2", slug: "test2" },
         });
     t.is(res.status, HTTPStatus.OK);
 
@@ -245,7 +245,7 @@ test("Pricelists crud endpoint Should add new entries", async t => {
     // creating the pricelist
     const { pricelist, entries } = await createPricelist(t, res.body.token, {
         entries: [{ item_id: -1, quantity_modifier: -1 }, { item_id: -1, quantity_modifier: -1 }],
-        pricelist: { name: "test" },
+        pricelist: { name: "test", slug: "test" },
     });
 
     // updating the pricelist with missing entries
@@ -254,7 +254,7 @@ test("Pricelists crud endpoint Should add new entries", async t => {
         .set("Authorization", `Bearer ${token}`)
         .send({
             entries: [...entries.slice(0, 1), { id: -1, item_id: -2, quantity_modifier: -2 }],
-            pricelist: { name: "test2" },
+            pricelist: { name: "test2", slug: "test2" },
         });
     t.is(res.status, HTTPStatus.OK);
 

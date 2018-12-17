@@ -45,6 +45,7 @@ export class PricelistCrudController {
         const pricelist = new Pricelist();
         pricelist.user = user;
         pricelist.name = result.pricelist.name;
+        pricelist.slug = result.pricelist.slug;
         await this.dbConn.manager.save(pricelist);
         const entries = await Promise.all(
             result.entries.map(v => {
@@ -146,6 +147,7 @@ export class PricelistCrudController {
 
         // saving the pricelist
         pricelist.name = result.pricelist.name;
+        pricelist.slug = result.pricelist.slug;
         await this.dbConn.manager.save(pricelist);
 
         // misc
