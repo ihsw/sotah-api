@@ -95,7 +95,7 @@ export class DataController {
         });
         switch (msg.code) {
             case code.ok:
-                const itemIds = msg.data!.auctions.map(v => v.itemId);
+                const itemIds = [...new Set(msg.data!.auctions.map(v => v.itemId))];
                 const itemsMsg = await this.messenger.getItems(itemIds);
                 if (itemsMsg.code !== code.ok) {
                     return {
@@ -104,8 +104,20 @@ export class DataController {
                     };
                 }
 
+                const professionPricelists = await this.dbConn
+                    .getRepository(ProfessionPricelist)
+                    .createQueryBuilder("professionpricelist")
+                    .leftJoinAndSelect("professionpricelist.pricelist", "pricelist")
+                    .leftJoinAndSelect("pricelist.entries", "entry")
+                    .where(`entry.itemId IN (${itemIds.join(", ")})`)
+                    .getMany();
+
                 return {
-                    data: { ...msg.data!, items: itemsMsg.data!.items },
+                    data: {
+                        ...msg.data!,
+                        items: itemsMsg.data!.items,
+                        professionPricelists: professionPricelists.map(v => v.toJson()),
+                    },
                     status: HTTPStatus.OK,
                 };
             case code.notFound:
