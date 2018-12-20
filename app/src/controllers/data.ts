@@ -351,36 +351,40 @@ export class DataController {
                     itemPrices.map(v => v.min_buyout_per),
                     itemPrices.length > 4 ? 4 : itemPrices.length,
                 );
-                const minBandMid = bands.mid.filter(v => !!v).reduce((previousValue, v) => {
-                    if (v === 0) {
+                const minBandMid = bands.mid
+                    .filter(v => !!v)
+                    .reduce((previousValue, v) => {
+                        if (v === 0) {
+                            return previousValue;
+                        }
+
+                        if (previousValue === 0) {
+                            return v;
+                        }
+
+                        if (v < previousValue) {
+                            return v;
+                        }
+
                         return previousValue;
-                    }
+                    }, 0);
+                const maxBandUpper = bands.upper
+                    .filter(v => !!v)
+                    .reduce((previousValue, v) => {
+                        if (v === 0) {
+                            return previousValue;
+                        }
 
-                    if (previousValue === 0) {
-                        return v;
-                    }
+                        if (previousValue === 0) {
+                            return v;
+                        }
 
-                    if (v < previousValue) {
-                        return v;
-                    }
+                        if (v > previousValue) {
+                            return v;
+                        }
 
-                    return previousValue;
-                }, 0);
-                const maxBandUpper = bands.upper.filter(v => !!v).reduce((previousValue, v) => {
-                    if (v === 0) {
                         return previousValue;
-                    }
-
-                    if (previousValue === 0) {
-                        return v;
-                    }
-
-                    if (v > previousValue) {
-                        return v;
-                    }
-
-                    return previousValue;
-                }, 0);
+                    }, 0);
                 out.lower = minBandMid;
                 out.upper = maxBandUpper;
             }
