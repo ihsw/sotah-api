@@ -112,10 +112,21 @@ export class DataController {
                     .where(`entry.itemId IN (${itemIds.join(", ")})`)
                     .getMany();
 
+                const pricelistItemIds = [
+                    ...professionPricelists.map(v => v.pricelist!.entries!.map(y => y.itemId)[0]),
+                ];
+                const pricelistItemsMsg = await this.messenger.getItems(pricelistItemIds);
+                if (pricelistItemsMsg.code !== code.ok) {
+                    return {
+                        data: { error: pricelistItemsMsg.error!.message },
+                        status: HTTPStatus.INTERNAL_SERVER_ERROR,
+                    };
+                }
+
                 return {
                     data: {
                         ...msg.data!,
-                        items: itemsMsg.data!.items,
+                        items: { ...itemsMsg.data!.items, ...pricelistItemsMsg.data!.items },
                         professionPricelists: professionPricelists.map(v => v.toJson()),
                     },
                     status: HTTPStatus.OK,
