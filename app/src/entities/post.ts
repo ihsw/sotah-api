@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 import { IPostJson } from "../types/entities";
 import { User } from "./user";
@@ -12,15 +12,30 @@ export class Post {
     @JoinColumn({ name: "user_id" })
     public user: User | undefined;
 
-    @Column()
+    @Column({ type: "varchar", length: 255 })
     public title: string;
+
+    @Column({ type: "text" })
+    public body: string;
+
+    @Column({ type: "timestamp" })
+    public createdAt: Date;
 
     constructor() {
         this.title = "";
+        this.body = "";
+        this.createdAt = new Date();
+    }
+
+    @BeforeInsert()
+    public setCreatedAt() {
+        this.createdAt = new Date();
     }
 
     public toJson(): IPostJson {
         return {
+            body: this.body,
+            createdAt: this.createdAt.getTime() / 1000,
             id: this.id!,
             title: this.title,
         };
