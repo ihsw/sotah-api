@@ -15,6 +15,9 @@ export class Post {
     @Column({ type: "varchar", length: 255 })
     public title: string;
 
+    @Column({ type: "varchar", length: 255 })
+    public slug: string;
+
     @Column({ type: "text" })
     public body: string;
 
@@ -23,6 +26,7 @@ export class Post {
 
     constructor() {
         this.title = "";
+        this.slug = "";
         this.body = "";
         this.createdAt = new Date();
     }
@@ -37,6 +41,7 @@ export class Post {
             body: this.body,
             createdAt: this.createdAt.getTime() / 1000,
             id: this.id!,
+            slug: this.slug,
             title: this.title,
         };
     }

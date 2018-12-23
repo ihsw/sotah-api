@@ -68,6 +68,7 @@ export const PostRequestBodyRules = yup
     .object<ICreatePostRequest>()
     .shape({
         body: yup.string().required("Body is required"),
+        slug: yup.string().required("Post slug is requred"),
         title: yup.string().required("Post title is requred"),
     })
     .noUnknown();

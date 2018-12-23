@@ -29,6 +29,7 @@ export class PostCrudController {
     ): Promise<IRequestResult<ICreatePostResponse | IValidationErrorResponse>> {
         const post = new Post();
         post.title = req.body.title;
+        post.slug = req.body.slug;
         post.user = req.user!;
         post.body = req.body.body;
         await this.dbConn.manager.save(post);
@@ -75,6 +76,7 @@ export class PostCrudController {
         }
 
         post.title = req.body.title;
+        post.slug = req.body.slug;
         post.body = req.body.body;
         await this.dbConn.manager.save(post);
 
