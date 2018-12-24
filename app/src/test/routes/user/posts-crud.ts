@@ -26,7 +26,7 @@ const helper = async () => {
 test("Posts crud endpoint Should fail on unauthenticated", async t => {
     const { request } = await helper();
 
-    const res = await request.post("/user/posts").send({ title: "Test", body: "Test" });
+    const res = await request.post("/user/posts").send({ title: "Test", body: "Test", slug: "test" });
     t.is(res.status, HTTPStatus.UNAUTHORIZED);
 });
 
@@ -45,7 +45,7 @@ test("Posts crud endpoint Should fail on unauthorized", async t => {
     res = await request
         .post("/user/posts")
         .set("Authorization", `Bearer ${token}`)
-        .send({ title: "test", body: "test" });
+        .send({ title: "test", body: "test", slug: "test" });
     t.is(res.status, HTTPStatus.UNAUTHORIZED);
 });
 
@@ -67,6 +67,7 @@ test("Posts crud endpoint Should create a post", async t => {
 
     const { post } = await createPost(t, token, {
         body: "test",
+        slug: "test",
         title: "test",
     });
     const isValidPost = post.id > -1;
@@ -93,7 +94,7 @@ test("Posts crud endpoint Should fail on blank title", async t => {
     res = await request
         .post("/user/posts")
         .set("Authorization", `Bearer ${token}`)
-        .send({ body: "", title: "" });
+        .send({ body: "", title: "", slug: "" });
     t.is(res.status, HTTPStatus.BAD_REQUEST);
 });
 
@@ -115,6 +116,7 @@ test("Posts crud endpoint Should update a post", async t => {
 
     const { post } = await createPost(t, token, {
         body: "test",
+        slug: "test",
         title: "test",
     });
     const isValidPost = post.id > -1;
@@ -124,7 +126,7 @@ test("Posts crud endpoint Should update a post", async t => {
     res = await request
         .put(`/user/posts/${post.id}`)
         .set("Authorization", `Bearer ${token}`)
-        .send({ title: "test2", body: "test2" });
+        .send({ title: "test2", body: "test2", slug: "test2" });
     t.is(res.status, HTTPStatus.OK);
     t.is(res.body.post.title, "test2");
 });
@@ -147,6 +149,7 @@ test("Posts crud endpoint Should delete a post", async t => {
 
     const { post } = await createPost(t, token, {
         body: "test",
+        slug: "test",
         title: "test",
     });
     const isValidPost = post.id > -1;
