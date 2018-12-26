@@ -104,13 +104,19 @@ export class DataController {
                     };
                 }
 
-                const professionPricelists = await this.dbConn
-                    .getRepository(ProfessionPricelist)
-                    .createQueryBuilder("professionpricelist")
-                    .leftJoinAndSelect("professionpricelist.pricelist", "pricelist")
-                    .leftJoinAndSelect("pricelist.entries", "entry")
-                    .where(`entry.itemId IN (${itemIds.join(", ")})`)
-                    .getMany();
+                const professionPricelists = await (async () => {
+                    if (itemIds.length === 0) {
+                        return [];
+                    }
+
+                    return this.dbConn
+                        .getRepository(ProfessionPricelist)
+                        .createQueryBuilder("professionpricelist")
+                        .leftJoinAndSelect("professionpricelist.pricelist", "pricelist")
+                        .leftJoinAndSelect("pricelist.entries", "entry")
+                        .where(`entry.itemId IN (${itemIds.join(", ")})`)
+                        .getMany();
+                })();
 
                 const pricelistItemIds = [
                     ...professionPricelists.map(v => v.pricelist!.entries!.map(y => y.itemId)[0]),
