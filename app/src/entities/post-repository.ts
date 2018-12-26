@@ -1,10 +1,10 @@
-import { EntityRepository, Repository } from "typeorm";
+import { AbstractRepository, EntityRepository } from "typeorm";
 
 import { Post } from "./post";
 
 @EntityRepository(Post)
-export class PostRepository extends Repository<Post> {
+export class PostRepository extends AbstractRepository<Post> {
     public async hasSlug(slug: string): Promise<boolean> {
-        return typeof (await this.findOne({ where: { slug } })) !== "undefined";
+        return typeof (await this.repository.findOne({ where: { slug } })) !== "undefined";
     }
 }
