@@ -1,5 +1,6 @@
 import * as yup from "yup";
 
+import { PostRepository } from "../entities/post-repository";
 import { ICreatePostRequest } from "../types/contracts/user/post-crud";
 import { ICreatePreferencesRequest } from "../types/contracts/user/preferences";
 
@@ -76,3 +77,18 @@ export const PostRequestBodyRules = yup
         title: yup.string().required("Post title is requred"),
     })
     .noUnknown();
+
+export const FullPostRequestBodyRules = (repo: PostRepository) =>
+    yup
+        .object<ICreatePostRequest>()
+        .shape({
+            body: yup.string().required("Body is required"),
+            slug: yup
+                .string()
+                .min(4, "Post slug must be 4 characters")
+                .matches(/^[a-z|0-9|_|\-]+$/, "Post slug must be a-z, 0-9, or underscore")
+                .required("Post slug is requred")
+                .test("is-unique", "Post must be unique", v => repo.hasSlug(v)),
+            title: yup.string().required("Post title is requred"),
+        })
+        .noUnknown();
