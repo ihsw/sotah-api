@@ -1,4 +1,4 @@
-import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 import { IPostJson } from "../types/entities";
 import { User } from "./user";
@@ -15,6 +15,7 @@ export class Post {
     @Column({ type: "varchar", length: 255 })
     public title: string;
 
+    @Index({ unique: true })
     @Column({ type: "varchar", length: 255 })
     public slug: string;
 
