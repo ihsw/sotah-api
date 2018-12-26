@@ -35,12 +35,13 @@ export class PostCrudController {
         if (typeof result.errorResult !== "undefined") {
             return result.errorResult;
         }
+        const { body } = result.req!;
 
         const post = new Post();
-        post.title = result.req!.body.title;
-        post.slug = result.req!.body.slug;
-        post.user = result.req!.user!;
-        post.body = result.req!.body.body;
+        post.title = body.title;
+        post.slug = body.slug;
+        post.user = req.user!;
+        post.body = body.body;
         await this.dbConn.manager.save(post);
 
         return {
@@ -55,6 +56,15 @@ export class PostCrudController {
         req: IRequest<IUpdatePostRequest>,
         _res: Response,
     ): Promise<IRequestResult<IUpdatePostResponse | IValidationErrorResponse>> {
+        const result = await ManualValidator<IUpdatePostRequest>(
+            req,
+            FullPostRequestBodyRules(this.dbConn.getCustomRepository(PostRepository)),
+        );
+        if (typeof result.errorResult !== "undefined") {
+            return result.errorResult;
+        }
+        const { body } = result.req!;
+
         const user = req.user!;
         const post = await this.dbConn.getRepository(Post).findOne({
             relations: ["user"],
@@ -84,9 +94,9 @@ export class PostCrudController {
             };
         }
 
-        post.title = req.body.title;
-        post.slug = req.body.slug;
-        post.body = req.body.body;
+        post.title = body.title;
+        post.slug = body.slug;
+        post.body = body.body;
         await this.dbConn.manager.save(post);
 
         return {
