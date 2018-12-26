@@ -3,7 +3,8 @@ import * as HTTPStatus from "http-status";
 import { Connection } from "typeorm";
 
 import { Post } from "../../entities/post";
-import { PostRequestBodyRules } from "../../lib/validator-rules";
+import { PostRepository } from "../../entities/post-repository";
+import { FullPostRequestBodyRules, PostRequestBodyRules } from "../../lib/validator-rules";
 import { IValidationErrorResponse } from "../../types/contracts";
 import {
     ICreatePostRequest,
@@ -12,7 +13,7 @@ import {
     IUpdatePostResponse,
 } from "../../types/contracts/user/post-crud";
 import { UserLevel } from "../../types/entities";
-import { Authenticator, IRequest, IRequestResult, Validator } from "../index";
+import { Authenticator, IRequest, IRequestResult, ManualValidator, Validator } from "../index";
 
 export class PostCrudController {
     private dbConn: Connection;
@@ -27,11 +28,19 @@ export class PostCrudController {
         req: IRequest<ICreatePostRequest>,
         _res: Response,
     ): Promise<IRequestResult<ICreatePostResponse | IValidationErrorResponse>> {
+        const result = await ManualValidator<ICreatePostRequest>(
+            req,
+            FullPostRequestBodyRules(this.dbConn.getCustomRepository(PostRepository)),
+        );
+        if (typeof result.errorResult !== "undefined") {
+            return result.errorResult;
+        }
+
         const post = new Post();
-        post.title = req.body.title;
-        post.slug = req.body.slug;
-        post.user = req.user!;
-        post.body = req.body.body;
+        post.title = result.req!.body.title;
+        post.slug = result.req!.body.slug;
+        post.user = result.req!.user!;
+        post.body = result.req!.body.body;
         await this.dbConn.manager.save(post);
 
         return {
