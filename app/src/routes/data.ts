@@ -10,7 +10,7 @@ export const getRouter = (dbConn: Connection, messenger: Messenger) => {
     const controller = new DataController(messenger, dbConn);
 
     router.get(
-        "/",
+        "/posts",
         wrap(async (req: Request, res: Response) => {
             await handle(controller.getPosts, req, res);
         }),
