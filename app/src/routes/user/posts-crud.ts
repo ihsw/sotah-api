@@ -10,6 +10,14 @@ export const getRouter = (dbConn: Connection) => {
     const router = Router();
     const controller = new PostCrudController(dbConn);
 
+    router.get(
+        "/",
+        auth,
+        wrap(async (req: Request, res: Response) => {
+            await handle(controller.getPosts.bind(controller), req, res);
+        }),
+    );
+
     router.post(
         "/",
         auth,

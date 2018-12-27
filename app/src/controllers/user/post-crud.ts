@@ -9,6 +9,7 @@ import { IValidationErrorResponse } from "../../types/contracts";
 import {
     ICreatePostRequest,
     ICreatePostResponse,
+    IGetPostsResponse,
     IUpdatePostRequest,
     IUpdatePostResponse,
 } from "../../types/contracts/user/post-crud";
@@ -20,6 +21,15 @@ export class PostCrudController {
 
     constructor(dbConn: Connection) {
         this.dbConn = dbConn;
+    }
+
+    public async getPosts(_req: IRequest<null>, _res: Response): Promise<IRequestResult<IGetPostsResponse>> {
+        const posts = await this.dbConn.getRepository(Post).find({ order: { id: "DESC" } });
+
+        return {
+            data: { posts: posts.map(v => v.toJson()) },
+            status: HTTPStatus.OK,
+        };
     }
 
     @Authenticator<ICreatePostRequest, ICreatePostResponse>(UserLevel.Admin)
