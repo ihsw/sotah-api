@@ -2,6 +2,7 @@ import * as boll from "bollinger-bands";
 import * as HTTPStatus from "http-status";
 import { Connection } from "typeorm";
 
+import { Post } from "../entities/post";
 import { ProfessionPricelist } from "../entities/profession-pricelist";
 import { code, Messenger } from "../lib/messenger";
 import { IErrorResponse } from "../types/contracts";
@@ -12,6 +13,7 @@ import {
     IGetItemsClassesResponse,
     IGetOwnersRequest,
     IGetOwnersResponse,
+    IGetPostsResponse,
     IGetPricelistHistoriesRequest,
     IGetPricelistHistoriesResponse,
     IGetPricelistRequest,
@@ -48,6 +50,15 @@ export class DataController {
         this.messenger = messenger;
         this.dbConn = dbConn;
     }
+
+    public getPosts: RequestHandler<null, IGetPostsResponse> = async () => {
+        const posts = await this.dbConn.getRepository(Post).find({ order: { id: "DESC" } });
+
+        return {
+            data: { posts: posts.map(v => v.toJson()) },
+            status: HTTPStatus.OK,
+        };
+    };
 
     public getRegions: RequestHandler<null, IGetRegionsResponse> = async () => {
         const msg = await this.messenger.getRegions();

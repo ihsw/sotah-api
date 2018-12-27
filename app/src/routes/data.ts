@@ -10,6 +10,12 @@ export const getRouter = (dbConn: Connection, messenger: Messenger) => {
     const controller = new DataController(messenger, dbConn);
 
     router.get(
+        "/",
+        wrap(async (req: Request, res: Response) => {
+            await handle(controller.getPosts, req, res);
+        }),
+    );
+    router.get(
         "/regions",
         wrap(async (req, res) => {
             await handle(controller.getRegions, req, res);
