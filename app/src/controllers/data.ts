@@ -52,7 +52,7 @@ export class DataController {
     }
 
     public getPosts: RequestHandler<null, IGetPostsResponse> = async () => {
-        const posts = await this.dbConn.getRepository(Post).find({ order: { id: "DESC" } });
+        const posts = await this.dbConn.getRepository(Post).find({ order: { id: "DESC" }, take: 3 });
 
         return {
             data: { posts: posts.map(v => v.toJson()) },
