@@ -42,6 +42,7 @@ export class PostCrudController {
         post.slug = body.slug;
         post.user = req.user!;
         post.body = body.body;
+        post.summary = body.summary;
         await this.dbConn.manager.save(post);
 
         return {
@@ -97,6 +98,7 @@ export class PostCrudController {
         post.title = body.title;
         post.slug = body.slug;
         post.body = body.body;
+        post.summary = body.summary;
         await this.dbConn.manager.save(post);
 
         return {

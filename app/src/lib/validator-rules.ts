@@ -74,6 +74,7 @@ export const PostRequestBodyRules = yup
             .min(4, "Post slug must be 4 characters")
             .matches(/^[a-z|0-9|_|\-]+$/, "Post slug must be a-z, 0-9, or underscore")
             .required("Post slug is requred"),
+        summary: yup.string().required("Summary is required"),
         title: yup.string().required("Post title is requred"),
     })
     .noUnknown();
@@ -89,6 +90,7 @@ export const FullPostRequestBodyRules = (repo: PostRepository) =>
                 .matches(/^[a-z|0-9|_|\-]+$/, "Post slug must be a-z, 0-9, or underscore")
                 .required("Post slug is requred")
                 .test("is-unique", "Post must be unique", v => repo.hasNoSlug(v)),
+            summary: yup.string().required("Summary is required"),
             title: yup.string().required("Post title is requred"),
         })
         .noUnknown();

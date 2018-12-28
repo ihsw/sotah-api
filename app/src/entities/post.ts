@@ -22,6 +22,9 @@ export class Post {
     @Column({ type: "text" })
     public body: string;
 
+    @Column({ type: "text" })
+    public summary: string;
+
     @Column({ type: "timestamp" })
     public createdAt: Date;
 
@@ -29,6 +32,7 @@ export class Post {
         this.title = "";
         this.slug = "";
         this.body = "";
+        this.summary = "";
         this.createdAt = new Date();
     }
 
@@ -43,6 +47,7 @@ export class Post {
             createdAt: this.createdAt.getTime() / 1000,
             id: this.id!,
             slug: this.slug,
+            summary: this.summary,
             title: this.title,
         };
     }

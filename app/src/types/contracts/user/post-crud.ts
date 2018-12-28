@@ -3,6 +3,7 @@ import { IPostJson } from "../../entities";
 export interface ICreatePostRequest {
     title: string;
     slug: string;
+    summary: string;
     body: string;
 }
 
