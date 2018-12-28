@@ -26,7 +26,7 @@ const helper = async () => {
 test("Posts crud endpoint Should fail on unauthenticated", async t => {
     const { request } = await helper();
 
-    const res = await request.post("/user/posts").send({ title: "Test", body: "Test", slug: "test" });
+    const res = await request.post("/user/posts").send({ title: "Test", body: "Test", slug: `test-${uuidv4()}` });
     t.is(res.status, HTTPStatus.UNAUTHORIZED);
 });
 
@@ -45,7 +45,7 @@ test("Posts crud endpoint Should fail on unauthorized", async t => {
     res = await request
         .post("/user/posts")
         .set("Authorization", `Bearer ${token}`)
-        .send({ title: "test", body: "test", slug: "test" });
+        .send({ title: "test", body: "test", slug: `test-${uuidv4()}` });
     t.is(res.status, HTTPStatus.UNAUTHORIZED);
 });
 
@@ -67,7 +67,8 @@ test("Posts crud endpoint Should create a post", async t => {
 
     const { post } = await createPost(t, token, {
         body: "test",
-        slug: "test",
+        slug: `test-${uuidv4()}`,
+        summary: "test",
         title: "test",
     });
     const isValidPost = post.id > -1;
@@ -116,7 +117,8 @@ test("Posts crud endpoint Should update a post", async t => {
 
     const { post } = await createPost(t, token, {
         body: "test",
-        slug: "test",
+        slug: `test-${uuidv4()}`,
+        summary: "test",
         title: "test",
     });
     const isValidPost = post.id > -1;
@@ -126,7 +128,7 @@ test("Posts crud endpoint Should update a post", async t => {
     res = await request
         .put(`/user/posts/${post.id}`)
         .set("Authorization", `Bearer ${token}`)
-        .send({ title: "test2", body: "test2", slug: "test2" });
+        .send({ title: "test2", body: "test2", slug: `test-${uuidv4()}`, summary: "test" });
     t.is(res.status, HTTPStatus.OK);
     t.is(res.body.post.title, "test2");
 });
@@ -149,7 +151,8 @@ test("Posts crud endpoint Should delete a post", async t => {
 
     const { post } = await createPost(t, token, {
         body: "test",
-        slug: "test",
+        slug: `test-${uuidv4()}`,
+        summary: "test",
         title: "test",
     });
     const isValidPost = post.id > -1;
