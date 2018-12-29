@@ -16,6 +16,12 @@ export const getRouter = (dbConn: Connection, messenger: Messenger) => {
         }),
     );
     router.get(
+        "/posts/:post_id",
+        wrap(async (req: Request, res: Response) => {
+            await handle(controller.getPost, req, res);
+        }),
+    );
+    router.get(
         "/regions",
         wrap(async (req, res) => {
             await handle(controller.getRegions, req, res);

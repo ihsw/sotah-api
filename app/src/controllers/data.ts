@@ -5,7 +5,7 @@ import { Connection } from "typeorm";
 import { Post } from "../entities/post";
 import { ProfessionPricelist } from "../entities/profession-pricelist";
 import { code, Messenger } from "../lib/messenger";
-import { IErrorResponse } from "../types/contracts";
+import { IErrorResponse, IValidationErrorResponse } from "../types/contracts";
 import {
     IGetAuctionsRequest,
     IGetAuctionsResponse,
@@ -13,6 +13,7 @@ import {
     IGetItemsClassesResponse,
     IGetOwnersRequest,
     IGetOwnersResponse,
+    IGetPostResponse,
     IGetPostsResponse,
     IGetPricelistHistoriesRequest,
     IGetPricelistHistoriesResponse,
@@ -50,6 +51,29 @@ export class DataController {
         this.messenger = messenger;
         this.dbConn = dbConn;
     }
+
+    public getPost: RequestHandler<null, IGetPostResponse | IValidationErrorResponse> = async req => {
+        const post = await this.dbConn.getRepository(Post).findOne({
+            where: {
+                id: req.params["post_id"],
+            },
+        });
+        if (typeof post === "undefined" || post === null) {
+            const validationResponse: IValidationErrorResponse = {
+                notFound: "Not Found",
+            };
+
+            return {
+                data: validationResponse,
+                status: HTTPStatus.NOT_FOUND,
+            };
+        }
+
+        return {
+            data: { post: post.toJson() },
+            status: HTTPStatus.OK,
+        };
+    };
 
     public getPosts: RequestHandler<null, IGetPostsResponse> = async () => {
         const posts = await this.dbConn.getRepository(Post).find({ order: { id: "DESC" }, take: 3 });
