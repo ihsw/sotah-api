@@ -9,6 +9,7 @@ import { IValidationErrorResponse } from "../../types/contracts";
 import {
     ICreatePostRequest,
     ICreatePostResponse,
+    IGetPostResponse,
     IUpdatePostRequest,
     IUpdatePostResponse,
 } from "../../types/contracts/user/post-crud";
@@ -100,6 +101,32 @@ export class PostCrudController {
         post.body = body.body;
         post.summary = body.summary;
         await this.dbConn.manager.save(post);
+
+        return {
+            data: { post: post.toJson() },
+            status: HTTPStatus.OK,
+        };
+    }
+
+    public async getPost(
+        req: IRequest<null>,
+        _res: Response,
+    ): Promise<IRequestResult<IGetPostResponse | IValidationErrorResponse>> {
+        const post = await this.dbConn.getRepository(Post).findOne({
+            where: {
+                id: req.params["post_id"],
+            },
+        });
+        if (typeof post === "undefined" || post === null) {
+            const validationResponse: IValidationErrorResponse = {
+                notFound: "Not Found",
+            };
+
+            return {
+                data: validationResponse,
+                status: HTTPStatus.NOT_FOUND,
+            };
+        }
 
         return {
             data: { post: post.toJson() },
