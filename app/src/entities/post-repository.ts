@@ -14,6 +14,8 @@ export class PostRepository extends AbstractRepository<Post> {
             return true;
         }
 
+        console.log(foundPost.slug, exceptSlug);
+
         return foundPost.slug === exceptSlug;
     }
 }
