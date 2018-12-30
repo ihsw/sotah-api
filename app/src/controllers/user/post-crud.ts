@@ -57,16 +57,6 @@ export class PostCrudController {
         req: IRequest<IUpdatePostRequest>,
         _res: Response,
     ): Promise<IRequestResult<IUpdatePostResponse | IValidationErrorResponse>> {
-        const result = await ManualValidator<IUpdatePostRequest>(
-            req,
-            FullPostRequestBodyRules(this.dbConn.getCustomRepository(PostRepository)),
-        );
-        if (typeof result.errorResult !== "undefined") {
-            return result.errorResult;
-        }
-        const { body } = result.req!;
-
-        const user = req.user!;
         const post = await this.dbConn.getRepository(Post).findOne({
             relations: ["user"],
             where: {
@@ -84,6 +74,7 @@ export class PostCrudController {
             };
         }
 
+        const user = req.user!;
         if (post.user!.id !== user.id) {
             const validationResponse: IValidationErrorResponse = {
                 unauthorized: "Unauthorized",
@@ -94,6 +85,15 @@ export class PostCrudController {
                 status: HTTPStatus.UNAUTHORIZED,
             };
         }
+
+        const result = await ManualValidator<IUpdatePostRequest>(
+            req,
+            FullPostRequestBodyRules(this.dbConn.getCustomRepository(PostRepository), post.slug),
+        );
+        if (typeof result.errorResult !== "undefined") {
+            return result.errorResult;
+        }
+        const { body } = result.req!;
 
         post.title = body.title;
         post.slug = body.slug;
