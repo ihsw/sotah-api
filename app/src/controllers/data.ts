@@ -55,7 +55,7 @@ export class DataController {
     public getPost: RequestHandler<null, IGetPostResponse | IValidationErrorResponse> = async req => {
         const post = await this.dbConn.getRepository(Post).findOne({
             where: {
-                id: req.params["post_id"],
+                slug: req.params["post_slug"],
             },
         });
         if (typeof post === "undefined" || post === null) {

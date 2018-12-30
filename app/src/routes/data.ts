@@ -16,7 +16,7 @@ export const getRouter = (dbConn: Connection, messenger: Messenger) => {
         }),
     );
     router.get(
-        "/posts/:post_id",
+        "/posts/:post_slug",
         wrap(async (req: Request, res: Response) => {
             await handle(controller.getPost, req, res);
         }),
