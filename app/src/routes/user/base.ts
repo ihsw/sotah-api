@@ -11,7 +11,7 @@ export const getRouter = () => {
         "/",
         auth,
         wrap(async (req: Request, res: Response) => {
-            res.json(req.user as User);
+            res.json((req.user as User).toJson());
         }),
     );
 
