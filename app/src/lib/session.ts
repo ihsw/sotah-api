@@ -33,6 +33,7 @@ export const appendSessions = async (app: Express, messenger: Messenger, conn: C
     const jwtOptions = await getJwtOptions(messenger);
 
     const opts: StrategyOptions = {
+        algorithms: ["HS512"],
         audience: jwtOptions.audience,
         issuer: jwtOptions.issuer,
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

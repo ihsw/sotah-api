@@ -41,6 +41,7 @@ export class User {
         const jwtOptions = await getJwtOptions(messenger);
 
         return jwt.sign({ data: this.id }, jwtOptions.secret, {
+            algorithm: "HS512",
             audience: jwtOptions.audience,
             issuer: jwtOptions.issuer,
         });
