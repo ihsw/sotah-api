@@ -32,7 +32,7 @@ interface IManualValidatorResult<T> {
     errorResult?: IRequestResult<IValidationErrorResponse>;
 }
 
-export async function ManualValidator<T>(
+export async function ManualValidator<T extends object>(
     req: IRequest<T>,
     schema: ObjectSchema<T>,
 ): Promise<IManualValidatorResult<T>> {
@@ -57,7 +57,7 @@ type ControllerDescriptor<T, A> = (
     res: Response,
 ) => Promise<IRequestResult<A | IValidationErrorResponse>>;
 
-export function Validator<T, A>(schema: ObjectSchema<T>) {
+export function Validator<T extends object, A>(schema: ObjectSchema<T>) {
     return function validatorCallable(
         _target: any,
         _propertyKey: string,
