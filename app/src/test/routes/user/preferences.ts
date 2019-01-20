@@ -11,6 +11,7 @@ import { getTestHelper, setup } from "../../../lib/test-helper";
 const helper = async () => {
     const { request } = await setup({
         dbHost: process.env["DB_HOST"] as string,
+        isGceEnv: false,
         logger: getLogger(),
         natsHost: process.env["NATS_HOST"] as string,
         natsPort: process.env["NATS_PORT"] as string,

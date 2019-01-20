@@ -5,17 +5,25 @@ import "reflect-metadata";
 import { getApp } from "./lib/app";
 import { getLogger } from "./lib/logger";
 
-// logger init
-const logger = getLogger("debug");
-
 // app init
 const natsHost = process.env["NATS_HOST"] || "";
 const natsPort = process.env["NATS_PORT"] || "";
 const dbHost = process.env["DB_HOST"] || "";
+const isGceEnv = (() => {
+    const result = process.env["IS_GCE_ENV"] || "";
+    if (result === "1") {
+        return true;
+    }
+
+    return false;
+})();
+
+// logger init
+const logger = getLogger({ level: "debug", isGceEnv });
 
 const appPort = process.env["APP_PORT"];
 (async () => {
-    const app = await getApp({ logger, natsHost, natsPort, dbHost });
+    const app = await getApp({ logger, natsHost, natsPort, dbHost, isGceEnv });
     const server = http.createServer(app);
     server.listen(appPort, () => logger.info(`Listening on ${appPort}`));
     process.on("SIGTERM", () => {

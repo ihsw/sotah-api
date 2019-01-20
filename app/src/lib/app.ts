@@ -21,6 +21,7 @@ export interface IOptions {
     natsHost: string;
     natsPort: string;
     dbHost: string;
+    isGceEnv: boolean;
 }
 
 export const getApp = async (opts: IOptions): Promise<express.Express> => {
