@@ -1,3 +1,4 @@
+import { LoggingWinston } from "@google-cloud/logging-winston";
 import { createLogger, format, Logger, transports } from "winston";
 
 interface ILoggerOptions {
@@ -16,12 +17,17 @@ export const getLogger = (opts?: ILoggerOptions): Logger => {
         return { ...defaultLoggerOptions, ...opts };
     })();
 
+    const loggerTransports = [
+        new transports.Console({ level: settings.level }),
+        new transports.File({ filename: "app.log", level: settings.level }),
+    ];
+    if (settings.isGceEnv) {
+        loggerTransports.push(new LoggingWinston({ level: settings.level }));
+    }
+
     return createLogger({
         format: format.json(),
         level: settings.level,
-        transports: [
-            new transports.Console({ level: settings.level }),
-            new transports.File({ filename: "app.log", level: settings.level }),
-        ],
+        transports: loggerTransports,
     });
 };
