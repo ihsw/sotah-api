@@ -1,3 +1,4 @@
+import { ErrorReporting } from "@google-cloud/error-reporting";
 import * as compression from "compression";
 import * as express from "express";
 import * as HttpStatus from "http-status";
@@ -25,9 +26,11 @@ export interface IOptions {
 }
 
 export const getApp = async (opts: IOptions): Promise<express.Express> => {
-    const { logger, natsHost, natsPort, dbHost } = opts;
+    const { logger, natsHost, natsPort, dbHost, isGceEnv } = opts;
 
     logger.info("Starting app");
+
+    const errors = isGceEnv ? new ErrorReporting() : null;
 
     // express init
     let app = express();
@@ -72,7 +75,12 @@ export const getApp = async (opts: IOptions): Promise<express.Express> => {
     app.use("/", getDataRouter(dbConn, messenger));
     app.use("/", getUserRouter(dbConn, messenger));
 
-    // error handler
+    // error handlers
+    if (isGceEnv && errors !== null) {
+        logger.info("Appending gcp error-reporting");
+
+        app.use(errors.express);
+    }
     app.use((err: Error, _: express.Request, res: express.Response, next: () => void) => {
         logger.error("Dumping out error response", { error: err });
 
