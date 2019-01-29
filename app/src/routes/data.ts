@@ -28,12 +28,6 @@ export const getRouter = (dbConn: Connection, messenger: Messenger) => {
         }),
     );
     router.get(
-        "/item-classes",
-        wrap(async (req, res) => {
-            await handle(controller.getItemClasses, req, res);
-        }),
-    );
-    router.get(
         "/boot",
         wrap(async (req, res) => {
             await handle(controller.getBoot, req, res);

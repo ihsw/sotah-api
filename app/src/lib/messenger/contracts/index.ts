@@ -70,10 +70,6 @@ export interface IQueryOwnersResponse {
     }>;
 }
 
-export interface IGetItemsClassesResponse {
-    classes: IItemClass[];
-}
-
 export interface IGetItemsResponse {
     items: IItemsMap;
 }

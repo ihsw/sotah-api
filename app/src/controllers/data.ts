@@ -10,7 +10,6 @@ import {
     IGetAuctionsRequest,
     IGetAuctionsResponse,
     IGetBootResponse,
-    IGetItemsClassesResponse,
     IGetOwnersRequest,
     IGetOwnersResponse,
     IGetPostResponse,
@@ -86,11 +85,6 @@ export class DataController {
 
     public getRegions: RequestHandler<null, IGetRegionsResponse> = async () => {
         const msg = await this.messenger.getRegions();
-        return { data: msg.data!, status: HTTPStatus.OK };
-    };
-
-    public getItemClasses: RequestHandler<null, IGetItemsClassesResponse> = async () => {
-        const msg = await this.messenger.getItemClasses();
         return { data: msg.data!, status: HTTPStatus.OK };
     };
 

@@ -7,7 +7,6 @@ import {
     IGetAuctionsRequest,
     IGetAuctionsResponse,
     IGetBootResponse,
-    IGetItemsClassesResponse,
     IGetItemsResponse,
     IGetOwnersRequest,
     IGetOwnersResponse,
@@ -50,7 +49,6 @@ export enum subjects {
     ownersQuery = "ownersQuery",
     itemsQuery = "itemsQuery",
     auctionsQuery = "auctionsQuery",
-    itemClasses = "itemClasses",
     priceList = "priceList",
     priceListHistory = "priceListHistory",
     items = "items",
@@ -124,10 +122,6 @@ export class Messenger {
 
     public queryOwners(request: IQueryOwnersRequest): Promise<Message<IQueryOwnersResponse>> {
         return this.request(subjects.ownersQuery, { body: JSON.stringify(request) });
-    }
-
-    public getItemClasses(): Promise<Message<IGetItemsClassesResponse>> {
-        return this.request(subjects.itemClasses);
     }
 
     public async getPriceList(request: IGetPricelistRequest): Promise<Message<IGetPricelistResponse>> {
