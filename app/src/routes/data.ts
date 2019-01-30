@@ -22,12 +22,6 @@ export const getRouter = (dbConn: Connection, messenger: Messenger) => {
         }),
     );
     router.get(
-        "/regions",
-        wrap(async (req, res) => {
-            await handle(controller.getRegions, req, res);
-        }),
-    );
-    router.get(
         "/boot",
         wrap(async (req, res) => {
             await handle(controller.getBoot, req, res);

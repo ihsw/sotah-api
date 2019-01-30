@@ -2,7 +2,7 @@ import * as nats from "nats";
 import * as zlib from "zlib";
 
 import { ItemId } from "../../types/item";
-import { IRegion, IStatus, RegionName } from "../../types/region";
+import { IStatus, RegionName } from "../../types/region";
 import {
     IGetAuctionsRequest,
     IGetAuctionsResponse,
@@ -42,7 +42,6 @@ export const gunzip = (data: Buffer): Promise<Buffer> => {
 
 export enum subjects {
     status = "status",
-    regions = "regions",
     genericTestErrors = "genericTestErrors",
     auctions = "auctions",
     owners = "owners",
@@ -90,10 +89,6 @@ export class Messenger {
 
     public getStatus(regionNameValue: RegionName): Promise<Message<IStatus>> {
         return this.request(subjects.status, { body: JSON.stringify({ region_name: regionNameValue }) });
-    }
-
-    public getRegions(): Promise<Message<IRegion[]>> {
-        return this.request(subjects.regions);
     }
 
     public async getAuctions(request: IGetAuctionsRequest): Promise<Message<IGetAuctionsResponse>> {

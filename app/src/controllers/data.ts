@@ -20,7 +20,6 @@ import {
     IGetPricelistResponse,
     IGetProfessionPricelistsResponse,
     IGetRealmsResponse,
-    IGetRegionsResponse,
     IGetUnmetDemandRequest,
     IGetUnmetDemandResponse,
     IQueryAuctionsItem,
@@ -81,11 +80,6 @@ export class DataController {
             data: { posts: posts.map(v => v.toJson()) },
             status: HTTPStatus.OK,
         };
-    };
-
-    public getRegions: RequestHandler<null, IGetRegionsResponse> = async () => {
-        const msg = await this.messenger.getRegions();
-        return { data: msg.data!, status: HTTPStatus.OK };
     };
 
     public getBoot: RequestHandler<null, IGetBootResponse> = async () => {

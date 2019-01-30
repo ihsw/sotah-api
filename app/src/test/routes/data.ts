@@ -43,7 +43,7 @@ test("Status Should return status information", async t => {
         throw new Error("Timed out!");
     }, 5 * 1000);
 
-    const regions = (await messenger.getRegions()).data!;
+    const { regions } = (await messenger.getBoot()).data!;
     t.true(regions.length > 0);
 
     const res = await request.get(`/region/${regions[0].name}/realms`);
@@ -59,7 +59,8 @@ test("Status Should return auction information", async t => {
         throw new Error("Timed out!");
     }, 5 * 1000);
 
-    const [region] = (await messenger.getRegions()).data!;
+    const { regions } = (await messenger.getBoot()).data!;
+    const [region] = regions;
     const [realm] = (await messenger.getStatus(region.name)).data!.realms;
     const res = await request.post(`/region/${region.name}/realm/${realm.slug}/auctions`).send({
         count: 10,
@@ -92,7 +93,8 @@ test("Status Should return 400 on invalid count", async t => {
         throw new Error("Timed out!");
     }, 5 * 1000);
 
-    const [region] = (await messenger.getRegions()).data!;
+    const { regions } = (await messenger.getBoot()).data!;
+    const [region] = regions;
     const [realm] = (await messenger.getStatus(region.name)).data!.realms;
     const res = await request.post(`/region/${region.name}/realm/${realm.slug}/auctions`).send({ count: 0 });
     clearTimeout(tId);
