@@ -302,6 +302,15 @@ export class DataController {
             region_name: req.params["regionName"],
             upper_bounds: currentUnixTimestamp,
         })).data!.history;
+        if (req.user && req.user.id === 1) {
+            history = (await this.messenger.getPricelistHistoriesV2({
+                item_ids,
+                lower_bounds: lowerBounds,
+                realm_slug: req.params["realmSlug"],
+                region_name: req.params["regionName"],
+                upper_bounds: currentUnixTimestamp,
+            })).data!.history;
+        }
         const items = (await this.messenger.getItems(item_ids)).data!.items;
 
         // gathering unix timestamps for all items
