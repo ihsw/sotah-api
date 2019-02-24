@@ -306,7 +306,6 @@ export class DataController {
         const { item_ids } = req.body;
         const currentUnixTimestamp = Math.floor(Date.now() / 1000);
         const lowerBounds = currentUnixTimestamp - 60 * 60 * 24 * 14;
-        logger.info("received history request", { user: req.user });
         let history = (await this.messenger.getPricelistHistories({
             item_ids,
             lower_bounds: lowerBounds,
@@ -315,6 +314,7 @@ export class DataController {
             upper_bounds: currentUnixTimestamp,
         })).data!.history;
         if (req.user && req.user.id === 1) {
+            logger.info("getPricelistHistoriesV2()");
             history = (await this.messenger.getPricelistHistoriesV2({
                 item_ids,
                 lower_bounds: lowerBounds,
