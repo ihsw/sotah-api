@@ -4,6 +4,7 @@ import { Connection } from "typeorm";
 
 import { Post } from "../entities/post";
 import { ProfessionPricelist } from "../entities/profession-pricelist";
+import { getLogger } from "../lib/logger";
 import { code, Messenger } from "../lib/messenger";
 import { IErrorResponse, IValidationErrorResponse } from "../types/contracts";
 import {
@@ -40,6 +41,16 @@ import {
     IPrices,
 } from "../types/pricelist";
 import { RequestHandler } from "./index";
+
+const isGceEnv = (() => {
+    const result = process.env["IS_GCE_ENV"] || "";
+    if (result === "1") {
+        return true;
+    }
+
+    return false;
+})();
+const logger = getLogger({ level: "debug", isGceEnv });
 
 export class DataController {
     private messenger: Messenger;
@@ -295,6 +306,7 @@ export class DataController {
         const { item_ids } = req.body;
         const currentUnixTimestamp = Math.floor(Date.now() / 1000);
         const lowerBounds = currentUnixTimestamp - 60 * 60 * 24 * 14;
+        logger.info("received history request", { user: req.user });
         let history = (await this.messenger.getPricelistHistories({
             item_ids,
             lower_bounds: lowerBounds,
