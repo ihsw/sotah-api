@@ -4,7 +4,6 @@ import { Connection } from "typeorm";
 
 import { DataController, handle } from "../controllers";
 import { Messenger } from "../lib/messenger";
-import { auth } from "../lib/session";
 
 export const getRouter = (dbConn: Connection, messenger: Messenger) => {
     const router = Router();
@@ -72,7 +71,6 @@ export const getRouter = (dbConn: Connection, messenger: Messenger) => {
     );
     router.post(
         "/region/:regionName/realm/:realmSlug/price-list-history",
-        auth,
         wrap(async (req, res) => {
             await handle(controller.getPricelistHistories, req, res);
         }),

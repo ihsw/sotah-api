@@ -4,7 +4,6 @@ import { Connection } from "typeorm";
 
 import { Post } from "../entities/post";
 import { ProfessionPricelist } from "../entities/profession-pricelist";
-import { getLogger } from "../lib/logger";
 import { code, Messenger } from "../lib/messenger";
 import { IErrorResponse, IValidationErrorResponse } from "../types/contracts";
 import {
@@ -50,7 +49,6 @@ const isGceEnv = (() => {
 
     return false;
 })();
-const logger = getLogger({ level: "debug", isGceEnv });
 
 export class DataController {
     private messenger: Messenger;
@@ -306,23 +304,16 @@ export class DataController {
         const { item_ids } = req.body;
         const currentUnixTimestamp = Math.floor(Date.now() / 1000);
         const lowerBounds = currentUnixTimestamp - 60 * 60 * 24 * 14;
-        let history = (await this.messenger.getPricelistHistories({
+        const getPricelistHistories = isGceEnv
+            ? this.messenger.getPricelistHistoriesV2
+            : this.messenger.getPricelistHistories;
+        let history = (await getPricelistHistories({
             item_ids,
             lower_bounds: lowerBounds,
             realm_slug: req.params["realmSlug"],
             region_name: req.params["regionName"],
             upper_bounds: currentUnixTimestamp,
         })).data!.history;
-        if (req.user && req.user.id === 1) {
-            logger.info("getPricelistHistoriesV2()");
-            history = (await this.messenger.getPricelistHistoriesV2({
-                item_ids,
-                lower_bounds: lowerBounds,
-                realm_slug: req.params["realmSlug"],
-                region_name: req.params["regionName"],
-                upper_bounds: currentUnixTimestamp,
-            })).data!.history;
-        }
         const items = (await this.messenger.getItems(item_ids)).data!.items;
 
         // gathering unix timestamps for all items
