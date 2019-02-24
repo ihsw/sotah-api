@@ -177,6 +177,7 @@ export class Messenger {
     public async getPricelistHistoriesV2(
         req: IGetPricelistHistoriesRequest,
     ): Promise<Message<IGetPricelistHistoriesResponse>> {
+        console.log("querying", { subject: subjects.priceListHistoryV2 });
         const message = await this.request<string>(subjects.priceListHistoryV2, {
             body: JSON.stringify(req),
             parseData: false,
