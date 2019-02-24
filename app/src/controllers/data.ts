@@ -305,8 +305,8 @@ export class DataController {
         const currentUnixTimestamp = Math.floor(Date.now() / 1000);
         const lowerBounds = currentUnixTimestamp - 60 * 60 * 24 * 14;
         const getPricelistHistories = isGceEnv
-            ? this.messenger.getPricelistHistoriesV2
-            : this.messenger.getPricelistHistories;
+            ? this.messenger.getPricelistHistoriesV2.bind(this.messenger.getPricelistHistoriesV2)
+            : this.messenger.getPricelistHistories.bind(this.messenger.getPricelistHistories);
         let history = (await getPricelistHistories({
             item_ids,
             lower_bounds: lowerBounds,
