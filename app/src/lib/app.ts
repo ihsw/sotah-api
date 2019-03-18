@@ -21,7 +21,7 @@ export interface IOptions {
     natsHost: string;
     natsPort: string;
     dbHost: string;
-    dbPassword: string;
+    dbPassword?: string;
     isGceEnv: boolean;
 }
 
@@ -47,7 +47,7 @@ export const getApp = async (opts: IOptions): Promise<express.Express> => {
         host: dbHost,
         logging: false,
         name: `app-${uuidv4()}`,
-        password: dbPassword,
+        password: typeof dbPassword !== "undefined" ? dbPassword : "",
         port: 5432,
         synchronize: false,
         type: "postgres",
