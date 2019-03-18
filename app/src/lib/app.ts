@@ -21,11 +21,12 @@ export interface IOptions {
     natsHost: string;
     natsPort: string;
     dbHost: string;
+    dbPassword: string;
     isGceEnv: boolean;
 }
 
 export const getApp = async (opts: IOptions): Promise<express.Express> => {
-    const { logger, natsHost, natsPort, dbHost } = opts;
+    const { logger, natsHost, natsPort, dbHost, dbPassword } = opts;
 
     logger.info("Starting app");
 
@@ -46,7 +47,7 @@ export const getApp = async (opts: IOptions): Promise<express.Express> => {
         host: dbHost,
         logging: false,
         name: `app-${uuidv4()}`,
-        password: "",
+        password: dbPassword,
         port: 5432,
         synchronize: false,
         type: "postgres",

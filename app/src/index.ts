@@ -9,6 +9,7 @@ import { getLogger } from "./lib/logger";
 const natsHost = process.env["NATS_HOST"] || "";
 const natsPort = process.env["NATS_PORT"] || "";
 const dbHost = process.env["DB_HOST"] || "";
+const dbPassword = process.env["DB_PASSWORD"] || "";
 const isGceEnv = (() => {
     const result = process.env["IS_GCE_ENV"] || "";
     if (result === "1") {
@@ -23,7 +24,7 @@ const logger = getLogger({ level: "debug", isGceEnv });
 
 const appPort = process.env["APP_PORT"];
 (async () => {
-    const app = await getApp({ logger, natsHost, natsPort, dbHost, isGceEnv });
+    const app = await getApp({ logger, natsHost, natsPort, dbHost, dbPassword, isGceEnv });
     const server = http.createServer(app);
     server.listen(appPort, () => logger.info(`Listening on ${appPort}`));
     process.on("SIGTERM", () => {
