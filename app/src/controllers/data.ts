@@ -125,66 +125,66 @@ export class DataController {
             sort_direction: sortDirection,
             sort_kind: sortKind,
         });
-        switch (msg.code) {
-            case code.ok:
-                const itemIds = [...new Set(msg.data!.auctions.map(v => v.itemId))];
-                const itemsMsg = await this.messenger.getItems(itemIds);
-                if (itemsMsg.code !== code.ok) {
+        if (msg.code !== code.ok) {
+            switch (msg.code) {
+                case code.notFound:
+                    return {
+                        data: { error: msg.error!.message },
+                        status: HTTPStatus.NOT_FOUND,
+                    };
+                case code.userError:
+                    return {
+                        data: { error: msg.error!.message },
+                        status: HTTPStatus.BAD_REQUEST,
+                    };
+                default:
                     return {
                         data: { error: msg.error!.message },
                         status: HTTPStatus.INTERNAL_SERVER_ERROR,
                     };
-                }
-
-                const professionPricelists = await (async () => {
-                    if (itemIds.length === 0) {
-                        return [];
-                    }
-
-                    return this.dbConn
-                        .getRepository(ProfessionPricelist)
-                        .createQueryBuilder("professionpricelist")
-                        .leftJoinAndSelect("professionpricelist.pricelist", "pricelist")
-                        .leftJoinAndSelect("pricelist.entries", "entry")
-                        .where(`entry.itemId IN (${itemIds.join(", ")})`)
-                        .getMany();
-                })();
-
-                const pricelistItemIds = [
-                    ...professionPricelists.map(v => v.pricelist!.entries!.map(y => y.itemId)[0]),
-                ];
-                const pricelistItemsMsg = await this.messenger.getItems(pricelistItemIds);
-                if (pricelistItemsMsg.code !== code.ok) {
-                    return {
-                        data: { error: pricelistItemsMsg.error!.message },
-                        status: HTTPStatus.INTERNAL_SERVER_ERROR,
-                    };
-                }
-
-                return {
-                    data: {
-                        ...msg.data!,
-                        items: { ...itemsMsg.data!.items, ...pricelistItemsMsg.data!.items },
-                        professionPricelists: professionPricelists.map(v => v.toJson()),
-                    },
-                    status: HTTPStatus.OK,
-                };
-            case code.notFound:
-                return {
-                    data: { error: msg.error!.message },
-                    status: HTTPStatus.NOT_FOUND,
-                };
-            case code.userError:
-                return {
-                    data: { error: msg.error!.message },
-                    status: HTTPStatus.BAD_REQUEST,
-                };
-            default:
-                return {
-                    data: { error: msg.error!.message },
-                    status: HTTPStatus.INTERNAL_SERVER_ERROR,
-                };
+            }
         }
+
+        const itemIds = [...new Set(msg.data!.auctions.map(v => v.itemId))];
+        const itemsMsg = await this.messenger.getItems(itemIds);
+        if (itemsMsg.code !== code.ok) {
+            return {
+                data: { error: msg.error!.message },
+                status: HTTPStatus.INTERNAL_SERVER_ERROR,
+            };
+        }
+
+        const professionPricelists = await (async () => {
+            if (itemIds.length === 0) {
+                return [];
+            }
+
+            return this.dbConn
+                .getRepository(ProfessionPricelist)
+                .createQueryBuilder("professionpricelist")
+                .leftJoinAndSelect("professionpricelist.pricelist", "pricelist")
+                .leftJoinAndSelect("pricelist.entries", "entry")
+                .where(`entry.itemId IN (${itemIds.join(", ")})`)
+                .getMany();
+        })();
+
+        const pricelistItemIds = [...professionPricelists.map(v => v.pricelist!.entries!.map(y => y.itemId)[0])];
+        const pricelistItemsMsg = await this.messenger.getItems(pricelistItemIds);
+        if (pricelistItemsMsg.code !== code.ok) {
+            return {
+                data: { error: pricelistItemsMsg.error!.message },
+                status: HTTPStatus.INTERNAL_SERVER_ERROR,
+            };
+        }
+
+        return {
+            data: {
+                ...msg.data!,
+                items: { ...itemsMsg.data!.items, ...pricelistItemsMsg.data!.items },
+                professionPricelists: professionPricelists.map(v => v.toJson()),
+            },
+            status: HTTPStatus.OK,
+        };
     };
 
     public getOwners: RequestHandler<IGetOwnersRequest, IGetOwnersResponse> = async req => {
