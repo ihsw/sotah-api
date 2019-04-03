@@ -207,19 +207,20 @@ export class DataController {
     > = async req => {
         const { query } = req.body;
 
-        const itemsMessage = await this.messenger.queryItems(query);
+        const [itemsMessage, ownersMessage] = await Promise.all([
+            this.messenger.queryItems(query),
+            this.messenger.queryOwners({
+                query,
+                realm_slug: req.params["realmSlug"],
+                region_name: req.params["regionName"],
+            }),
+        ]);
         if (itemsMessage.code !== code.ok) {
             return {
                 data: { error: itemsMessage.error!.message },
                 status: HTTPStatus.INTERNAL_SERVER_ERROR,
             };
         }
-
-        const ownersMessage = await this.messenger.queryOwners({
-            query,
-            realm_slug: req.params["realmSlug"],
-            region_name: req.params["regionName"],
-        });
         if (ownersMessage.code !== code.ok) {
             return {
                 data: { error: ownersMessage.error!.message },
