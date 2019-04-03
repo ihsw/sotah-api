@@ -41,15 +41,6 @@ import {
 } from "../types/pricelist";
 import { RequestHandler } from "./index";
 
-const isGceEnv = (() => {
-    const result = process.env["IS_GCE_ENV"] || "";
-    if (result === "1") {
-        return true;
-    }
-
-    return false;
-})();
-
 export class DataController {
     private messenger: Messenger;
     private dbConn: Connection;
@@ -299,10 +290,7 @@ export class DataController {
         const { item_ids } = req.body;
         const currentUnixTimestamp = Math.floor(Date.now() / 1000);
         const lowerBounds = currentUnixTimestamp - 60 * 60 * 24 * 14;
-        const getPricelistHistories = isGceEnv
-            ? this.messenger.getPricelistHistoriesV2.bind(this.messenger)
-            : this.messenger.getPricelistHistories.bind(this.messenger);
-        let history = (await getPricelistHistories({
+        let history = (await this.messenger.getPricelistHistories({
             item_ids,
             lower_bounds: lowerBounds,
             realm_slug: req.params["realmSlug"],

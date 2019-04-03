@@ -50,7 +50,6 @@ export enum subjects {
     auctionsQuery = "auctionsQuery",
     priceList = "priceList",
     priceListHistory = "priceListHistory",
-    priceListHistoryV2 = "priceListHistoryV2",
     items = "items",
     boot = "boot",
     sessionSecret = "sessionSecret",
@@ -160,24 +159,6 @@ export class Messenger {
         req: IGetPricelistHistoriesRequest,
     ): Promise<Message<IGetPricelistHistoriesResponse>> {
         const message = await this.request<string>(subjects.priceListHistory, {
-            body: JSON.stringify(req),
-            parseData: false,
-        });
-        if (message.code !== code.ok) {
-            return { code: message.code, error: message.error };
-        }
-
-        return {
-            code: code.ok,
-            data: JSON.parse((await gunzip(Buffer.from(message.rawData!, "base64"))).toString()),
-            error: null,
-        };
-    }
-
-    public async getPricelistHistoriesV2(
-        req: IGetPricelistHistoriesRequest,
-    ): Promise<Message<IGetPricelistHistoriesResponse>> {
-        const message = await this.request<string>(subjects.priceListHistoryV2, {
             body: JSON.stringify(req),
             parseData: false,
         });
