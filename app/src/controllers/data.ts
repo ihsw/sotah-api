@@ -215,15 +215,9 @@ export class DataController {
                 region_name: req.params["regionName"],
             }),
         ]);
-        if (itemsMessage.code !== code.ok) {
+        if (itemsMessage.code !== code.ok || ownersMessage.code !== code.ok) {
             return {
                 data: { error: itemsMessage.error!.message },
-                status: HTTPStatus.INTERNAL_SERVER_ERROR,
-            };
-        }
-        if (ownersMessage.code !== code.ok) {
-            return {
-                data: { error: ownersMessage.error!.message },
                 status: HTTPStatus.INTERNAL_SERVER_ERROR,
             };
         }
