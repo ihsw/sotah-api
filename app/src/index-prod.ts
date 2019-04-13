@@ -12,7 +12,7 @@ const natsHost = process.env["NATS_HOST"] || "";
 const natsPort = process.env["NATS_PORT"] || "";
 const dbHost = process.env["DB_HOST"] || "";
 const dbPassword = process.env["DB_PASSWORD"] || "";
-const appPort = process.env["APP_PORT"];
+const appPort = process.env["PORT"];
 const isGceEnv = (() => {
     const result = process.env["IS_GCE_ENV"] || "";
     if (result === "1") {

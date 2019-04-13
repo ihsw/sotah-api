@@ -22,7 +22,7 @@ const isGceEnv = (() => {
 // logger init
 const logger = getLogger({ level: "debug", isGceEnv });
 
-const appPort = process.env["APP_PORT"];
+const appPort = process.env["PORT"];
 (async () => {
     const app = await getApp({ logger, natsHost, natsPort, dbHost, dbPassword, isGceEnv });
     const server = http.createServer(app);
