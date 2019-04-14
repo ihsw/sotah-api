@@ -18,6 +18,12 @@ export enum RealmPopulation {
     full = "full",
 }
 
+export interface IRealmModificationDates {
+    downloaded: number;
+    live_auctions_received: number;
+    pricelist_histories_received: number;
+}
+
 export interface IRealm {
     regionName: RegionName;
     type: string;
@@ -30,9 +36,5 @@ export interface IRealm {
     locale: string;
     timezone: string;
     connected_realms: RealmSlug[];
-    realm_modification_dates: {
-        downloaded: number;
-        live_auctions_received: number;
-        pricelist_histories_received: number;
-    };
+    realm_modification_dates: IRealmModificationDates;
 }

@@ -5,7 +5,7 @@ import { IItemsMap, ItemId } from "../../../types/item";
 import { IItemClass } from "../../../types/item-class";
 import { IPricelistHistoryMap, IPriceListMap } from "../../../types/pricelist";
 import { IProfession } from "../../../types/profession";
-import { IRegion, RealmSlug, RegionName } from "../../../types/region";
+import { IRealmModificationDates, IRegion, RealmSlug, RegionName } from "../../../types/region";
 
 export interface IGetAuctionsRequest {
     region_name: RegionName;
@@ -115,3 +115,10 @@ export interface IQueryOwnerItemsResponse {
         };
     };
 }
+
+export interface IRealmModificationDatesRequest {
+    region_name: RegionName;
+    realm_slug: RealmSlug;
+}
+
+export type IRealmModificationDatesResponse = IRealmModificationDates;
