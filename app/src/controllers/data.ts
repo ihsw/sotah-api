@@ -5,6 +5,7 @@ import { Connection } from "typeorm";
 import { Post } from "../entities/post";
 import { ProfessionPricelist } from "../entities/profession-pricelist";
 import { code, Messenger } from "../lib/messenger";
+import { AuctionsQueryParamsRules } from "../lib/validator-rules";
 import { IErrorResponse, IValidationErrorResponse } from "../types/contracts";
 import {
     IGetAuctionsRequest,
@@ -115,8 +116,21 @@ export class DataController {
         };
     };
 
-    public getAuctions: QueryRequestHandler<IGetAuctionsRequest, IGetAuctionsResponse | IErrorResponse> = async req => {
-        const { count, page, sortDirection, sortKind, ownerFilters, itemFilters } = req.query;
+    public getAuctions: QueryRequestHandler<
+        IGetAuctionsResponse | IErrorResponse | IValidationErrorResponse
+    > = async req => {
+        let result: IGetAuctionsRequest | null = null;
+        try {
+            result = await AuctionsQueryParamsRules.validate(req.query);
+        } catch (err) {
+            const validationErrors: IValidationErrorResponse = { [err.path]: err.message };
+
+            return {
+                data: validationErrors,
+                status: HTTPStatus.BAD_REQUEST,
+            };
+        }
+        const { count, page, sortDirection, sortKind, ownerFilters, itemFilters } = result;
 
         const msg = await this.messenger.getAuctions({
             count,
