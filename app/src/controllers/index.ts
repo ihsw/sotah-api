@@ -27,6 +27,9 @@ export interface IQueryRequest<Q> extends Request {
 export interface IRequestResult<T> {
     status: number;
     data: T;
+    headers?: {
+        [key: string]: string;
+    };
 }
 
 export type RequestHandler<T, A> = (req: IRequest<T>, res: Response) => Promise<IRequestResult<A>>;
@@ -34,8 +37,13 @@ export type RequestHandler<T, A> = (req: IRequest<T>, res: Response) => Promise<
 export type QueryRequestHandler<Q, A> = (req: IQueryRequest<Q>, res: Response) => Promise<IRequestResult<A>>;
 
 export async function handle<T, A>(handlerFunc: RequestHandler<T, A>, req: IRequest<T>, res: Response) {
-    const { status, data } = await handlerFunc(req, res);
-    res.status(status).send(data);
+    const { status, data, headers } = await handlerFunc(req, res);
+
+    res.status(status);
+    if (headers) {
+        res.set(headers);
+    }
+    res.send(data);
 }
 
 interface IManualValidatorResult<T> {
