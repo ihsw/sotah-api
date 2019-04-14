@@ -272,12 +272,41 @@ export class DataController {
         };
     };
 
-    public queryItems: RequestHandler<IQueryItemsRequest, IQueryItemsResponse> = async req => {
+    public queryItems: RequestHandler<IQueryItemsRequest, IQueryItemsResponse | IErrorResponse> = async req => {
         const { query } = req.body;
-        const msg = await this.messenger.queryItems(query);
+
+        // resolving items-query message
+        const itemsQueryMessage = await this.messenger.queryItems(query);
+        if (itemsQueryMessage.code !== code.ok) {
+            return {
+                data: { error: itemsQueryMessage.error!.message },
+                status: HTTPStatus.INTERNAL_SERVER_ERROR,
+            };
+        }
+
+        // resolving items from item-ids in items-query response data
+        const getItemsMessage = await this.messenger.getItems(itemsQueryMessage.data!.items.map(v => v.item_id));
+        if (getItemsMessage.code !== code.ok) {
+            return {
+                data: { error: itemsQueryMessage.error!.message },
+                status: HTTPStatus.INTERNAL_SERVER_ERROR,
+            };
+        }
+        const foundItems = getItemsMessage.data!.items;
+
+        // formatting a response
+        const data: IQueryItemsResponse = {
+            items: itemsQueryMessage.data!.items.map(v => {
+                return {
+                    item: v.item_id in foundItems ? foundItems[v.item_id] : null,
+                    rank: v.rank,
+                    target: v.target,
+                };
+            }),
+        };
 
         return {
-            data: msg.data!,
+            data,
             status: HTTPStatus.OK,
         };
     };
