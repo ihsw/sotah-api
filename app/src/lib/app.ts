@@ -34,6 +34,7 @@ export const getApp = async (opts: IOptions): Promise<express.Express> => {
 
     // express init
     let app = express();
+    app.set("etag", false);
     app.use(express.json());
     app.use(compression());
     app.use((_, res, next) => {
