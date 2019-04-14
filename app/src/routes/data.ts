@@ -33,7 +33,7 @@ export const getRouter = (dbConn: Connection, messenger: Messenger) => {
             await handle(controller.getRealms, req, res);
         }),
     );
-    router.post(
+    router.get(
         "/region/:regionName/realm/:realmSlug/auctions",
         wrap(async (req, res) => {
             await handle(controller.getAuctions, req, res);

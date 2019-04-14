@@ -39,7 +39,7 @@ import {
     IPricelistHistoryMap,
     IPrices,
 } from "../types/pricelist";
-import { RequestHandler } from "./index";
+import { QueryRequestHandler, RequestHandler } from "./index";
 
 export class DataController {
     private messenger: Messenger;
@@ -115,8 +115,8 @@ export class DataController {
         };
     };
 
-    public getAuctions: RequestHandler<IGetAuctionsRequest, IGetAuctionsResponse | IErrorResponse> = async req => {
-        const { count, page, sortDirection, sortKind, ownerFilters, itemFilters } = req.body;
+    public getAuctions: QueryRequestHandler<IGetAuctionsRequest, IGetAuctionsResponse | IErrorResponse> = async req => {
+        const { count, page, sortDirection, sortKind, ownerFilters, itemFilters } = req.query;
 
         const msg = await this.messenger.getAuctions({
             count,
