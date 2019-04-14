@@ -15,13 +15,13 @@ export interface IRequest<T> extends Request {
     };
 }
 
-export interface IQueryRequest<Q> extends Request {
+export interface IQueryRequest extends Request {
     body: null;
     user?: User;
     params: {
         [key: string]: string;
     };
-    query: Q;
+    query: unknown;
 }
 
 export interface IRequestResult<T> {
@@ -34,7 +34,7 @@ export interface IRequestResult<T> {
 
 export type RequestHandler<T, A> = (req: IRequest<T>, res: Response) => Promise<IRequestResult<A>>;
 
-export type QueryRequestHandler<Q, A> = (req: IQueryRequest<Q>, res: Response) => Promise<IRequestResult<A>>;
+export type QueryRequestHandler<A> = (req: IQueryRequest, res: Response) => Promise<IRequestResult<A>>;
 
 export async function handle<T, A>(handlerFunc: RequestHandler<T, A>, req: IRequest<T>, res: Response) {
     const { status, data, headers } = await handlerFunc(req, res);
