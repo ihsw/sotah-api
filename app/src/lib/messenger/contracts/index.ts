@@ -1,7 +1,7 @@
 import { SortDirection, SortKind } from "../../../types";
 import { IAuction, IOwner, OwnerName } from "../../../types/auction";
 import { IExpansion } from "../../../types/expansion";
-import { IItem, IItemsMap, ItemId } from "../../../types/item";
+import { IItemsMap, ItemId } from "../../../types/item";
 import { IItemClass } from "../../../types/item-class";
 import { IPricelistHistoryMap, IPriceListMap } from "../../../types/pricelist";
 import { IProfession } from "../../../types/profession";
@@ -50,7 +50,7 @@ export interface IGetSessionSecretResponse {
 
 export interface IQueryItemsResponse {
     items: Array<{
-        item: IItem;
+        item_id: ItemId;
         target: string;
         rank: number;
     }>;
