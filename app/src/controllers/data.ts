@@ -198,7 +198,7 @@ export class DataController {
     > = async req => {
         const { query } = req.body;
 
-        const [itemsMessage, ownersMessage] = await Promise.all([
+        const [itemsQueryMessage, ownersQueryMessage] = await Promise.all([
             this.messenger.queryItems(query),
             this.messenger.queryOwners({
                 query,
@@ -206,20 +206,34 @@ export class DataController {
                 region_name: req.params["regionName"],
             }),
         ]);
-        if (itemsMessage.code !== code.ok || ownersMessage.code !== code.ok) {
+        if (itemsQueryMessage.code !== code.ok || ownersQueryMessage.code !== code.ok) {
             return {
-                data: { error: itemsMessage.error!.message },
+                data: { error: itemsQueryMessage.error!.message },
                 status: HTTPStatus.INTERNAL_SERVER_ERROR,
             };
         }
 
+        const getItemsMessage = await this.messenger.getItems(itemsQueryMessage.data!.items.map(v => v.item_id));
+        if (getItemsMessage.code !== code.ok) {
+            return {
+                data: { error: itemsQueryMessage.error!.message },
+                status: HTTPStatus.INTERNAL_SERVER_ERROR,
+            };
+        }
+        const foundItems = getItemsMessage.data!.items;
+
         let items: IQueryAuctionsItem[] = [
-            ...itemsMessage.data!.items.map(v => {
-                const result: IQueryAuctionsItem = { ...v, owner: null };
+            ...itemsQueryMessage.data!.items.map(v => {
+                const result: IQueryAuctionsItem = {
+                    item: v.item_id in foundItems ? foundItems[v.item_id] : null,
+                    owner: null,
+                    rank: v.rank,
+                    target: v.target,
+                };
 
                 return result;
             }),
-            ...ownersMessage.data!.items.map(v => {
+            ...ownersQueryMessage.data!.items.map(v => {
                 const result: IQueryAuctionsItem = { ...v, item: null };
 
                 return result;
