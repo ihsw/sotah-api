@@ -93,12 +93,24 @@ export class DataController {
             return { status: HTTPStatus.NOT_FOUND, data: null };
         }
 
+        const realms = msg
+            .data!.realms.map(realm => {
+                return { ...realm, regionName: req.params["regionName"] };
+            })
+            .sort((a, b) => {
+                if (a.name < b.name) {
+                    return -1;
+                }
+
+                if (a.name > b.name) {
+                    return 1;
+                }
+
+                return 0;
+            });
+
         return {
-            data: {
-                realms: msg.data!.realms.map(realm => {
-                    return { ...realm, regionName: req.params["regionName"] };
-                }),
-            },
+            data: { realms },
             status: HTTPStatus.OK,
         };
     };
