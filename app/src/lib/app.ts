@@ -36,6 +36,10 @@ export const getApp = async (opts: IOptions): Promise<express.Express> => {
     let app = express();
     app.use(express.json());
     app.use(compression());
+    app.use((_, res, next) => {
+        res.set("Cache-Control", "private");
+        next();
+    });
 
     // messenger init
     const messenger = new Messenger(nats.connect({ url: `nats://${natsHost}:${natsPort}` }));
