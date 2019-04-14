@@ -1,6 +1,7 @@
 import * as yup from "yup";
 
 import { PostRepository } from "../entities/post-repository";
+import { IGetAuctionsRequest } from "../types/contracts/data";
 import { ICreatePostRequest } from "../types/contracts/user/post-crud";
 import { ICreatePreferencesRequest } from "../types/contracts/user/preferences";
 
@@ -94,3 +95,27 @@ export const FullPostRequestBodyRules = (repo: PostRepository, exceptSlug?: stri
             title: yup.string().required("Post title is requred"),
         })
         .noUnknown();
+
+export const AuctionsQueryParamsRules = yup
+    .object<IGetAuctionsRequest>()
+    .shape({
+        count: yup
+            .number()
+            .integer("Count must be an integer")
+            .required("Count is required"),
+        itemFilters: yup.array(yup.number().integer("Item-id must be an integer")),
+        ownerFilters: yup.array(yup.string().required("Owner-name is required")),
+        page: yup
+            .number()
+            .integer("Page must be an integer")
+            .required("Page is required"),
+        sortDirection: yup
+            .number()
+            .integer("Sort-direction must be an integer")
+            .required("Sort-direction is required"),
+        sortKind: yup
+            .number()
+            .integer("Sort-kind must be an integer")
+            .required("Sort-kind is required"),
+    })
+    .noUnknown();
