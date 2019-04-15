@@ -145,7 +145,7 @@ export class DataController {
             }
         }
         const realmModificationDates = realmModificationDatesMessage.data!;
-        const lastModifiedDate = moment(realmModificationDates.downloaded * 1000);
+        const lastModifiedDate = moment(realmModificationDates.downloaded * 1000).utc();
         const lastModified = `${lastModifiedDate.format("ddd, DD MMM YYYY HH:mm:ss")} GMT`;
 
         // parsing request params
