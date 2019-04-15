@@ -153,13 +153,10 @@ export class DataController {
         if (ifModifiedSince) {
             const ifModifiedSinceDate = moment(new Date(ifModifiedSince)).utc();
             if (lastModifiedDate.isSameOrBefore(ifModifiedSinceDate)) {
-                // tslint:disable-next-line:no-console
-                console.log("serving cached response");
-
                 return {
                     data: null,
                     headers: {
-                        "Cache-Control": "public",
+                        "Cache-Control": ["public", `max-age=${60 * 60}`],
                         "Last-Modified": lastModified,
                     },
                     status: HTTPStatus.NOT_MODIFIED,
@@ -251,7 +248,7 @@ export class DataController {
                 professionPricelists: professionPricelists.map(v => v.toJson()),
             },
             headers: {
-                "Cache-Control": "public",
+                "Cache-Control": ["public", `max-age=${60 * 60}`],
                 "Last-Modified": lastModified,
             },
             status: HTTPStatus.OK,
