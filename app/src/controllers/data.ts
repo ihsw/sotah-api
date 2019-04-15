@@ -118,7 +118,7 @@ export class DataController {
     };
 
     public getAuctions: QueryRequestHandler<
-        IGetAuctionsResponse | IErrorResponse | IValidationErrorResponse
+        IGetAuctionsResponse | IErrorResponse | IValidationErrorResponse | null
     > = async req => {
         // gathering last-modified
         const realmModificationDatesMessage = await this.messenger.getRealmModificationDates({
@@ -147,6 +147,22 @@ export class DataController {
         const realmModificationDates = realmModificationDatesMessage.data!;
         const lastModifiedDate = moment(realmModificationDates.downloaded * 1000).utc();
         const lastModified = `${lastModifiedDate.format("ddd, DD MMM YYYY HH:mm:ss")} GMT`;
+
+        // checking if-modified-since header
+        const ifModifiedSince = req.header("if-modified-since");
+        if (ifModifiedSince) {
+            const ifModifiedSinceDate = moment(new Date(ifModifiedSince)).utc();
+            if (lastModifiedDate.isBefore(ifModifiedSinceDate)) {
+                return {
+                    data: null,
+                    headers: {
+                        "Cache-Control": "public",
+                        "Last-Modified": lastModified,
+                    },
+                    status: HTTPStatus.NOT_MODIFIED,
+                };
+            }
+        }
 
         // parsing request params
         let result: IGetAuctionsRequest | null = null;
