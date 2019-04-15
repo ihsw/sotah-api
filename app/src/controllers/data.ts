@@ -152,7 +152,7 @@ export class DataController {
         const ifModifiedSince = req.header("if-modified-since");
         if (ifModifiedSince) {
             const ifModifiedSinceDate = moment(new Date(ifModifiedSince)).utc();
-            if (lastModifiedDate.isBefore(ifModifiedSinceDate)) {
+            if (lastModifiedDate.isSameOrBefore(ifModifiedSinceDate)) {
                 // tslint:disable-next-line:no-console
                 console.log("serving cached response");
 
