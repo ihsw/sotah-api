@@ -153,6 +153,9 @@ export class DataController {
         if (ifModifiedSince) {
             const ifModifiedSinceDate = moment(new Date(ifModifiedSince)).utc();
             if (lastModifiedDate.isSameOrBefore(ifModifiedSinceDate)) {
+                // tslint:disable-next-line:no-console
+                console.log("serving cached request");
+
                 return {
                     data: null,
                     headers: {
@@ -240,6 +243,9 @@ export class DataController {
                 status: HTTPStatus.INTERNAL_SERVER_ERROR,
             };
         }
+
+        // tslint:disable-next-line:no-console
+        console.log("serving un-cached request");
 
         return {
             data: {
