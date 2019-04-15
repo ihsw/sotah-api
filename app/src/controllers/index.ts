@@ -28,7 +28,7 @@ export interface IRequestResult<T> {
     status: number;
     data: T;
     headers?: {
-        [key: string]: string;
+        [key: string]: string | string[];
     };
 }
 
