@@ -159,7 +159,7 @@ export class DataController {
                 return {
                     data: null,
                     headers: {
-                        "Cache-Control": ["public", `max-age=${60 * 60}`],
+                        "Cache-Control": ["public", `max-age=${60 * 30}`],
                         "Last-Modified": lastModified,
                     },
                     status: HTTPStatus.NOT_MODIFIED,
@@ -254,7 +254,7 @@ export class DataController {
                 professionPricelists: professionPricelists.map(v => v.toJson()),
             },
             headers: {
-                "Cache-Control": ["public", `max-age=${60 * 60}`],
+                "Cache-Control": ["public", `max-age=${60 * 30}`],
                 "Last-Modified": lastModified,
             },
             status: HTTPStatus.OK,
