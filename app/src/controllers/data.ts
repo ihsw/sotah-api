@@ -1,5 +1,6 @@
 import * as boll from "bollinger-bands";
 import * as HTTPStatus from "http-status";
+import * as moment from "moment";
 import { Connection } from "typeorm";
 
 import { Post } from "../entities/post";
@@ -119,6 +120,35 @@ export class DataController {
     public getAuctions: QueryRequestHandler<
         IGetAuctionsResponse | IErrorResponse | IValidationErrorResponse
     > = async req => {
+        // gathering last-modified
+        const realmModificationDatesMessage = await this.messenger.getRealmModificationDates({
+            realm_slug: req.params["realmSlug"],
+            region_name: req.params["regionName"],
+        });
+        if (realmModificationDatesMessage.code !== code.ok) {
+            switch (realmModificationDatesMessage.code) {
+                case code.notFound:
+                    return {
+                        data: { error: realmModificationDatesMessage.error!.message },
+                        status: HTTPStatus.NOT_FOUND,
+                    };
+                case code.userError:
+                    return {
+                        data: { error: realmModificationDatesMessage.error!.message },
+                        status: HTTPStatus.BAD_REQUEST,
+                    };
+                default:
+                    return {
+                        data: { error: realmModificationDatesMessage.error!.message },
+                        status: HTTPStatus.INTERNAL_SERVER_ERROR,
+                    };
+            }
+        }
+        const realmModificationDates = realmModificationDatesMessage.data!;
+        const lastModifiedDate = moment(realmModificationDates.downloaded * 1000);
+        const lastModified = `${lastModifiedDate.format("ddd, DD MMM YYYY HH:mm:ss")} GMT`;
+
+        // parsing request params
         let result: IGetAuctionsRequest | null = null;
         try {
             result = await AuctionsQueryParamsRules.validate(req.query);
@@ -132,6 +162,7 @@ export class DataController {
         }
         const { count, page, sortDirection, sortKind, ownerFilters, itemFilters } = result;
 
+        // gathering auctions
         const msg = await this.messenger.getAuctions({
             count,
             item_filters: itemFilters,
@@ -199,6 +230,10 @@ export class DataController {
                 ...msg.data!,
                 items: { ...itemsMsg.data!.items, ...pricelistItemsMsg.data!.items },
                 professionPricelists: professionPricelists.map(v => v.toJson()),
+            },
+            headers: {
+                "Cache-Control": "public",
+                "Last-Modified": lastModified,
             },
             status: HTTPStatus.OK,
         };
