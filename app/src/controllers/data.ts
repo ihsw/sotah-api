@@ -153,6 +153,9 @@ export class DataController {
         if (ifModifiedSince) {
             const ifModifiedSinceDate = moment(new Date(ifModifiedSince)).utc();
             if (lastModifiedDate.isBefore(ifModifiedSinceDate)) {
+                // tslint:disable-next-line:no-console
+                console.log("serving cached response");
+
                 return {
                     data: null,
                     headers: {
