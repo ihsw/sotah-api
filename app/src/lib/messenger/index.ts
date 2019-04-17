@@ -19,7 +19,9 @@ import {
     IQueryOwnerItemsRequest,
     IQueryOwnerItemsResponse,
     IQueryOwnersRequest,
-    IQueryOwnersResponse, IRealmModificationDatesRequest, IRealmModificationDatesResponse,
+    IQueryOwnersResponse,
+    IRealmModificationDatesRequest,
+    IRealmModificationDatesResponse,
 } from "./contracts";
 import { Message } from "./message";
 import { MessageError } from "./message-error";

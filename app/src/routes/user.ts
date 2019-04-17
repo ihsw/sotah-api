@@ -10,6 +10,7 @@ import { getRouter as getPostsRouter } from "./user/posts-crud";
 import { getRouter as getPreferencesRouter } from "./user/preferences";
 import { getRouter as getPricelistsCrudRouter } from "./user/pricelists-crud";
 import { getRouter as getProfessionPricelistsCrudRouter } from "./user/profession-pricelists-crud";
+import { getRouter as getProfileRouter } from "./user/profile";
 
 export const getRouter = (dbConn: Connection, messenger: Messenger) => {
     const router = Router();
@@ -19,6 +20,7 @@ export const getRouter = (dbConn: Connection, messenger: Messenger) => {
     router.use("/user/preferences", getPreferencesRouter(dbConn));
     router.use("/user/pricelists", getPricelistsCrudRouter(dbConn, messenger));
     router.use("/user/profession-pricelists", getProfessionPricelistsCrudRouter(dbConn));
+    router.use("/user/profile", getProfileRouter(dbConn));
     router.use("/user", getBaseRouter());
 
     router.post(
