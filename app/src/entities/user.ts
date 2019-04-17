@@ -28,13 +28,13 @@ export class User {
     @Column({ name: "hashed_password", nullable: false })
     public hashedPassword: string;
 
-    @Column("int", { default: UserLevel.Regular, nullable: false })
+    @Column("int", { default: UserLevel.Unverified, nullable: false })
     public level: UserLevel;
 
     constructor() {
         this.email = "";
         this.hashedPassword = "";
-        this.level = UserLevel.Regular;
+        this.level = UserLevel.Unverified;
     }
 
     public async generateJwtToken(messenger: Messenger): Promise<string> {

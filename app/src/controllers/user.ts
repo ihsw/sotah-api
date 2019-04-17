@@ -46,7 +46,7 @@ export class UserController {
         const user = new User();
         user.email = result.email;
         user.hashedPassword = await bcrypt.hash(result.password, 10);
-        user.level = UserLevel.Regular;
+        user.level = UserLevel.Unverified;
         await this.dbConn.manager.save(user);
 
         return {

@@ -30,7 +30,8 @@ export interface IProfessionPricelistJson {
 
 export enum UserLevel {
     Admin = 60,
-    Regular = 5,
+    Regular = 10,
+    Unverified = 5,
 }
 
 export interface IUserJson {
