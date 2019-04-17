@@ -1,9 +1,11 @@
 import * as yup from "yup";
 
 import { PostRepository } from "../entities/post-repository";
+import { UserRepository } from "../entities/user-repository";
 import { IGetAuctionsRequest } from "../types/contracts/data";
 import { ICreatePostRequest } from "../types/contracts/user/post-crud";
 import { ICreatePreferencesRequest } from "../types/contracts/user/preferences";
+import { IUpdateProfileRequest } from "../types/contracts/user/profile";
 
 export const PreferenceRules = yup
     .object<ICreatePreferencesRequest>()
@@ -93,6 +95,18 @@ export const FullPostRequestBodyRules = (repo: PostRepository, exceptSlug?: stri
                 .test("is-unique", "Post must be unique", v => repo.hasNoSlug(v, exceptSlug)),
             summary: yup.string().required("Summary is required"),
             title: yup.string().required("Post title is requred"),
+        })
+        .noUnknown();
+
+export const UpdateProfileRequestBodyRules = (repo: UserRepository, exceptEmail?: string) =>
+    yup
+        .object<IUpdateProfileRequest>()
+        .shape({
+            email: yup
+                .string()
+                .email("Email must be a valid email")
+                .required("Email is required")
+                .test("is-unique", "Email must not already be taken", v => repo.hasNoEmail(v, exceptEmail)),
         })
         .noUnknown();
 
