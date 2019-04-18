@@ -10,7 +10,7 @@ export const getRouter = (dbConn: Connection) => {
     const router = Router();
     const controller = new ProfileController(dbConn);
 
-    router.post(
+    router.put(
         "/",
         auth,
         wrap(async (req: Request, res: Response) => {
