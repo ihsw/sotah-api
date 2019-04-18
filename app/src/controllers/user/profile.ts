@@ -37,7 +37,7 @@ export class ProfileController {
 
         return {
             data: { email: user.email },
-            status: HTTPStatus.CREATED,
+            status: HTTPStatus.OK,
         };
     }
 }
