@@ -21,16 +21,17 @@ export class ProfileController {
         req: IRequest<IUpdateProfileRequest>,
         _res: Response,
     ): Promise<IRequestResult<IUpdateProfileResponse | IValidationErrorResponse>> {
+        const user = req.user!;
+
         const result = await ManualValidator<IUpdateProfileRequest>(
             req,
-            UpdateProfileRequestBodyRules(this.dbConn.getCustomRepository(UserRepository)),
+            UpdateProfileRequestBodyRules(this.dbConn.getCustomRepository(UserRepository), user.email),
         );
         if (typeof result.errorResult !== "undefined") {
             return result.errorResult;
         }
         const { body } = result.req!;
 
-        const user = req.user!;
         user.email = body.email;
 
         await this.dbConn.manager.save(user);
