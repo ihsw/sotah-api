@@ -1,3 +1,4 @@
+/* tslint:disable:no-console */
 import * as cluster from "cluster";
 import * as http from "http";
 import * as os from "os";
