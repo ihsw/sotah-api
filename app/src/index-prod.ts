@@ -1,6 +1,4 @@
-import * as cluster from "cluster";
 import * as http from "http";
-import * as os from "os";
 import * as process from "process";
 
 import { Firestore } from "@google-cloud/firestore";
@@ -50,27 +48,15 @@ const getConfig = async (documentFieldName: string, envVarName: string): Promise
 // logger init
 const logger = getLogger({ level: "debug", isGceEnv });
 
-if (cluster.isMaster) {
-    const numCpus = os.cpus().length;
+(async () => {
+    // gathering runtime configs
+    const appPort = process.env["PORT"];
+    const natsHost: string = await getConfig("nats_host", "NATS_HOST");
+    const natsPort: string = await getConfig("nats_port", "NATS_PORT");
+    const dbHost: string = await getConfig("db_host", "DB_HOST");
+    const dbPassword: string = await getConfig("db_password", "DB_PASSWORD");
 
-    for (let i = 0; i < numCpus; i++) {
-        cluster.fork();
-    }
-
-    cluster.on("exit", (worker, code, signal) => {
-        logger.info("Worker exited", { code, pid: worker.process.pid, signal });
-    });
-} else {
-    (async () => {
-        // gathering runtime configs
-        const appPort = process.env["PORT"];
-        const natsHost: string = await getConfig("nats_host", "NATS_HOST");
-        const natsPort: string = await getConfig("nats_port", "NATS_PORT");
-        const dbHost: string = await getConfig("db_host", "DB_HOST");
-        const dbPassword: string = await getConfig("db_password", "DB_PASSWORD");
-
-        const app = await getApp({ logger, natsHost, natsPort, dbHost, dbPassword, isGceEnv });
-        const server = http.createServer(app);
-        server.listen(appPort, () => logger.info("Listening", { port: appPort }));
-    })();
-}
+    const app = await getApp({ logger, natsHost, natsPort, dbHost, dbPassword, isGceEnv });
+    const server = http.createServer(app);
+    server.listen(appPort, () => logger.info("Listening", { port: appPort }));
+})();
