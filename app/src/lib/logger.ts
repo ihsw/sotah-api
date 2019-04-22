@@ -16,14 +16,15 @@ export const getLogger = (opts?: ILoggerOptions): Logger => {
 
         return { ...defaultLoggerOptions, ...opts };
     })();
+    const { level, isGceEnv } = settings;
 
-    const loggerTransports = [
-        new transports.Console({ level: settings.level }),
-        new transports.File({ filename: "app.log", level: settings.level }),
-    ];
-    if (settings.isGceEnv) {
-        loggerTransports.push(new LoggingWinston({ level: settings.level }));
-    }
+    const loggerTransports = (() => {
+        if (!isGceEnv) {
+            return [new transports.Console({ level }), new transports.File({ filename: "app.log", level })];
+        }
+
+        return [new transports.Console({ level }), new LoggingWinston({ level })];
+    })();
 
     return createLogger({
         format: format.json(),
