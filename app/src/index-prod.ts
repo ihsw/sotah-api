@@ -1,4 +1,3 @@
-import * as http from "http";
 import * as process from "process";
 
 import { Firestore } from "@google-cloud/firestore";
@@ -50,13 +49,14 @@ const logger = getLogger({ level: "debug", isGceEnv });
 
 (async () => {
     // gathering runtime configs
-    const appPort = process.env["PORT"];
+    const appPort = process.env["PORT"] || 8080;
     const natsHost: string = await getConfig("nats_host", "NATS_HOST");
     const natsPort: string = await getConfig("nats_port", "NATS_PORT");
     const dbHost: string = await getConfig("db_host", "DB_HOST");
     const dbPassword: string = await getConfig("db_password", "DB_PASSWORD");
 
     const app = await getApp({ logger, natsHost, natsPort, dbHost, dbPassword, isGceEnv });
-    const server = http.createServer(app);
-    server.listen(appPort, () => logger.info("Listening", { port: appPort }));
+    logger.info("Calling listen", { appPort });
+    app.listen(appPort, () => logger.info("Listening", { port: appPort }));
+    logger.info("Called listen", { appPort });
 })();
