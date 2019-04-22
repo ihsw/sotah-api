@@ -17,7 +17,7 @@ const isGceEnv = (() => {
 })();
 
 // optionally loading firestore
-const firestoreDb: Firestore | null = isGceEnv ? null : new Firestore();
+const firestoreDb: Firestore | null = isGceEnv ? new Firestore() : null;
 
 const getEnvVar = (envVarName: string): string => {
     const envVar = process.env[envVarName];
