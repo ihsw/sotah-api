@@ -1,25 +1,25 @@
 steps:
-# - name: 'gcr.io/cloud-builders/docker'
-#   args: ['pull', 'gcr.io/$PROJECT_ID/api-build-env:latest']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['pull', 'gcr.io/$PROJECT_ID/api-build-env:latest']
 - name: 'gcr.io/cloud-builders/docker'
   args: [
             'build',
             '-f', './build-env.Dockerfile',
             '-t', 'gcr.io/$PROJECT_ID/api-build-env',
-            # '--cache-from', 'gcr.io/$PROJECT_ID/api-build-env:latest',
+            '--cache-from', 'gcr.io/$PROJECT_ID/api-build-env:latest',
             '.'
         ]
 - name: 'gcr.io/cloud-builders/docker'
   args: ['tag', 'gcr.io/$PROJECT_ID/api-build-env', 'ihsw/sotah-api/build']
 
-# - name: 'gcr.io/cloud-builders/docker'
-#   args: ['pull', 'gcr.io/$PROJECT_ID/api:latest']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['pull', 'gcr.io/$PROJECT_ID/api:latest']
 - name: 'gcr.io/cloud-builders/docker'
   args: [
             'build',
             '-f', './runtime-env.Dockerfile',
             '-t', 'gcr.io/$PROJECT_ID/api',
-            # '--cache-from', 'gcr.io/$PROJECT_ID/api:latest',
+            '--cache-from', 'gcr.io/$PROJECT_ID/api:latest',
             '.'
         ]
 
