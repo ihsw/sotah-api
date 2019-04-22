@@ -25,6 +25,12 @@ const logger = getLogger({ level: "debug", isGceEnv });
 const appPort = process.env["PORT"];
 (async () => {
     const app = await getApp({ logger, natsHost, natsPort, dbHost, dbPassword, isGceEnv });
+    if (app === null) {
+        logger.info("Failed to initialize app");
+        process.exit(-1);
+
+        return;
+    }
     const server = http.createServer(app);
     server.listen(appPort, () => logger.info(`Listening on ${appPort}`));
     process.on("SIGTERM", () => {

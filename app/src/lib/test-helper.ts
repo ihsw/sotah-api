@@ -47,7 +47,7 @@ export const setup = async (opts: IOptions): Promise<ISetupSettings> => {
         username: "postgres",
     });
 
-    return { app, messenger, dbConn, request };
+    return { app: app!, messenger, dbConn, request };
 };
 
 // user test-helper

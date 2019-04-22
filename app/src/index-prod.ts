@@ -24,9 +24,9 @@ const getEnvVar = (envVarName: string): string => {
     return envVar;
 };
 
-const getConfig = async (documentFieldName: string, envVarName: string): Promise<string> => {
+const getConnectionField = async (documentFieldName: string, defaultValue?: string): Promise<string> => {
     if (firestoreDb === null) {
-        return getEnvVar(envVarName);
+        return defaultValue || "";
     }
 
     const doc = await firestoreDb
@@ -35,13 +35,21 @@ const getConfig = async (documentFieldName: string, envVarName: string): Promise
         .get();
     const data = doc.data();
     if (typeof data === "undefined") {
-        return getEnvVar(envVarName);
+        return defaultValue || "";
     }
     if (!(documentFieldName in data)) {
-        return getEnvVar(envVarName);
+        return defaultValue || "";
     }
 
     return data[documentFieldName];
+};
+
+const getConfig = async (documentFieldName: string, envVarName: string): Promise<string> => {
+    if (firestoreDb === null) {
+        return getEnvVar(envVarName);
+    }
+
+    return getConnectionField(documentFieldName, getEnvVar(envVarName));
 };
 
 // logger init
@@ -56,6 +64,13 @@ const logger = getLogger({ level: "debug", isGceEnv });
     const dbPassword: string = await getConfig("db_password", "DB_PASSWORD");
 
     const app = await getApp({ logger, natsHost, natsPort, dbHost, dbPassword, isGceEnv });
+    if (app === null) {
+        logger.info("Failed to initialize app");
+        process.exit(-1);
+
+        return;
+    }
+
     logger.info("Calling listen", { appPort });
     app.listen(appPort, () => logger.info("Listening", { port: appPort }));
     logger.info("Called listen", { appPort });

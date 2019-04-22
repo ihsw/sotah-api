@@ -25,7 +25,7 @@ export interface IOptions {
     isGceEnv: boolean;
 }
 
-export const getApp = async (opts: IOptions): Promise<express.Express> => {
+export const getApp = async (opts: IOptions): Promise<express.Express | null> => {
     const { logger, natsHost, natsPort, dbHost, dbPassword } = opts;
 
     logger.info("Starting app");
@@ -43,26 +43,65 @@ export const getApp = async (opts: IOptions): Promise<express.Express> => {
     });
 
     // messenger init
-    const messenger = new Messenger(nats.connect({ url: `nats://${natsHost}:${natsPort}` }));
+    logger.info("Connecting to nats", { natsHost, natsPort });
+    const natsConnection = await (async () => {
+        const conn = nats.connect({
+            maxReconnectAttempts: 5,
+            reconnectTimeWait: 100,
+            url: `nats://${natsHost}:${natsPort}`,
+        });
+        return new Promise<nats.Client | null>(resolve => {
+            conn.on("connect", () => resolve(conn));
+            conn.on("error", err => {
+                logger.error("Failed to connect to nats", { err });
+
+                resolve(null);
+            });
+            setTimeout(() => {
+                logger.error("Timed out when connecting to nats");
+
+                resolve(null);
+            }, 10 * 1000);
+        });
+    })();
+    if (natsConnection === null) {
+        return null;
+    }
+    const messenger = new Messenger(natsConnection);
+    await messenger.getBoot();
 
     // db init
-    const dbConn = await createConnection({
-        database: "postgres",
-        entities: [Preference, Pricelist, PricelistEntry, ProfessionPricelist, User, Post],
-        host: dbHost,
-        logging: false,
-        name: `app-${uuidv4()}`,
-        password: typeof dbPassword !== "undefined" ? dbPassword : "",
-        port: 5432,
-        synchronize: false,
-        type: "postgres",
-        username: "postgres",
-    });
+    logger.info("Connecting to db", { dbHost, dbPassword });
+    const dbConn = await (async () => {
+        try {
+            return await createConnection({
+                database: "postgres",
+                entities: [Preference, Pricelist, PricelistEntry, ProfessionPricelist, User, Post],
+                host: dbHost,
+                logging: false,
+                name: `app-${uuidv4()}`,
+                password: typeof dbPassword !== "undefined" ? dbPassword : "",
+                port: 5432,
+                synchronize: false,
+                type: "postgres",
+                username: "postgres",
+            });
+        } catch (err) {
+            logger.error("Failed to connect to db", { err });
+
+            return null;
+        }
+    })();
+    if (dbConn === null) {
+        return null;
+    }
 
     // session init
+    logger.info("Appending session middleware");
     app = await appendSessions(app, messenger, dbConn);
 
     // request logging
+    logger.info("Appending cors middleware");
     app.use((req, res, next) => {
         logger.info("Received HTTP request", { url: req.originalUrl, method: req.method });
 
@@ -72,10 +111,8 @@ export const getApp = async (opts: IOptions): Promise<express.Express> => {
         next();
     });
 
-    // static assets
-    app.use("/item-icons", express.static("/tmp/item-icons"));
-
     // route init
+    logger.info("Appending route middlewares");
     app.use("/", defaultRouter);
     app.use("/", getDataRouter(dbConn, messenger));
     app.use("/", getUserRouter(dbConn, messenger));
@@ -86,6 +123,7 @@ export const getApp = async (opts: IOptions): Promise<express.Express> => {
 
     //     app.use(errors.express);
     // }
+    logger.info("Appending error middleware");
     app.use((err: Error, _: express.Request, res: express.Response, next: () => void) => {
         logger.error("Dumping out error response", { error: err });
 
