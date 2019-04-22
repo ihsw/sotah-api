@@ -6,3 +6,8 @@ vpc_access_connector:
   name: 'projects/sotah-prod/locations/us-central1/connectors/sotah-connector'
 env_variables:
   IS_GCE_ENV: '1'
+
+handlers:
+- url: /.*
+  secure: always
+  script: auto
