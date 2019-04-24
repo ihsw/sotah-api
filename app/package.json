@@ -1,7 +1,7 @@
 {
   "name": "api",
   "version": "v1.0.0",
-  "description": "",
+  "description": "SotAH API SDK",
   "main": "./dist/index.js",
   "typings": "./dist/index.d.ts",
   "scripts": {
