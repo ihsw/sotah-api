@@ -1,17 +1,20 @@
 {
-  "name": "sotah-api",
-  "version": "1.0.0",
+  "name": "api",
+  "version": "v1.0.0",
   "description": "",
   "main": "./dist/index.js",
+  "typings": "./dist/index.d.ts",
   "scripts": {
+    "clean": "del ./dist",
     "test": "ava -vs './dist/test/**/*.js'",
     "test:w": "ava -vsw './dist/test/**/*.js'",
     "test-coverage": "nyc --reporter=lcov npm test",
     "test-coverage-report": "nyc report",
     "test-coverage-check": "nyc check-coverage --lines 95 --functions 75 --branches 95",
     "coveralls-coverage": "nyc report --reporter=text-lcov | coveralls",
-    "build": "tsc && echo built",
+    "build": "npm run clean && tsc && echo built",
     "build:w": "tsc -w && echo built",
+    "prepublish": "npm run build",
     "ava": "ava --verbose",
     "lint": "tslint './src/**/*.ts' && echo linted",
     "migrate-up": "typeorm migration:run",
@@ -26,7 +29,7 @@
     "type": "git",
     "url": "git+https://github.com/ihsw/sotah-api.git"
   },
-  "author": "",
+  "author": "Adrian Parker <adrian@sotah.info>",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/ihsw/sotah-api/issues"
@@ -51,6 +54,7 @@
     "@types/yup": "^0.26.0",
     "ava": "^0.21.0",
     "coveralls": "^2.13.1",
+    "del-cli": "^1.1.0",
     "nyc": "^11.1.0",
     "supertest": "^3.0.0",
     "tslint": "^5.6.0",
