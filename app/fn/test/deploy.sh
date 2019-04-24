@@ -4,7 +4,7 @@
 
 # deploying func
 gcloud beta functions deploy test \
-    --runtime nodejs8 \
+    --runtime nodejs10 \
     --trigger-topic test \
     --source ./dist \
     --memory 128MB \
