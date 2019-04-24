@@ -6,6 +6,6 @@
 gcloud beta functions deploy test \
     --runtime nodejs8 \
     --trigger-topic test \
-    --source $PWD/dist/fn/test \
+    --source ./dist \
     --memory 128MB \
     --region us-central1
