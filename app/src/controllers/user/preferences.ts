@@ -22,7 +22,7 @@ export class PreferencesController {
         this.dbConn = dbConn;
     }
 
-    @Authenticator<null, IGetPreferencesResponse | IValidationErrorResponse>(UserLevel.Regular)
+    @Authenticator<null, IGetPreferencesResponse | IValidationErrorResponse>(UserLevel.Unverified)
     public async getPreferences(
         req: IRequest<null>,
         _res: Response,
@@ -43,7 +43,9 @@ export class PreferencesController {
         };
     }
 
-    @Authenticator<ICreatePreferencesRequest, ICreatePreferencesResponse | IValidationErrorResponse>(UserLevel.Regular)
+    @Authenticator<ICreatePreferencesRequest, ICreatePreferencesResponse | IValidationErrorResponse>(
+        UserLevel.Unverified,
+    )
     @Validator<ICreatePreferencesRequest, ICreatePreferencesResponse>(PreferenceRules)
     public async createPreferences(
         req: IRequest<ICreatePreferencesRequest>,
@@ -75,7 +77,9 @@ export class PreferencesController {
         };
     }
 
-    @Authenticator<IUpdatePreferencesRequest, IUpdatePreferencesResponse | IValidationErrorResponse>(UserLevel.Regular)
+    @Authenticator<IUpdatePreferencesRequest, IUpdatePreferencesResponse | IValidationErrorResponse>(
+        UserLevel.Unverified,
+    )
     @Validator<IUpdatePreferencesRequest, IUpdatePreferencesResponse>(PreferenceRules)
     public async updatePreferences(
         req: IRequest<IUpdatePreferencesRequest>,
