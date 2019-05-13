@@ -6,7 +6,7 @@ import { IItem, IItemsMap, ItemId } from "../item";
 import { IItemClass } from "../item-class";
 import { IItemPriceLimits, IItemPricelistHistoryMap, IPriceLimits, IPriceListMap } from "../pricelist";
 import { IProfession } from "../profession";
-import { IRealm, IRegion } from "../region";
+import { IRealm, IRealmModificationDates, IRegion } from "../region";
 
 export interface IGetBootResponse {
     regions: IRegion[];
@@ -19,6 +19,7 @@ export interface IGetBootResponse {
 
 export interface IStatusRealm extends IRealm {
     regionName: string;
+    realm_modification_dates: IRealmModificationDates;
 }
 
 export interface IGetRealmsResponse {
