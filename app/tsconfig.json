@@ -12,12 +12,14 @@
         "experimentalDecorators": true,
         "strict": true,
         "noImplicitReturns": true,
-        "noImplicitAny": false
+        "noImplicitAny": false,
+        "declaration": true
     },
     "filesGlob": [
         "./src/**/*.ts"
     ],
     "exclude": [
-        "node_modules/**"
+        "node_modules/**",
+        "fn/**"
     ]
 }

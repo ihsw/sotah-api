@@ -36,5 +36,4 @@ export interface IRealm {
     locale: string;
     timezone: string;
     connected_realms: RealmSlug[];
-    realm_modification_dates: IRealmModificationDates;
 }

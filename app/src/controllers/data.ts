@@ -31,6 +31,7 @@ import {
     IQueryItemsResponse,
     IQueryOwnerItemsRequest,
     IQueryOwnerItemsResponse,
+    IStatusRealm,
 } from "../types/contracts/data";
 import { ItemId } from "../types/item";
 import {
@@ -96,8 +97,16 @@ export class DataController {
         }
 
         const realms = msg
-            .data!.realms.map(realm => {
-                return { ...realm, regionName: req.params["regionName"] };
+            .data!.realms.map<IStatusRealm>(realm => {
+                return {
+                    ...realm,
+                    realm_modification_dates: {
+                        downloaded: 0,
+                        live_auctions_received: 0,
+                        pricelist_histories_received: 0,
+                    },
+                    regionName: req.params["regionName"],
+                };
             })
             .sort((a, b) => {
                 if (a.name < b.name) {
