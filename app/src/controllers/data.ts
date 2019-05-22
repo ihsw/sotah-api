@@ -130,7 +130,7 @@ export class DataController {
         IGetAuctionsResponse | IErrorResponse | IValidationErrorResponse | null
     > = async req => {
         // gathering last-modified
-        const realmModificationDatesMessage = await this.messenger.getRealmModificationDates({
+        const realmModificationDatesMessage = await this.messenger.queryRealmModificationDates({
             realm_slug: req.params["realmSlug"],
             region_name: req.params["regionName"],
         });

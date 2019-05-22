@@ -56,7 +56,7 @@ export enum subjects {
     boot = "boot",
     sessionSecret = "sessionSecret",
     ownersQueryByItems = "ownersQueryByItems",
-    realmModificationDates = "realmModificationDates",
+    queryRealmModificationDates = "queryRealmModificationDates",
 }
 
 export enum code {
@@ -180,10 +180,10 @@ export class Messenger {
         return this.request(subjects.sessionSecret);
     }
 
-    public getRealmModificationDates(
+    public queryRealmModificationDates(
         req: IRealmModificationDatesRequest,
     ): Promise<Message<IRealmModificationDatesResponse>> {
-        return this.request(subjects.realmModificationDates, { body: JSON.stringify(req) });
+        return this.request(subjects.queryRealmModificationDates, { body: JSON.stringify(req) });
     }
 
     public queryOwnerItems(request: IQueryOwnerItemsRequest): Promise<Message<IQueryOwnerItemsResponse>> {
