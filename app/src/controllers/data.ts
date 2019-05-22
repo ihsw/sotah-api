@@ -162,7 +162,7 @@ export class DataController {
             switch (realmModificationDatesMessage.code) {
                 case code.notFound:
                     return {
-                        data: { error: realmModificationDatesMessage.error!.message },
+                        data: { error: `${realmModificationDatesMessage.error!.message} (realm-modification-dates)` },
                         status: HTTPStatus.NOT_FOUND,
                     };
                 case code.userError:
@@ -229,7 +229,7 @@ export class DataController {
             switch (msg.code) {
                 case code.notFound:
                     return {
-                        data: { error: msg.error!.message },
+                        data: { error: `${msg.error!.message} (auctions)` },
                         status: HTTPStatus.NOT_FOUND,
                     };
                 case code.userError:
