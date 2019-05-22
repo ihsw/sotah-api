@@ -1,5 +1,6 @@
 import * as nats from "nats";
 import * as zlib from "zlib";
+import {IRealmModificationDatesResponse} from "../../../dist/lib/messenger/contracts";
 
 import { ItemId } from "../../types/item";
 import { IStatus, RegionName } from "../../types/region";
@@ -157,6 +158,10 @@ export class Messenger {
 
     public getBoot(): Promise<Message<IGetBootResponse>> {
         return this.request(subjects.boot);
+    }
+
+    public getRealmModificationDates(): Promise<Message<IRealmModificationDatesResponse>> {
+        return this.request(subjects.realmModificationDates);
     }
 
     public async getPricelistHistories(

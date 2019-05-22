@@ -122,3 +122,9 @@ export interface IQueryRealmModificationDatesRequest {
 }
 
 export type IQueryRealmModificationDatesResponse = IRealmModificationDates;
+
+export interface IRealmModificationDatesRequest {
+    [regionName: string]: {
+        [realmSlug: string]: IRealmModificationDates;
+    };
+}
