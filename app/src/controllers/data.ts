@@ -42,6 +42,7 @@ import {
     IPricelistHistoryMap,
     IPrices,
 } from "../types/pricelist";
+import { IRealmModificationDates } from "../types/region";
 import { QueryRequestHandler, RequestHandler } from "./index";
 
 export class DataController {
@@ -91,20 +92,43 @@ export class DataController {
     };
 
     public getRealms: RequestHandler<null, IGetRealmsResponse | null> = async req => {
-        const msg = await this.messenger.getStatus(req.params["regionName"]);
-        if (msg.code === code.notFound) {
+        const [statusMessage, modDatesMessage] = await Promise.all([
+            this.messenger.getStatus(req.params["regionName"]),
+            this.messenger.getRealmModificationDates(),
+        ]);
+        if (statusMessage.code === code.notFound) {
             return { status: HTTPStatus.NOT_FOUND, data: null };
         }
 
-        const realms = msg
+        if (modDatesMessage.code !== code.ok) {
+            return { status: HTTPStatus.INTERNAL_SERVER_ERROR, data: null };
+        }
+
+        const realms = statusMessage
             .data!.realms.map<IStatusRealm>(realm => {
+                const realmModificationDates = ((): IRealmModificationDates => {
+                    if (!(req.params["regionName"] in modDatesMessage.data!)) {
+                        return {
+                            downloaded: 0,
+                            live_auctions_received: 0,
+                            pricelist_histories_received: 0,
+                        };
+                    }
+
+                    if (!(realm.slug in modDatesMessage.data![req.params["regionName"]])) {
+                        return {
+                            downloaded: 0,
+                            live_auctions_received: 0,
+                            pricelist_histories_received: 0,
+                        };
+                    }
+
+                    return modDatesMessage.data![req.params["regionName"]][realm.slug];
+                })();
+
                 return {
                     ...realm,
-                    realm_modification_dates: {
-                        downloaded: 0,
-                        live_auctions_received: 0,
-                        pricelist_histories_received: 0,
-                    },
+                    realm_modification_dates: realmModificationDates,
                     regionName: req.params["regionName"],
                 };
             })
