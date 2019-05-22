@@ -20,8 +20,8 @@ import {
     IQueryOwnerItemsResponse,
     IQueryOwnersRequest,
     IQueryOwnersResponse,
-    IRealmModificationDatesRequest,
-    IRealmModificationDatesResponse,
+    IQueryRealmModificationDatesRequest,
+    IQueryRealmModificationDatesResponse,
 } from "./contracts";
 import { Message } from "./message";
 import { MessageError } from "./message-error";
@@ -57,6 +57,7 @@ export enum subjects {
     sessionSecret = "sessionSecret",
     ownersQueryByItems = "ownersQueryByItems",
     queryRealmModificationDates = "queryRealmModificationDates",
+    realmModificationDates = "realmModificationDates",
 }
 
 export enum code {
@@ -181,8 +182,8 @@ export class Messenger {
     }
 
     public queryRealmModificationDates(
-        req: IRealmModificationDatesRequest,
-    ): Promise<Message<IRealmModificationDatesResponse>> {
+        req: IQueryRealmModificationDatesRequest,
+    ): Promise<Message<IQueryRealmModificationDatesResponse>> {
         return this.request(subjects.queryRealmModificationDates, { body: JSON.stringify(req) });
     }
 

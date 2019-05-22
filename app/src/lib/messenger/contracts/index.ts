@@ -116,9 +116,9 @@ export interface IQueryOwnerItemsResponse {
     };
 }
 
-export interface IRealmModificationDatesRequest {
+export interface IQueryRealmModificationDatesRequest {
     region_name: RegionName;
     realm_slug: RealmSlug;
 }
 
-export type IRealmModificationDatesResponse = IRealmModificationDates;
+export type IQueryRealmModificationDatesResponse = IRealmModificationDates;
